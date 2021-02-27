@@ -3,13 +3,13 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>uk.dansiviter.logging</groupId>
 	<artifactId>logging</artifactId>
-	<version>0.1.0-SNAPSHOT</version>
+	<version>0.1.0</version>
 	<packaging>pom</packaging>
 
 	<url>https://github.com/dansiviter/logging</url>
 	<scm>
 		<developerConnection>scm:git:git@github.com:dansiviter/logging.git</developerConnection>
-		<tag>HEAD</tag>
+		<tag>logging-0.1.0</tag>
   </scm>
 
 	<licenses>
