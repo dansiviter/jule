@@ -1,3 +1,5 @@
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/dansiviter/logging/Java%20CI?style=flat-square)
+
 # Logger Wrap #
 
 Log4J? SLF4J? Commons Logger? Flogger? How about another?!
