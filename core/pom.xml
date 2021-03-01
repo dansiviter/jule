@@ -7,4 +7,11 @@
 		<version>0.1.1-SNAPSHOT</version>
 	</parent>
 	<artifactId>core</artifactId>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.awaitility</groupId>
+			<artifactId>awaitility</artifactId>
+		</dependency>
+	</dependencies>
 </project>
