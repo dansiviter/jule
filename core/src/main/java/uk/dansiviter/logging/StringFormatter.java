@@ -22,28 +22,28 @@ import java.util.logging.SimpleFormatter;
  * Formatter that uses {@link String#format(String, Object...)}.
  */
 public class StringFormatter extends SimpleFormatter {
-    @Override
-    public String formatMessage(LogRecord record) {
-        String format = record.getMessage();
-        java.util.ResourceBundle catalog = record.getResourceBundle();
-        if (catalog != null) {
-            try {
-                format = catalog.getString(format);
-            } catch (java.util.MissingResourceException ex) {
-                // Drop through.  Use record message as format
-            }
-        }
-        // Do the formatting.
-        try {
-            Object parameters[] = record.getParameters();
-            if (parameters == null || parameters.length == 0) {
-                // No parameters.  Just return format string.
-                return format;
-            }
-            return String.format(format, parameters);
-        } catch (Exception ex) {
-            // Formatting failed: use localized format string.
-            return format;
-        }
-    }
+	@Override
+	public String formatMessage(LogRecord record) {
+		String format = record.getMessage();
+		java.util.ResourceBundle catalog = record.getResourceBundle();
+		if (catalog != null) {
+			try {
+				format = catalog.getString(format);
+			} catch (java.util.MissingResourceException ex) {
+				// Drop through.  Use record message as format
+			}
+		}
+		// Do the formatting.
+		try {
+			Object parameters[] = record.getParameters();
+			if (parameters == null || parameters.length == 0) {
+				// No parameters.  Just return format string.
+				return format;
+			}
+			return String.format(format, parameters);
+		} catch (Exception ex) {
+			// Formatting failed: use localized format string.
+			return format;
+		}
+	}
 }

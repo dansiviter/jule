@@ -89,8 +89,8 @@ JUL handlers are all synchronous which puts IO directly within the path of execu
 
 > :warning: If the buffer saturates, then the much of the performance benefits of the asynchronous handler can be lost. Results from JMH show that although it had higher throughput, it also has increased variance which is likely due to this saturation:
 > ```
-> Benchmark                              Mode  Cnt      Score      Error  Units
-> AsyncConsoleHandlerBenchmark.publish  thrpt   25  13013.473 ± 6862.453  ops/s
-> ConsoleHandlerBenchmark.publish       thrpt   25   9218.860 ± 3735.889  ops/s
+> Benchmark                       Mode  Cnt      Score      Error  Units
+> ConsoleHandlerBenchmark.async  thrpt   25  13013.473 ± 6862.453  ops/s
+> ConsoleHandlerBenchmark.sync   thrpt   25   9218.860 ± 3735.889  ops/s
 > ```
 

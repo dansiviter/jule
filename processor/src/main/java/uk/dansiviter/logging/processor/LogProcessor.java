@@ -57,7 +57,7 @@ import uk.dansiviter.logging.annotations.Message;
 import uk.dansiviter.logging.annotations.Message.Level;
 
 /**
- *
+ * Processes {@link Log} annotations.
  */
 @SupportedAnnotationTypes("uk.dansiviter.logging.annotations.Log")
 @SupportedSourceVersion(SourceVersion.RELEASE_11)
@@ -129,6 +129,10 @@ public class LogProcessor extends AbstractProcessor {
 
 	private void processMethod(@Nonnull TypeSpec.Builder builder, @Nonnull ExecutableElement e) {
 		Message message = e.getAnnotation(Message.class);
+
+		if (message.value() == null || message.value().isEmpty()) {
+			processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, "Message cannot be empty!", e);
+		}
 
 		MethodSpec.Builder method = MethodSpec.methodBuilder(e.getSimpleName().toString())
 				.addAnnotation(Override.class)

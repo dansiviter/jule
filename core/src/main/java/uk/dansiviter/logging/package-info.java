@@ -15,22 +15,12 @@
  */
 package uk.dansiviter.logging;
 
-import static org.openjdk.jmh.runner.options.TimeValue.milliseconds;
-
-import org.openjdk.jmh.runner.Runner;
-import org.openjdk.jmh.runner.RunnerException;
-import org.openjdk.jmh.runner.options.Options;
-import org.openjdk.jmh.runner.options.OptionsBuilder;
-
-public class JmhMain {
-	public static void main(String[] args) throws RunnerException {
-		Options opt = new OptionsBuilder()
-				.include(JmhMain.class.getPackage().getName())
-				.warmupTime(milliseconds(500))
-				.measurementTime(milliseconds(500))
-				.shouldDoGC(true)
-				.addProfiler(UsedMemoryProfiler.class)
-				.build();
-		new Runner(opt).run();
-	}
-}
+/**
+ * This library has two purposes:
+ * <ul>
+ * <li>To define a very thin wrapper on {@link java.util.logging.Logger} to reduce the boilerplate code and
+ * implement best practices,</li>
+ * <li>To provide specialist {@link java.util.logging.Handler} implementations to potentially improve performance
+ * within your application.</li>
+ * </ul>
+ */

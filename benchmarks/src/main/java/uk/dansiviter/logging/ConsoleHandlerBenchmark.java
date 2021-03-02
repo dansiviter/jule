@@ -31,7 +31,7 @@ import org.openjdk.jmh.annotations.State;
 
 public class ConsoleHandlerBenchmark {
 	@State(Scope.Benchmark)
-	public static class MyState {
+	public static class SyncState {
 		private Logger log = Logger.getLogger("TEST");
 		private ConsoleHandler handler = new ConsoleHandler();
 
@@ -45,8 +45,28 @@ public class ConsoleHandlerBenchmark {
 		}
 	}
 
+	@State(Scope.Benchmark)
+	public static class AsyncState {
+		private Logger log = Logger.getLogger("TEST");
+		private AsyncConsoleHandler handler = new AsyncConsoleHandler();
+
+		@Setup(Level.Trial)
+		public void doSetup() {
+			var root = Logger.getLogger("");
+			for (Handler h : root.getHandlers()) {
+				root.removeHandler(h);
+			}
+			log.addHandler(handler);
+		}
+	}
+
 	@Benchmark
-	public void publish(MyState state) {
+	public void async(SyncState state) {
+		state.log.info("Hello world");
+	}
+
+	@Benchmark
+	public void sync(AsyncState state) {
 		state.log.info("Hello world");
 	}
 }
