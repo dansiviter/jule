@@ -23,7 +23,18 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 /**
+ * Designates the class as a logger wrapper.
+ * </p>
+ * Usage:
+ * <pre>
+ * &#064;Log
+ * public interface MyLogger {
+ *   &#064;Message("Hello")
+ *   void hello();
+ * }
+ * </pre>
  *
+ * @see Message
  */
 @Target({ TYPE, FIELD })
 @Retention(RUNTIME)
