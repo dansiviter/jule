@@ -75,6 +75,6 @@ public enum LogProducer { ;
 	}
 
 	public static String key(@Nonnull Class<?> log, @Nonnull String name) {
-		return format("%s-%s", log.getName(), name);
+		return format("%s-%s", log.getName(), name).intern();
 	}
 }
