@@ -15,15 +15,16 @@
  */
 package uk.dansiviter.logging;
 
-import java.util.logging.ConsoleHandler;
 import java.util.logging.Handler;
 import java.util.logging.Logger;
 
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Level;
+import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
+import org.openjdk.jmh.annotations.TearDown;
 
 /**
  *
@@ -31,42 +32,32 @@ import org.openjdk.jmh.annotations.State;
 
 public class ConsoleHandlerBenchmark {
 	@State(Scope.Benchmark)
-	public static class SyncState {
-		private Logger log = Logger.getLogger("TEST");
-		private ConsoleHandler handler = new ConsoleHandler();
+	public static class BenchmarkState {
+		@Param({ "java.util.logging.ConsoleHandler", "uk.dansiviter.logging.AsyncConsoleHandler" })
+		public String handlerName;
+
+		private Logger log;
+		private Handler handler;
 
 		@Setup(Level.Trial)
-		public void doSetup() {
+		public void doSetup() throws ReflectiveOperationException {
 			var root = Logger.getLogger("");
 			for (Handler h : root.getHandlers()) {
 				root.removeHandler(h);
 			}
+			handler = (Handler) Class.forName(handlerName).getConstructor().newInstance();
+			log = Logger.getLogger("TEST");
 			log.addHandler(handler);
 		}
-	}
 
-	@State(Scope.Benchmark)
-	public static class AsyncState {
-		private Logger log = Logger.getLogger("TEST");
-		private AsyncConsoleHandler handler = new AsyncConsoleHandler();
-
-		@Setup(Level.Trial)
-		public void doSetup() {
-			var root = Logger.getLogger("");
-			for (Handler h : root.getHandlers()) {
-				root.removeHandler(h);
-			}
-			log.addHandler(handler);
+		@TearDown(Level.Trial)
+		public void doTeardown() {
+			log.removeHandler(handler);
 		}
 	}
 
 	@Benchmark
-	public void async(SyncState state) {
-		state.log.info("Hello world");
-	}
-
-	@Benchmark
-	public void sync(AsyncState state) {
+	public void handler(BenchmarkState state) {
 		state.log.info("Hello world");
 	}
 }
