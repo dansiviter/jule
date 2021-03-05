@@ -38,7 +38,7 @@ public class RoughBenchmark {
 
 		var log = Logger.getLogger("TEST");
 
-		int[] iterations = { 50, 100, 200, 400, 800, 1600 };
+		int[] iterations = { 50, 100, 200, 400, 800, 1_600, 3_200, 6_400, 12_800 };
 
 		for (int i : iterations) {  // warm up
 			test(log, syncHandler, "SYNC-", i);
