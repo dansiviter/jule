@@ -83,10 +83,7 @@ public abstract class AsyncHandler extends Handler {
 		}
 
 		var maxBuffer = property(manager, "maxBuffer").map(Integer::parseInt).orElseGet(Flow::defaultBufferSize);
-
-		this.publisher = new SubmissionPublisher<>(
-			commonPool(),
-			maxBuffer);
+		this.publisher = new SubmissionPublisher<>(commonPool(), maxBuffer);
 		this.publisher.subscribe(this.subscriber);
 	}
 
