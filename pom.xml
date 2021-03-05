@@ -48,7 +48,6 @@
 		<module>core</module>
 		<module>processor</module>
 		<module>cdi</module>
-		<module>benchmarks</module>
 	</modules>
 
 	<dependencyManagement>
@@ -141,4 +140,16 @@
 			</plugins>
 		</pluginManagement>
 	</build>
+
+	<profiles>
+		<profile>
+			<id>benchmarks</id>
+			<modules>
+				<module>core</module>
+				<module>processor</module>
+				<module>cdi</module>
+				<module>benchmarks</module>
+			</modules>		
+		</profile>
+	</profiles>
 </project>
