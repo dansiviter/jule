@@ -17,6 +17,7 @@ package uk.dansiviter.logging;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.logging.ErrorManager;
 import java.util.logging.LogRecord;
 import java.util.logging.StreamHandler;
@@ -29,7 +30,11 @@ import javax.annotation.Nonnull;
 public abstract class AsyncStreamHandler extends AsyncHandler {
 	protected final StreamHandler delegate;
 
-	public AsyncStreamHandler(@Nonnull StreamHandler delegate) {
+	public AsyncStreamHandler(
+			Optional<Emitter<LogRecord>> emitter,
+			@Nonnull StreamHandler delegate)
+	{
+		super(emitter);
 		this.delegate = Objects.requireNonNull(delegate);
 		this.delegate.setLevel(getLevel());
 		this.delegate.setFilter(getFilter());

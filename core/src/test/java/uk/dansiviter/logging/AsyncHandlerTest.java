@@ -21,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
@@ -80,6 +81,10 @@ public class AsyncHandlerTest {
 
     private static class TestHandler extends AsyncHandler {
         private final List<LogRecord> records = new ArrayList<>();
+
+        public TestHandler() {
+            super(Optional.empty());
+        }
 
         @Override
         protected void doPublish(LogRecord record) {

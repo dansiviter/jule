@@ -34,7 +34,7 @@ public class RoughBenchmark {
 		}
 
 		var syncHandler = new ConsoleHandler();
-		var asyncHandler = new AsyncConsoleHandler();
+		var asyncHandler = new DisruptorAsyncConsoleHandler();
 
 		var log = Logger.getLogger("TEST");
 

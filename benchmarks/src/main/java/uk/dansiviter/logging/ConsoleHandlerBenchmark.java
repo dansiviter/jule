@@ -33,7 +33,7 @@ import org.openjdk.jmh.annotations.TearDown;
 public class ConsoleHandlerBenchmark {
 	@State(Scope.Benchmark)
 	public static class BenchmarkState {
-		@Param({ "java.util.logging.ConsoleHandler", "uk.dansiviter.logging.AsyncConsoleHandler" })
+		@Param({ "java.util.logging.ConsoleHandler", "uk.dansiviter.logging.AsyncConsoleHandler", "uk.dansiviter.logging.DisruptorAsyncConsoleHandler" })
 		public String handlerName;
 
 		private Logger log;

@@ -17,17 +17,12 @@ package uk.dansiviter.logging;
 
 import java.util.Optional;
 import java.util.logging.ConsoleHandler;
-import java.util.logging.LogRecord;
 
 /**
  * Async implementation of {@link ConsoleHandler} which simply delegates.
  */
-public class AsyncConsoleHandler extends AsyncStreamHandler {
-	public AsyncConsoleHandler() {
-		this(Optional.empty());
-	}
-
-	public AsyncConsoleHandler(Optional<Emitter<LogRecord>> emitter) {
-		super(emitter, new ConsoleHandler());
+public class DisruptorAsyncConsoleHandler extends AsyncStreamHandler {
+	public DisruptorAsyncConsoleHandler() {
+		super(Optional.of(new DisruptorEmitter()), new ConsoleHandler());
 	}
 }
