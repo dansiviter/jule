@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uk.dansiviter.logging;
+package uk.dansiviter.juli;
 
 import java.util.logging.Handler;
 import java.util.logging.Logger;
@@ -33,7 +33,7 @@ import org.openjdk.jmh.annotations.TearDown;
 public class ConsoleHandlerBenchmark {
 	@State(Scope.Benchmark)
 	public static class BenchmarkState {
-		@Param({ "java.util.logging.ConsoleHandler", "uk.dansiviter.logging.AsyncConsoleHandler" })
+		@Param({ "java.util.logging.ConsoleHandler", "uk.dansiviter.juli.AsyncConsoleHandler" })
 		public String handlerName;
 
 		private Logger log;

@@ -1,13 +1,14 @@
 ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/dansiviter/logging/Java%20CI?style=flat-square)
 
-# Logger Wrap #
+# Java Util Logging Improver (JULI) #
 
-Log4J? SLF4J? Commons Logger? Flogger? How about another?!
-
-Although rarely the preferred framework `java.util.Logger` is embedded into Java so aids minimal applications but is not the easiest to use. This library thinly wraps it to make life a little easier:
-* Type safe logging,
-* Simpler unit testing, especially with CDI,
-* Defer array initialisation and auto-boxing until actually needed,
+Although rarely the preferred framework `java.util.logging` (JUL) is embedded into Java so aids minimal applications but is not the easiest to use. This library lightly wraps it to make life a little easier:
+* Speed up development by simplifying logging,
+* Improve type safety to reduce errors,
+* Simplify unit testing, especially with CDI,
+* Improve memory and CPU performance by:
+  * Deferring array initialisation and auto-boxing until actually needed,
+  * Async `java.util.logging.Handler` implementations,
 * Automatic unwrapping of `java.util.function.Supplier` and `java.util.Optional` parameters.
 
 > :information_source: [JBoss Logging Tools](https://github.com/jboss-logging/jboss-logging-tools) was the inspiration but designed to be even simpler, leaner and not dependent on JBoss Log Manager.
@@ -16,14 +17,14 @@ First import dependencies:
 
 ```xml
 <dependency>
-  <groupId>uk.dansiviter.logging</groupId>
+  <groupId>uk.dansiviter.juli</groupId>
   <artifactId>core</artifactId>
-  <version>{dsLogger.version}</version>
+  <version>${juli.version}</version>
 </dependency>
 <dependency>
-  <groupId>uk.dansiviter.logging</groupId>
+  <groupId>uk.dansiviter.juli</groupId>
   <artifactId>processor</artifactId>
-  <version>{dsLogger.version}</version>
+  <version>${juli.version}</version>
   <scope>provided</scope> <!-- only needed during compilation -->
   <optional>true</optional>
 </dependency>
@@ -46,7 +47,7 @@ public interface MyLog {
 
 This will generate a class `com.foo.MyLog$log` which actually does the logging.
 
-To get an instance use `uk.dansiviter.logging.LogProducer`:
+To get an instance use `uk.dansiviter.juli.LogProducer`:
 ```java
 public class MyClass {
   private final static MyLog LOG = LogProducer.log(MyLog.class);
@@ -63,9 +64,9 @@ This can perform automatic injection of dependencies via CDI:
 
 ```xml
 <dependency>
-  <groupId>uk.dansiviter.logging</groupId>
+  <groupId>uk.dansiviter.juli</groupId>
   <artifactId>cdi</artifactId>
-  <version>{dsLogger.version}</version>
+  <version>${juli.version}</version>
 </dependency>
 ```
 
@@ -86,6 +87,8 @@ This will inject a `@Dependent` scoped instance of the logger to prevent proxyin
 
 ## Asynchronous Handlers ##
 
-JUL handlers are all synchronous which puts IO directly within the path of execution; this is a bottleneck. To address this, this library has a very simple `uk.dansiviter.logging.AsyncHandler` implementation that uses `java.util.concurrent.Flow` to asynchronously process log events. Using this can dramatically improve the performance of 'chatty' logging at the expense of a little memory and CPU. There is only one concrete implementation as the moment which is `uk.dansiviter.logging.AsyncConsoleHandler` which can be used as a direct replacement for `java.util.logging.ConsoleHandler`.
+JUL handlers are all synchronous which puts IO directly within the path of execution; this is a bottleneck. To address this, this library has a very simple `uk.dansiviter.juli.AsyncHandler` implementation that uses `java.util.concurrent.Flow` to asynchronously process log events. Using this can dramatically improve the performance of 'chatty' logging at the expense of a little memory and CPU. There is only one concrete implementation as the moment which is `uk.dansiviter.juli.AsyncConsoleHandler` which can be used as a direct replacement for `java.util.logging.ConsoleHandler`.
 
 > :warning: If the buffer saturates, then the much of the performance benefits of the asynchronous handler can be lost. However, it _should_ still outperform a synchronous implementation.
+
+> :information_source: `com.lmax:disruptor` has been trialed as an alternative to using Java 9 `Flow` but its bulk (~90KB) and no significant out-of-the-box performance improvement is has been discounted ([#6](../../issues/6)).

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uk.dansiviter.logging;
+package uk.dansiviter.juli;
 
 import java.util.logging.Logger;
 
@@ -22,9 +22,10 @@ import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
 
-import uk.dansiviter.logging.annotations.Log;
-import uk.dansiviter.logging.annotations.Message;
-import uk.dansiviter.logging.annotations.Message.Level;
+import uk.dansiviter.juli.LogProducer;
+import uk.dansiviter.juli.annotations.Log;
+import uk.dansiviter.juli.annotations.Message;
+import uk.dansiviter.juli.annotations.Message.Level;
 
 public class LogBenchmark {
 	@State(Scope.Benchmark)

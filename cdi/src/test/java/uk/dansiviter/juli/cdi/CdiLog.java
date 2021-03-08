@@ -13,15 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uk.dansiviter.logging;
+package uk.dansiviter.juli.cdi;
 
-import java.util.logging.ConsoleHandler;
+import uk.dansiviter.juli.annotations.Log;
+import uk.dansiviter.juli.annotations.Message;
 
-/**
- * Async implementation of {@link ConsoleHandler} which simply delegates.
- */
-public class AsyncConsoleHandler extends AsyncStreamHandler {
-	public AsyncConsoleHandler() {
-		super(new ConsoleHandler());
-	}
+@Log
+public interface CdiLog {
+    @Message("Hello")
+    void doLog();
 }
