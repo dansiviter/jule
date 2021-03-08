@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uk.dansiviter.logging;
+package uk.dansiviter.juli;
 
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -29,6 +29,8 @@ import java.util.logging.Logger;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+
+import uk.dansiviter.juli.AsyncHandler;
 
 /**
  * Unit test for {@link AsyncHandler}.

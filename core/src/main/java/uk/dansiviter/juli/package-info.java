@@ -13,13 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uk.dansiviter.logging.cdi;
+package uk.dansiviter.juli;
 
-import uk.dansiviter.logging.annotations.Log;
-import uk.dansiviter.logging.annotations.Message;
-
-@Log
-public interface CdiLog {
-    @Message("Hello")
-    void doLog();
-}
+/**
+ * This library has two purposes:
+ * <ul>
+ * <li>To define a very thin wrapper on {@link java.util.logging.Logger} to reduce the boilerplate code and
+ * implement best practices,</li>
+ * <li>To provide specialist {@link java.util.logging.Handler} implementations to potentially improve performance
+ * within your application.</li>
+ * </ul>
+ */

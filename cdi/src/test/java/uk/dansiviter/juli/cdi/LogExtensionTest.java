@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uk.dansiviter.logging.cdi;
+package uk.dansiviter.juli.cdi;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
@@ -55,8 +55,8 @@ public class LogExtensionTest {
         var record = recordCaptor.getValue();
         assertEquals(java.util.logging.Level.INFO, record.getLevel());
         assertEquals("Hello", record.getMessage());
-        assertEquals("uk.dansiviter.logging.cdi.LogExtensionTest", record.getLoggerName());
-        assertEquals("uk.dansiviter.logging.cdi.LogExtensionTest", record.getSourceClassName());
+        assertEquals("uk.dansiviter.juli.cdi.LogExtensionTest", record.getLoggerName());
+        assertEquals("uk.dansiviter.juli.cdi.LogExtensionTest", record.getSourceClassName());
         assertEquals("log", record.getSourceMethodName());
     }
 }

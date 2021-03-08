@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uk.dansiviter.logging.cdi;
+package uk.dansiviter.juli.cdi;
 
-import static uk.dansiviter.logging.LogProducer.log;
+import static uk.dansiviter.juli.LogProducer.log;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -29,7 +29,7 @@ import javax.enterprise.inject.spi.Extension;
 import javax.enterprise.inject.spi.InjectionPoint;
 import javax.enterprise.inject.spi.ProcessInjectionPoint;
 
-import uk.dansiviter.logging.annotations.Log;
+import uk.dansiviter.juli.annotations.Log;
 
 /**
  *

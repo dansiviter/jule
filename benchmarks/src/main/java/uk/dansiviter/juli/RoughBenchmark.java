@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uk.dansiviter.logging;
+package uk.dansiviter.juli;
 
 import static java.lang.Thread.sleep;
 
@@ -25,6 +25,8 @@ import java.util.ArrayList;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Handler;
 import java.util.logging.Logger;
+
+import uk.dansiviter.juli.AsyncConsoleHandler;
 
 public class RoughBenchmark {
 	public static void main(String[] args) throws InterruptedException {

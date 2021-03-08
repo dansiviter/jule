@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uk.dansiviter.logging;
+package uk.dansiviter.juli;
 
 import java.util.logging.LogRecord;
 import java.util.logging.SimpleFormatter;

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uk.dansiviter.logging;
+package uk.dansiviter.juli;
 
 import static java.lang.StackWalker.Option.RETAIN_CLASS_REFERENCE;
 
@@ -25,8 +25,8 @@ import java.util.logging.Logger;
 
 import javax.annotation.Nonnull;
 
-import uk.dansiviter.logging.annotations.Log;
-import uk.dansiviter.logging.annotations.Message;
+import uk.dansiviter.juli.annotations.Log;
+import uk.dansiviter.juli.annotations.Message;
 
 /**
  * Defines the base implementation of the logger interface.
