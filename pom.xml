@@ -7,10 +7,10 @@
 	<packaging>pom</packaging>
 	<name>Java Util Logger Improver</name>
 
-	<url>https://github.com/dansiviter/logging</url>
+	<url>https://github.com/dansiviter/juni</url>
 	<scm>
-		<developerConnection>scm:git:git@github.com:dansiviter/logging.git</developerConnection>
-		<tag>logging-0.1.0</tag>
+		<developerConnection>scm:git:git@github.com:dansiviter/juli.git</developerConnection>
+		<tag>HEAD</tag>
   </scm>
 
 	<licenses>
@@ -36,12 +36,12 @@
 		<repository>
 			<id>github</id>
 			<name>GitHub Packages</name>
-			<url>https://maven.pkg.github.com/dansiviter/logging</url>
+			<url>https://maven.pkg.github.com/dansiviter/juli</url>
 		</repository>
 		<snapshotRepository>
 			<id>github</id>
 			<name>GitHub Packages</name>
-			<url>https://maven.pkg.github.com/dansiviter/logging</url>
+			<url>https://maven.pkg.github.com/dansiviter/juli</url>
 		</snapshotRepository>
 	</distributionManagement>
 
