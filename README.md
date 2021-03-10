@@ -42,6 +42,13 @@ public interface MyLog {
 
   @Message(value = "Oh no! {0}", level = Level.ERROR)
   void error(String name, Throwable t);  // <- Throwables must be last parameter
+
+  @Message("Hello {0}")
+  void unwrap(Supplier<String> name);  // <- value will be unwrapped on the calling thread
+
+  @Message(value = "Number {0}", Level.DEBUG)
+  void number(int value);  // <- primitives only auto-boxed if the log level is consumed
+
 }
 ```
 
@@ -57,6 +64,8 @@ public class MyClass {
   }
 }
 ```
+
+> :information_source: The log levels are reduced to just `ERROR`, `WARN`, `INFO`, `DEBUG` and `TRACE` as, frankly, that's all you really need.
 
 ## CDI ##
 
