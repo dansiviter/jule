@@ -26,8 +26,6 @@ import java.util.logging.ConsoleHandler;
 import java.util.logging.Handler;
 import java.util.logging.Logger;
 
-import uk.dansiviter.juli.AsyncConsoleHandler;
-
 public class RoughBenchmark {
 	public static void main(String[] args) throws InterruptedException {
 		var root = Logger.getLogger("");
