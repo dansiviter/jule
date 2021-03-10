@@ -30,8 +30,6 @@ import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
-import uk.dansiviter.juli.AsyncHandler;
-
 /**
  * Unit test for {@link AsyncHandler}.
  */
