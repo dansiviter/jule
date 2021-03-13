@@ -15,7 +15,7 @@
  */
 package uk.dansiviter.juli.processor;
 
-import static javax.lang.model.element.Modifier.*;
+import static javax.lang.model.element.Modifier.FINAL;
 import static javax.lang.model.element.Modifier.PRIVATE;
 import static javax.lang.model.element.Modifier.PUBLIC;
 import static javax.lang.model.element.Modifier.STATIC;
@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.ThreadSafe;
@@ -83,7 +82,7 @@ public class LogProcessor extends AbstractProcessor {
 				.addParameter(String.class, "name")
 				.addStatement("this.log = $T.class.getAnnotation($T.class)", element.asType(), Log.class)
 				.addStatement("this.key = $T.key($T.class, name)", LogProducer.class, element.asType())
-				.addStatement("this.delegate = getLogger(name)")
+				.addStatement("this.delegate = delegate(name)")
 				.build();
 		MethodSpec delegateMethod = MethodSpec.methodBuilder("delegate")
 				.addAnnotation(Override.class)
@@ -190,18 +189,5 @@ public class LogProcessor extends AbstractProcessor {
 		}
 
 		return String.join("$", types);
-	}
-
-	public static String modifiers(@Nonnull ExecutableElement e) {
-		return e.getModifiers().stream().filter(m -> m != Modifier.ABSTRACT).map(m -> m.name().toLowerCase())
-				.collect(Collectors.joining(" "));
-	}
-
-	public static String params(@Nonnull ExecutableElement e) {
-		if (e.getParameters().isEmpty()) {
-			return "";
-		}
-		return e.getParameters().stream().map(p -> p.asType() + " " + p.getSimpleName())
-				.collect(Collectors.joining(", "));
 	}
 }

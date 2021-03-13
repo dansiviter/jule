@@ -25,7 +25,7 @@ import java.lang.annotation.Target;
  * Designates a method as a log message. Exceptions must be the last parameter in the method.
  * {@link java.util.function.Supplier} and {@link java.util.Optional} parameters will be automatically unwrapped prior
  * to logging.
- * </p>
+ * <p>
  * Usage:
  * <pre>
  * &#064;Message(value = "Oh no! The value was {0}!")
@@ -50,13 +50,24 @@ public @interface Message {
 	 */
 	boolean once() default false;
 
+	/**
+	 * Log levels
+	 */
 	public enum Level {
+		/** Error level */
 		ERROR(java.util.logging.Level.SEVERE),
+		/** Warning level */
 		WARN(java.util.logging.Level.WARNING),
+		/** Information Level */
 		INFO(java.util.logging.Level.INFO),
+		/** Debug level */
 		DEBUG(java.util.logging.Level.FINE),
+		/** Trace level */
 		TRACE(java.util.logging.Level.FINER);
 
+		/**
+		 * The JUL {@code Level}
+		 */
 		public final java.util.logging.Level julLevel;
 
 		Level(java.util.logging.Level julLevel) {

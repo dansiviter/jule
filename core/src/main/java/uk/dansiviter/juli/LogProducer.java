@@ -17,6 +17,7 @@ package uk.dansiviter.juli;
 
 import static java.lang.StackWalker.Option.RETAIN_CLASS_REFERENCE;
 import static java.lang.String.format;
+import static java.util.Objects.requireNonNull;
 
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -74,7 +75,15 @@ public enum LogProducer { ;
 		}));
 	}
 
+	/**
+	 * Creates an interned key value for the logger instance. This is to aid usage in caching a value when using
+	 * {@link WeakHashMap}.
+	 *
+	 * @param log the log class.
+	 * @param name the log name.
+	 * @return the key.
+	 */
 	public static String key(@Nonnull Class<?> log, @Nonnull String name) {
-		return format("%s-%s", log.getName(), name).intern();
+		return format("%s-%s", log.getName(), requireNonNull(name)).intern();
 	}
 }

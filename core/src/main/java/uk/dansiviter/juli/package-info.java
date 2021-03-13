@@ -13,9 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uk.dansiviter.juli;
 
-/**
+ /**
  * This library has two purposes:
  * <ul>
  * <li>To define a very thin wrapper on {@link java.util.logging.Logger} to reduce the boilerplate code and
@@ -24,3 +23,4 @@ package uk.dansiviter.juli;
  * within your application.</li>
  * </ul>
  */
+package uk.dansiviter.juli;
