@@ -43,11 +43,12 @@ public interface BaseLog {
 	Log log();
 
 	/**
+	 * Gets delegate logger instance.
 	 *
-	 * @param name
-	 * @return
+	 * @param name the name of the log.
+	 * @return the logger instance.
 	 */
-	default Logger getLogger(@Nonnull String name) {
+	default Logger delegate(@Nonnull String name) {
 		var resourceBundleName = log().resourceBundleName();
 		return Logger.getLogger(name, resourceBundleName.isBlank() ? null : resourceBundleName);
 	}
@@ -55,9 +56,10 @@ public interface BaseLog {
 	/**
 	 * Log a message.
 	 *
-	 * @param level
-	 * @param msg
-	 * @param params
+	 * @param level the log level.
+	 * @param msg the message.
+	 * @param params the message parameters. If these are {@link Optional} or {@link Supplier} then they will be
+	 * expanded.
 	 */
 	default void logp(@Nonnull Message.Level level, @Nonnull String msg, Object... params) {
 		var delegate = delegate();

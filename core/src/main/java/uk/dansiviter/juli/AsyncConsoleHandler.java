@@ -21,6 +21,9 @@ import java.util.logging.ConsoleHandler;
  * Async implementation of {@link ConsoleHandler} which simply delegates.
  */
 public class AsyncConsoleHandler extends AsyncStreamHandler {
+	/**
+	 * Constructs an asynchronous {@code ConsoleHandler}
+	 */
 	public AsyncConsoleHandler() {
 		super(new ConsoleHandler());
 	}

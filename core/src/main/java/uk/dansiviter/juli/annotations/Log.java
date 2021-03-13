@@ -24,7 +24,7 @@ import java.lang.annotation.Target;
 
 /**
  * Designates the class as a logger wrapper.
- * </p>
+ * <p>
  * Usage:
  * <pre>
  * &#064;Log

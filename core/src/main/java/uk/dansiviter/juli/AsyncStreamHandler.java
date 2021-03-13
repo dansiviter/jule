@@ -27,8 +27,14 @@ import javax.annotation.Nonnull;
  * Async implementation of {@link StreamHandler} which simply delegates.
  */
 public abstract class AsyncStreamHandler extends AsyncHandler {
+	/** Delegate {@code StreamHandler} */
 	protected final StreamHandler delegate;
 
+	/**
+	 * Construct a asynchronous version of {@link StreamHandler} by delegating.
+	 *
+	 * @param delegate the delegate {@code StreamHandler}.
+	 */
 	public AsyncStreamHandler(@Nonnull StreamHandler delegate) {
 		this.delegate = Objects.requireNonNull(delegate);
 		this.delegate.setLevel(getLevel());

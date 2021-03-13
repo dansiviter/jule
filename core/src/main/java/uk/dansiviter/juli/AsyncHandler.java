@@ -42,7 +42,7 @@ import javax.annotation.Nonnull;
  * {@link java.util.concurrent.Flow} to handle log events. Back-pressure is handled by blocking the
  * calling thread if the buffer is full. Therefore, to avoid a significant thread hang ensure the processing is done in
  * a timely manner.
- * </p>
+ * <p>
  * <b>Configuration:</b>
  * Using the following {@code LogManager} configuration properties, where {@code <handler-name>} refers to the
  * fully-qualified class name of the handler:
@@ -68,8 +68,12 @@ public abstract class AsyncHandler extends Handler {
 	private final Subscriber<LogRecord> subscriber = new LogSubscriber();
 	private final SubmissionPublisher<LogRecord> publisher;
 
+	/** Closed status */
 	protected final AtomicBoolean closed = new AtomicBoolean();
 
+	/**
+	 * Create an asynchronous {@code Handler} and configure it based on {@code LogManager} configuration properties.
+	 */
 	public AsyncHandler() {
 		var manager = Objects.requireNonNull(LogManager.getLogManager());
 
@@ -101,8 +105,16 @@ public abstract class AsyncHandler extends Handler {
 
 	// --- Static Methods ---
 
+	/**
+	 * Creates an instance of the class given by it's name using no-args constructor.
+	 *
+	 * @param <T> the type.
+	 * @param name the class name
+	 * @return an instance of the class.
+	 * @throws IllegalArgumentException if the class cannot be created.
+	 */
 	@SuppressWarnings("unchecked")
-	public static @Nonnull <T> T instance(@Nonnull String name) {
+	protected static @Nonnull <T> T instance(@Nonnull String name) {
 		try {
 			Class<?> concreteCls = Class.forName(name);
 			return (T) concreteCls.getDeclaredConstructor().newInstance();
@@ -132,9 +144,16 @@ public abstract class AsyncHandler extends Handler {
 	@Override
 	public void flush() { }
 
+	/**
+	 * @return {@code true} if closed.
+	 */
+	public boolean isClosed() {
+		return this.closed.get();
+	}
+
 	@Override
 	public void close() throws SecurityException {
-		if (!closed.compareAndSet(false, true)) {
+		if (!this.closed.compareAndSet(false, true)) {
 			throw new IllegalStateException("Already closed!");
 		}
 		this.publisher.close();
