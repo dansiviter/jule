@@ -1,9 +1,8 @@
-name: Java CI
+name: Build
 on:
   push:
     branches:
-    - main
-    - 'releases/**'
+    - '**'
   pull_request:
     branches:
     - main
@@ -30,11 +29,5 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 11
-        server-id: ossrh
-        server-username: MAVEN_USERNAME
-        server-password: MAVEN_CENTRAL_TOKEN
-    - name: Publish to Apache Maven Central Snapshot
-      run: mvn -B -ntp source:jar javadoc:jar deploy
-      env:
-        MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
-        MAVEN_CENTRAL_TOKEN: ${{ secrets.MAVEN_CENTRAL_TOKEN }}
+    - name: Build
+      run: mvn -B -ntp package

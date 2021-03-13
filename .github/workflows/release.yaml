@@ -17,7 +17,7 @@ jobs:
         server-password: MAVEN_CENTRAL_TOKEN
         gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }}
         gpg-passphrase: MAVEN_GPG_PASSPHRASE
-    - name: Publish to Apache Maven Central Snapshot
+    - name: Publish to Apache Maven Central Staging repo
       run: mvn -B -ntp source:jar javadoc:jar package gpg:sign deploy
       env:
         MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
