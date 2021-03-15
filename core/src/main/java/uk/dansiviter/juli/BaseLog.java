@@ -54,6 +54,15 @@ public interface BaseLog {
 	}
 
 	/**
+	 *
+	 * @param level
+	 * @return
+	 */
+	default boolean isLoggable(@Nonnull Message.Level level) {
+		return delegate().isLoggable(level.julLevel);
+	}
+
+	/**
 	 * Log a message.
 	 *
 	 * @param level the log level.
@@ -62,12 +71,10 @@ public interface BaseLog {
 	 * expanded.
 	 */
 	default void logp(@Nonnull Message.Level level, @Nonnull String msg, Object... params) {
-		var delegate = delegate();
-		if (!delegate.isLoggable(level.julLevel)) {
-			return;
-		}
+		// isLoggable check will already be done
 		expand(params);
 
+		var delegate = delegate();
 		LogRecord record = new LogRecord(level.julLevel, msg);
 		record.setLoggerName(delegate.getName());
 		if (params.length > 0) {
