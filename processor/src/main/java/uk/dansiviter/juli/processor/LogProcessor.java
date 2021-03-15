@@ -142,6 +142,10 @@ public class LogProcessor extends AbstractProcessor {
 
 		var returnThis = builder.superinterfaces.contains(ClassName.get(e.getReturnType()));
 
+		method.beginControlFlow("if (!isLoggable($T.$N))", Level.class, message.level().name())
+					.addStatement(returnThis ? "return this" : "return")
+					.endControlFlow();
+
 		if (message.once()) {
 			var onceField = "ONCE__".concat(e.getSimpleName().toString());
 			FieldSpec onceSpec = FieldSpec.builder(AtomicBoolean.class, onceField, PRIVATE, STATIC, FINAL)
