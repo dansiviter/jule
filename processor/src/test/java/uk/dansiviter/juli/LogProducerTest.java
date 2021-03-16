@@ -24,7 +24,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
-import java.util.Iterator;
 import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.logging.Handler;
@@ -75,7 +74,7 @@ public class LogProducerTest {
 		var recordCaptor = ArgumentCaptor.forClass(LogRecord.class);
 		verify(handler, times(8)).publish(recordCaptor.capture());
 
-		Iterator<LogRecord> records = recordCaptor.getAllValues().iterator();
+		var records = recordCaptor.getAllValues().iterator();
 
 		var record = records.next();
 		assertEquals(java.util.logging.Level.INFO, record.getLevel());

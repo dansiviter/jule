@@ -19,12 +19,11 @@ import static org.openjdk.jmh.runner.options.TimeValue.milliseconds;
 
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
-import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
 public class JmhMain {
 	public static void main(String[] args) throws RunnerException {
-		Options opt = new OptionsBuilder()
+		var opt = new OptionsBuilder()
 				.include(JmhMain.class.getPackage().getName())
 				.warmupTime(milliseconds(500))
 				.measurementTime(milliseconds(500))

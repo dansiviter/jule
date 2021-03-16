@@ -15,6 +15,7 @@
  */
 package uk.dansiviter.juli;
 
+import java.util.MissingResourceException;
 import java.util.logging.LogRecord;
 import java.util.logging.SimpleFormatter;
 
@@ -24,18 +25,18 @@ import java.util.logging.SimpleFormatter;
 public class StringFormatter extends SimpleFormatter {
 	@Override
 	public String formatMessage(LogRecord record) {
-		String format = record.getMessage();
-		java.util.ResourceBundle catalog = record.getResourceBundle();
+		var format = record.getMessage();
+		var catalog = record.getResourceBundle();
 		if (catalog != null) {
 			try {
 				format = catalog.getString(format);
-			} catch (java.util.MissingResourceException ex) {
+			} catch (MissingResourceException ex) {
 				// Drop through.  Use record message as format
 			}
 		}
 		// Do the formatting.
 		try {
-			Object parameters[] = record.getParameters();
+			var parameters = record.getParameters();
 			if (parameters == null || parameters.length == 0) {
 				// No parameters.  Just return format string.
 				return format;

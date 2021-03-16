@@ -22,7 +22,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Handler;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
@@ -38,7 +37,7 @@ public class AsyncHandlerTest {
 
     @Test
     public void doPublish() {
-        TestHandler handler = new TestHandler();
+        var handler = new TestHandler();
         log.addHandler(handler);
 
         log.info("hello");
@@ -62,7 +61,7 @@ public class AsyncHandlerTest {
 
     @Test
     public void close() {
-        TestHandler handler = new TestHandler();
+        var handler = new TestHandler();
         log.addHandler(handler);
 
         handler.close();
@@ -73,7 +72,7 @@ public class AsyncHandlerTest {
     @AfterEach
     public void after() {
         // cleanup as potentially artifacts that live after each test run
-        for (Handler h : this.log.getHandlers()) {
+        for (var h : this.log.getHandlers()) {
             this.log.removeHandler(h);
         }
     }

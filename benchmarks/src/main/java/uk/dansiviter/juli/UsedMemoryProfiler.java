@@ -15,13 +15,14 @@
  */
 package uk.dansiviter.juli;
 
-import java.util.ArrayList;
+import static java.util.Collections.singleton;
+import static org.openjdk.jmh.results.AggregationPolicy.AVG;
+
 import java.util.Collection;
 
 import org.openjdk.jmh.infra.BenchmarkParams;
 import org.openjdk.jmh.infra.IterationParams;
 import org.openjdk.jmh.profile.InternalProfiler;
-import org.openjdk.jmh.results.AggregationPolicy;
 import org.openjdk.jmh.results.IterationResult;
 import org.openjdk.jmh.results.Result;
 import org.openjdk.jmh.results.ScalarResult;
@@ -41,14 +42,12 @@ public class UsedMemoryProfiler implements InternalProfiler {
 
 	@Override
 	@SuppressWarnings("rawtypes")
-	public Collection<? extends Result> afterIteration(BenchmarkParams benchmarkParams, IterationParams iterationParams,
-		IterationResult result) {
-
-		double used = runtime.totalMemory() - runtime.freeMemory();
-
-		Collection<ScalarResult> results = new ArrayList<>();
-		results.add(new ScalarResult("Used memory heap", used / 1024, "KB", AggregationPolicy.AVG));
-
-		return results;
+	public Collection<? extends Result> afterIteration(
+		BenchmarkParams benchmarkParams,
+		IterationParams iterationParams,
+		IterationResult result)
+ {
+		var used = runtime.totalMemory() - runtime.freeMemory();
+		return singleton(new ScalarResult("Used memory heap", used / 1024, "KB", AVG));
 	}
 }
