@@ -38,7 +38,6 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
-import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.tools.Diagnostic;
@@ -71,7 +70,7 @@ public class LogProcessor extends AbstractProcessor {
 
 	private void process(@Nonnull TypeElement annotation, @Nonnull Element element) {
 		var type = (TypeElement) element;
-		var pkg = pkg(type);
+		var pkg = this.processingEnv.getElementUtils().getPackageOf(type);
 		var className = className(type);
 		var concreteName = className + "$log";
 
@@ -170,17 +169,6 @@ public class LogProcessor extends AbstractProcessor {
 		}
 
 		builder.addMethod(method.build());
-	}
-
-	private static PackageElement pkg(@Nonnull TypeElement typeElement) {
-		Element e = typeElement;
-		while (!(e instanceof PackageElement)) {
-			e = e.getEnclosingElement();
-			if (e == null) {
-				return null;
-			}
-		}
-		return (PackageElement) e;
 	}
 
 	private static String className(@Nonnull TypeElement typeElement) {
