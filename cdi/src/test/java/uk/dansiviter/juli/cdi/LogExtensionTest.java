@@ -38,25 +38,25 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @EnableAutoWeld
 @AddExtensions(LogExtension.class)
 @ExtendWith(MockitoExtension.class)
-public class LogExtensionTest {
+class LogExtensionTest {
 
-    @Inject
-    private CdiLog log;
+	@Inject
+	private CdiLog log;
 
-    @Test
-    public void log(@Mock Handler handler) {
-        Logger.getLogger("").addHandler(handler);
+	@Test
+	void log(@Mock Handler handler) {
+		Logger.getLogger("").addHandler(handler);
 
-        this.log.doLog();
+		this.log.doLog();
 
-        var recordCaptor = ArgumentCaptor.forClass(LogRecord.class);
-        verify(handler).publish(recordCaptor.capture());
+		var recordCaptor = ArgumentCaptor.forClass(LogRecord.class);
+		verify(handler).publish(recordCaptor.capture());
 
-        var record = recordCaptor.getValue();
-        assertEquals(java.util.logging.Level.INFO, record.getLevel());
-        assertEquals("Hello", record.getMessage());
-        assertEquals("uk.dansiviter.juli.cdi.LogExtensionTest", record.getLoggerName());
-        assertEquals("uk.dansiviter.juli.cdi.LogExtensionTest", record.getSourceClassName());
-        assertEquals("log", record.getSourceMethodName());
-    }
+		var record = recordCaptor.getValue();
+		assertEquals(java.util.logging.Level.INFO, record.getLevel());
+		assertEquals("Hello", record.getMessage());
+		assertEquals("uk.dansiviter.juli.cdi.LogExtensionTest", record.getLoggerName());
+		assertEquals("uk.dansiviter.juli.cdi.LogExtensionTest", record.getSourceClassName());
+		assertEquals("log", record.getSourceMethodName());
+	}
 }
