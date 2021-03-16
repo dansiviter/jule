@@ -16,6 +16,7 @@
 package uk.dansiviter.juli;
 
 import static java.lang.StackWalker.Option.RETAIN_CLASS_REFERENCE;
+import static java.util.logging.Logger.getLogger;
 
 import java.util.Arrays;
 import java.util.Optional;
@@ -50,7 +51,7 @@ public interface BaseLog {
 	 */
 	default Logger delegate(@Nonnull String name) {
 		var resourceBundleName = log().resourceBundleName();
-		return Logger.getLogger(name, resourceBundleName.isBlank() ? null : resourceBundleName);
+		return getLogger(name, resourceBundleName.isBlank() ? null : resourceBundleName);
 	}
 
 	/**
@@ -75,7 +76,7 @@ public interface BaseLog {
 		expand(params);
 
 		var delegate = delegate();
-		LogRecord record = new LogRecord(level.julLevel, msg);
+		var record = new LogRecord(level.julLevel, msg);
 		record.setLoggerName(delegate.getName());
 		if (params.length > 0) {
 			if (params[params.length - 1] instanceof Throwable) {
@@ -86,7 +87,7 @@ public interface BaseLog {
 				record.setParameters(params);
 			}
 		}
-		StackWalker.StackFrame frame = frame(3).orElseThrow();
+		var frame = frame(3).orElseThrow();
 		record.setSourceClassName(frame.getClassName());
 		record.setSourceMethodName(frame.getMethodName());
 
@@ -109,7 +110,7 @@ public interface BaseLog {
 		if (params == null) {
 			return;
 		}
-		for (int i = 0; i < params.length; i++) {
+		for (var i = 0; i < params.length; i++) {
 			if (params[i] instanceof Supplier) {
 				params[i] = ((Supplier<?>) params[i]).get();
 			}
@@ -120,7 +121,7 @@ public interface BaseLog {
 	}
 
 	private static Optional<StackWalker.StackFrame> frame(int skip) {
-		StackWalker walker = StackWalker.getInstance(RETAIN_CLASS_REFERENCE);
+		var walker = StackWalker.getInstance(RETAIN_CLASS_REFERENCE);
 		return walker.walk(s -> s.skip(skip).findFirst());
 	}
 }

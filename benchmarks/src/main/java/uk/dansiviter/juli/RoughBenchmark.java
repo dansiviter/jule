@@ -40,7 +40,7 @@ public class RoughBenchmark {
 
 		int[] iterations = { 50, 100, 200, 400, 800, 1_600, 3_200, 6_400, 12_800 };
 
-		for (int i : iterations) {  // warm up
+		for (var i : iterations) {  // warm up
 			test(log, syncHandler, "SYNC-", i);
 			test(log, asyncHandler, "ASYNC", i);
 		}
@@ -48,14 +48,14 @@ public class RoughBenchmark {
 		sleep(1_000);  // wait for async to finish before writing results
 
 		var results = new ArrayList<Result>();
-		for (int i : iterations) {
+		for (var i : iterations) {
 			results.add(new Result(i,
 					test(log, syncHandler, "SYNC-", i),
 					test(log, asyncHandler, "ASYNC", i)));
 		}
 
 		sleep(1_000);  // wait for async to finish before writing results
-		for (Result r : results) {
+		for (var r : results) {
 			var sync = toBigDecimalSeconds(r.sync);
 			var async = toBigDecimalSeconds(r.async);
 			var percent = async.compareTo(BigDecimal.ZERO) != 0 ? sync.divide(async, MathContext.DECIMAL32).multiply(BigDecimal.valueOf(100)) : null;
@@ -68,11 +68,11 @@ public class RoughBenchmark {
 	{
 		log.addHandler(handler);
 		sleep(250);
-		Instant start = Instant.now();
-		for (int i = 0; i < iterations; i++) {
+		var start = Instant.now();
+		for (var i = 0; i < iterations; i++) {
 			log.info(message);
 		}
-		Instant end = Instant.now();
+		var end = Instant.now();
 		log.removeHandler(handler);
 		return Duration.between(start, end);
 	}

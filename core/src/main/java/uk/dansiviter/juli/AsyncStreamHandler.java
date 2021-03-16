@@ -35,7 +35,7 @@ public abstract class AsyncStreamHandler extends AsyncHandler {
 	 *
 	 * @param delegate the delegate {@code StreamHandler}.
 	 */
-	public AsyncStreamHandler(@Nonnull StreamHandler delegate) {
+	protected AsyncStreamHandler(@Nonnull StreamHandler delegate) {
 		this.delegate = Objects.requireNonNull(delegate);
 		this.delegate.setLevel(getLevel());
 		this.delegate.setFilter(getFilter());
