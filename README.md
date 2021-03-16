@@ -1,4 +1,4 @@
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/dansiviter/logging/Java%20CI?style=flat-square) [![Known Vulnerabilities](https://snyk.io/test/github/dansiviter/juli/badge.svg?style=flat-square)](https://snyk.io/test/github/dansiviter/juli)
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/dansiviter/juli/Java%20CI?style=flat-square) [![Known Vulnerabilities](https://snyk.io/test/github/dansiviter/juli/badge.svg?style=flat-square)](https://snyk.io/test/github/dansiviter/juli) ![Sonar Coverage](https://img.shields.io/sonar/coverage/dansiviter_juli?server=https%3A%2F%2Fsonarcloud.io&style=flat-square)
 
 
 # Java Util Logging Improver (JULI) #
