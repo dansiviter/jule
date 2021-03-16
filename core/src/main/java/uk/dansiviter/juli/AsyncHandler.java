@@ -74,7 +74,7 @@ public abstract class AsyncHandler extends Handler {
 	/**
 	 * Create an asynchronous {@code Handler} and configure it based on {@code LogManager} configuration properties.
 	 */
-	public AsyncHandler() {
+	protected AsyncHandler() {
 		var manager = Objects.requireNonNull(LogManager.getLogManager());
 
 		setLevel(property(manager, "level").map(Level::parse).orElse(Level.INFO));

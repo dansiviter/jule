@@ -45,18 +45,18 @@ import uk.dansiviter.juli.annotations.Message.Level;
  * the generated classes are here.
  */
 @ExtendWith(MockitoExtension.class)
-public class LogProducerTest {
+class LogProducerTest {
 	private final MyLog log = LogProducer.log(MyLog.class);
 
 	@Test
-	public void equivalence() {
+	void equivalence() {
 		assertSame(this.log, LogProducer.log(MyLog.class, LogProducerTest.class));
 		assertSame(LogProducer.log(MyLog.class, "foo"), LogProducer.log(MyLog.class, "foo"));
 		assertNotSame(this.log, LogProducer.log(MyLog.class, "foo"));
 	}
 
 	@Test
-	public void logInjected(@Mock Handler handler) {
+	void logInjected(@Mock Handler handler) {
 		Logger.getLogger("").addHandler(handler);
 
 		assertNotNull(log);
@@ -132,38 +132,38 @@ public class LogProducerTest {
 	}
 
 	@Log
-	public interface MyLog {
+	interface MyLog {
 		@Message("Hello world!")
-		public void doLog();
+		void doLog();
 
 		@Message(value = "Hello world! {0}", level = Level.ERROR)
-		public void doLog(String foo);
+		void doLog(String foo);
 
 		@Message("Hello world! {0}")
-		public void doLog(Supplier<Long> foo);
+		void doLog(Supplier<Long> foo);
 
 		@Message("Hello world! {0}")
-		public void doLog(int foo);
+		void doLog(int foo);
 
 		@Message(value = "Hello world!", level = Level.ERROR)
-		public MyLog doLog(Throwable t);
+		MyLog doLog(Throwable t);
 
 		@Message(value = "Hello world! {0}", level = Level.ERROR)
-		public void doLog(String foo, Throwable t);
+		void doLog(String foo, Throwable t);
 
 		@Message("Hello world!")
-		public void doLog(String... foo);
+		void doLog(String... foo);
 
 		@Message("Hello world! {0}")
-		public void doLog(Optional<String> foo);
+		void doLog(Optional<String> foo);
 
 		@Message(value = "Hello world! {0}", level = Level.TRACE)
-		public void trace(Supplier<Long> foo);
+		void trace(Supplier<Long> foo);
 
 		@Message(value = "Hello once!", once = true)
-		public MyLog doOnce();
+		MyLog doOnce();
 
-		public default void anotherMethods(String foo) {
+		default void anotherMethods(String foo) {
 			throw new IllegalArgumentException();
 		}
 	}

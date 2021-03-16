@@ -42,10 +42,10 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.tools.Diagnostic;
 
-import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
+import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 
 import uk.dansiviter.juli.BaseLog;
@@ -63,12 +63,11 @@ public class LogProcessor extends AbstractProcessor {
 
 	@Override
 	public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-		annotations.forEach(annotation -> roundEnv.getElementsAnnotatedWith(annotation)
-				.forEach(element -> process(annotation, element)));
+		annotations.forEach(annotation -> roundEnv.getElementsAnnotatedWith(annotation).forEach(this::process));
 		return true;
 	}
 
-	private void process(@Nonnull TypeElement annotation, @Nonnull Element element) {
+	private void process(@Nonnull Element element) {
 		var type = (TypeElement) element;
 		var pkg = this.processingEnv.getElementUtils().getPackageOf(type);
 		var className = className(type);
@@ -135,11 +134,11 @@ public class LogProcessor extends AbstractProcessor {
 		MethodSpec.Builder method = MethodSpec.methodBuilder(e.getSimpleName().toString())
 				.addAnnotation(Override.class)
 				.addModifiers(PUBLIC)
-				.returns(ClassName.get(e.getReturnType()));
+				.returns(TypeName.get(e.getReturnType()));
 
-		e.getParameters().forEach(p -> method.addParameter(ClassName.get(p.asType()), p.getSimpleName().toString()));
+		e.getParameters().forEach(p -> method.addParameter(TypeName.get(p.asType()), p.getSimpleName().toString()));
 
-		var returnThis = builder.superinterfaces.contains(ClassName.get(e.getReturnType()));
+		var returnThis = builder.superinterfaces.contains(TypeName.get(e.getReturnType()));
 
 		method.beginControlFlow("if (!isLoggable($T.$N))", Level.class, message.level().name())
 					.addStatement(returnThis ? "return this" : "return")

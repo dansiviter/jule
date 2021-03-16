@@ -32,57 +32,52 @@ import org.junit.jupiter.api.Test;
 /**
  * Unit test for {@link AsyncHandler}.
  */
-public class AsyncHandlerTest {
-    private final Logger log = Logger.getLogger("TEST");
+class AsyncHandlerTest {
+	private final Logger log = Logger.getLogger("TEST");
 
-    @Test
-    public void doPublish() {
-        var handler = new TestHandler();
-        log.addHandler(handler);
+	@Test
+	void doPublish() {
+		var handler = new TestHandler();
+		log.addHandler(handler);
 
-        log.info("hello");
+		log.info("hello");
 
-        new Thread(() -> {
-            try {
-                Thread.sleep(50);
-            } catch (InterruptedException e) {
-                // nothing to see here
-            }
-            log.info("world");
-        }).start();
+		new Thread(() -> {
+			log.info("world");
+		}).start();
 
-        await().atMost(1, TimeUnit.SECONDS).untilAsserted(
-            () -> {
-                assertThat(handler.records, Matchers.hasSize(2));
-                assertThat(handler.records.get(0).getMessage(), Matchers.equalTo("hello"));
-                assertThat(handler.records.get(1).getMessage(), Matchers.equalTo("world"));
-            });
-    }
+		await().atMost(1, TimeUnit.SECONDS).untilAsserted(
+			() -> {
+				assertThat(handler.records, Matchers.hasSize(2));
+				assertThat(handler.records.get(0).getMessage(), Matchers.equalTo("hello"));
+				assertThat(handler.records.get(1).getMessage(), Matchers.equalTo("world"));
+			});
+	}
 
-    @Test
-    public void close() {
-        var handler = new TestHandler();
-        log.addHandler(handler);
+	@Test
+	void close() {
+		var handler = new TestHandler();
+		log.addHandler(handler);
 
-        handler.close();
+		handler.close();
 
-        assertThrows(IllegalStateException.class, () -> log.info("hello"));
-    }
+		assertThrows(IllegalStateException.class, () -> log.info("hello"));
+	}
 
-    @AfterEach
-    public void after() {
-        // cleanup as potentially artifacts that live after each test run
-        for (var h : this.log.getHandlers()) {
-            this.log.removeHandler(h);
-        }
-    }
+	@AfterEach
+	void after() {
+		// cleanup as potentially artifacts that live after each test run
+		for (var h : this.log.getHandlers()) {
+			this.log.removeHandler(h);
+		}
+	}
 
-    private static class TestHandler extends AsyncHandler {
-        private final List<LogRecord> records = new ArrayList<>();
+	private static class TestHandler extends AsyncHandler {
+		private final List<LogRecord> records = new ArrayList<>();
 
-        @Override
-        protected void doPublish(LogRecord record) {
-            records.add(record);
-        }
-    }
+		@Override
+		protected void doPublish(LogRecord record) {
+			records.add(record);
+		}
+	}
 }
