@@ -71,7 +71,7 @@ public interface BaseLog {
 	 * @param params the message parameters. If these are {@link Optional} or {@link Supplier} then they will be
 	 * expanded.
 	 */
-	default void logp(@Nonnull Message.Level level, @Nonnull String msg, Object... params) {
+	default void logp(@Nonnull Message.Level level, @Nonnull String msg, @Nonnull Object... params) {
 		// isLoggable check will already be done
 		expand(params);
 
@@ -107,7 +107,7 @@ public interface BaseLog {
 	 * @param params the parameters to expand to get lazy values.
 	 */
 	private static void expand(Object[] params) {
-		if (params == null) {
+		if (params.length == 0) {
 			return;
 		}
 		for (var i = 0; i < params.length; i++) {

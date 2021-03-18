@@ -26,24 +26,21 @@ public class StringFormatter extends SimpleFormatter {
 	@Override
 	public String formatMessage(LogRecord record) {
 		var format = record.getMessage();
-		var catalog = record.getResourceBundle();
-		if (catalog != null) {
+		var bundle = record.getResourceBundle();
+		if (bundle != null) {
 			try {
-				format = catalog.getString(format);
+				format = bundle.getString(format);
 			} catch (MissingResourceException ex) {
-				// Drop through.  Use record message as format
+				// nothing to see here
 			}
 		}
-		// Do the formatting.
 		try {
 			var parameters = record.getParameters();
 			if (parameters == null || parameters.length == 0) {
-				// No parameters.  Just return format string.
 				return format;
 			}
 			return String.format(format, parameters);
-		} catch (Exception ex) {
-			// Formatting failed: use localized format string.
+		} catch (RuntimeException ex) {
 			return format;
 		}
 	}
