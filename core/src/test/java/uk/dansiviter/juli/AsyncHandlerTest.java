@@ -17,15 +17,18 @@ package uk.dansiviter.juli;
 
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Filter;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
@@ -41,6 +44,9 @@ class AsyncHandlerTest {
 		log.addHandler(handler);
 
 		log.info("hello");
+		log.fine("hello");
+
+		handler.flush();
 
 		new Thread(() -> {
 			log.info("world");
@@ -48,9 +54,9 @@ class AsyncHandlerTest {
 
 		await().atMost(1, TimeUnit.SECONDS).untilAsserted(
 			() -> {
-				assertThat(handler.records, Matchers.hasSize(2));
-				assertThat(handler.records.get(0).getMessage(), Matchers.equalTo("hello"));
-				assertThat(handler.records.get(1).getMessage(), Matchers.equalTo("world"));
+				assertThat(handler.records, hasSize(2));
+				assertThat(handler.records.get(0).getMessage(), equalTo("hello"));
+				assertThat(handler.records.get(1).getMessage(), equalTo("world"));
 			});
 	}
 
@@ -58,10 +64,18 @@ class AsyncHandlerTest {
 	void close() {
 		var handler = new TestHandler();
 		log.addHandler(handler);
-
+		assertThat(handler.isClosed(), equalTo(false));
 		handler.close();
 
+		assertThat(handler.isClosed(), equalTo(true));
 		assertThrows(IllegalStateException.class, () -> log.info("hello"));
+		assertThrows(IllegalStateException.class, () -> handler.close());
+	}
+
+	@Test
+	void instance() {
+		var filter = AsyncHandler.instance(NoopFilter.class.getName());
+		assertThat(filter, notNullValue());
 	}
 
 	@AfterEach
@@ -78,6 +92,13 @@ class AsyncHandlerTest {
 		@Override
 		protected void doPublish(LogRecord record) {
 			records.add(record);
+		}
+	}
+
+	static class NoopFilter implements Filter {
+		@Override
+		public boolean isLoggable(LogRecord record) {
+			return false;
 		}
 	}
 }

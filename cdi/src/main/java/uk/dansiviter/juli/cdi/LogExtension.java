@@ -19,8 +19,10 @@ import static uk.dansiviter.juli.LogProducer.log;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Nonnull;
 import javax.enterprise.event.Observes;
@@ -35,15 +37,22 @@ import uk.dansiviter.juli.annotations.Log;
  *
  */
 public class LogExtension implements Extension {
-	private final List<InjectionPoint> found = new ArrayList<>();
+	private final Map<Class<?>, Set<InjectionPoint>> found = new HashMap<>();
 
 	/**
 	 *
 	 * @param pip injection point event.
 	 */
 	public void findBody(@Observes ProcessInjectionPoint<?, ?> pip) {
-		if (getRawType(pip.getInjectionPoint().getType()).isAnnotationPresent(Log.class)) {
-			found.add(pip.getInjectionPoint());
+		var rawType = rawType(pip.getInjectionPoint().getType());
+		if (rawType.isAnnotationPresent(Log.class)) {
+			found.compute(rawType, (k, v) -> {
+				if (v == null) {
+					v = new HashSet<>();
+				}
+				v.add(pip.getInjectionPoint());
+				return v;
+			});
 		}
 	}
 
@@ -52,7 +61,7 @@ public class LogExtension implements Extension {
 	 * @param abd after bean discovery event.
 	 */
 	public void addBeans(@Observes AfterBeanDiscovery abd) {
-		this.found.forEach(ip -> createBean(abd, ip));
+		this.found.forEach((k, v) -> createBean(abd, k, v));
 		this.found.clear();
 	}
 
@@ -64,25 +73,27 @@ public class LogExtension implements Extension {
 	 */
 	private void createBean(
 			@Nonnull AfterBeanDiscovery abd,
-			@Nonnull InjectionPoint ip)
+			@Nonnull Class<?> rawType,
+			@Nonnull Set<InjectionPoint> ips)
 	{
-		final var type = ip.getType();
-		final var rawType = getRawType(type);
 		abd.addBean()
-				.name(ip.getMember().getName())
+				.name(rawType.getSimpleName())
 				.beanClass(rawType)
-				.types(type, Object.class)
-				.qualifiers(ip.getQualifiers())
-				.createWith(cc -> log(rawType, ip.getMember().getDeclaringClass()));
+				.types(rawType, Object.class)
+				.produceWith(i -> {
+					var ip = i.select(InjectionPoint.class).get();
+					var member = ip.getMember();
+					return log(rawType, member.getDeclaringClass());
+				});
 	}
 
 	/**
 	 *
 	 * @param type the input type.
-	 * @return the found raw type.
+	 * @return the found raw type.asy
 	 * @throws IllegalStateException if unable to find raw type.
 	 */
-	private static Class<?> getRawType(@Nonnull Type type) {
+	private static Class<?> rawType(@Nonnull Type type) {
 		if (type instanceof Class) {
 			return (Class<?>) type;
 		}

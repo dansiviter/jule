@@ -59,18 +59,19 @@ public enum LogProducer { ;
 	 *
 	 * @param <L>  the log type.
 	 * @param log  the log class type.
-	 * @param name the log name.
+	 * @param name the log ename.
 	 * @return log instance. This may come from a cache of instances.
 	 */
 	public static <L> L log(@Nonnull Class<L> log, @Nonnull String name) {
 		var key = key(log, name);
 		return log.cast(LOGS.computeIfAbsent(key, k -> {
+			var className = log.getName() + "$log";
 			try {
-				return Class.forName(log.getName() + "$log")
+				return Class.forName(className)
 					.getDeclaredConstructor(String.class)
 					.newInstance(name);
 			} catch (ReflectiveOperationException e) {
-				throw new IllegalStateException(e);
+				throw new IllegalStateException(format("Unable to instantiate class! [%s]", className), e);
 			}
 		}));
 	}
