@@ -114,7 +114,7 @@ public abstract class AsyncHandler extends Handler {
 	 * @throws IllegalArgumentException if the class cannot be created.
 	 */
 	@SuppressWarnings("unchecked")
-	protected static @Nonnull <T> T instance(@Nonnull String name) {
+	static @Nonnull <T> T instance(@Nonnull String name) {
 		try {
 			Class<?> concreteCls = Class.forName(name);
 			return (T) concreteCls.getDeclaredConstructor().newInstance();

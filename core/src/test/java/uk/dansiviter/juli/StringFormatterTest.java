@@ -16,7 +16,7 @@
 package uk.dansiviter.juli;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.endsWith;
 
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
@@ -31,10 +31,31 @@ class StringFormatterTest {
 	void format() {
 		var formatter = new StringFormatter();
 
+		var record = new LogRecord(Level.ALL, "Hello!");
+		var actual = formatter.format(record);
+
+		assertThat(actual, endsWith("Hello!" + System.lineSeparator()));
+	}
+
+	@Test
+	void format_params() {
+		var formatter = new StringFormatter();
+
 		var record = new LogRecord(Level.ALL, "Hello %s!");
 		record.setParameters(new Object[] { "world" });
 		var actual = formatter.format(record);
 
 		assertThat(actual, endsWith("Hello world!" + System.lineSeparator()));
+	}
+
+	@Test
+	void format_exception() {
+		var formatter = new StringFormatter();
+
+		var record = new LogRecord(Level.ALL, "Hello %d!");
+		record.setParameters(new Object[] { "world" });
+		var actual = formatter.format(record);
+
+		assertThat(actual, endsWith("Hello %d!" + System.lineSeparator()));
 	}
 }

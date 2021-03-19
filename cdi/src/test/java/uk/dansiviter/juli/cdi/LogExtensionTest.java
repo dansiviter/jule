@@ -15,6 +15,9 @@
  */
 package uk.dansiviter.juli.cdi;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
 
@@ -22,6 +25,10 @@ import java.util.logging.Handler;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
+import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.event.Event;
+import javax.enterprise.event.Observes;
+import javax.enterprise.inject.spi.CDI;
 import javax.inject.Inject;
 
 import org.jboss.weld.junit5.auto.AddExtensions;
@@ -39,9 +46,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @AddExtensions(LogExtension.class)
 @ExtendWith(MockitoExtension.class)
 class LogExtensionTest {
-
 	@Inject
-	private CdiLog log;
+	Event<TestEvent> event;
+	@Inject
+	CdiLog log;
 
 	@Test
 	void log(@Mock Handler handler) {
@@ -59,4 +67,58 @@ class LogExtensionTest {
 		assertEquals("uk.dansiviter.juli.cdi.LogExtensionTest", record.getSourceClassName());
 		assertEquals("log", record.getSourceMethodName());
 	}
+
+	@Test
+	void log_injectConstructor(TestBean bean) {
+		assertThat(bean.getConstructor(), notNullValue());
+	}
+
+	@Test
+	void log_injectField(TestBean bean) {
+		assertThat(bean.getField(), notNullValue());
+		assertThat(bean.getField(), sameInstance(bean.getConstructor()));
+	}
+
+	@Test
+	void log_injectMethod(TestBean bean) {
+		event.fire(new TestEvent());
+		assertThat(bean.getMethod(), notNullValue());
+		assertThat(bean.getMethod(), sameInstance(bean.getConstructor()));
+	}
+
+	void log_cdi() {
+		CdiLog log = CDI.current().select(CdiLog.class).get();
+		assertThat(log, notNullValue());
+	}
+
+	@ApplicationScoped
+	static class TestBean {
+		private final CdiLog constructor;
+		@Inject
+		private CdiLog field;
+		private CdiLog method;
+
+		@Inject
+		TestBean(CdiLog log) {
+			this.constructor = log;
+		}
+
+		void log(@Observes TestEvent e, CdiLog log) {
+			this.method = log;
+		}
+
+		CdiLog getConstructor() {
+			return this.constructor;
+		}
+
+		CdiLog getField() {
+			return this.field;
+		}
+
+		CdiLog getMethod() {
+			return this.method;
+		}
+	}
+
+	static class TestEvent { }
 }
