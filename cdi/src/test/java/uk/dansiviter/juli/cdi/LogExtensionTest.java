@@ -20,7 +20,6 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.sameInstance;
-import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.Mockito.verify;
 
 import java.util.logging.Handler;
@@ -109,6 +108,7 @@ class LogExtensionTest {
 		@Inject
 		private Log0 field0;
 		@Inject
+		@SuppressWarnings("unused")
 		private Log1 field1;
 		private Log0 method;
 
