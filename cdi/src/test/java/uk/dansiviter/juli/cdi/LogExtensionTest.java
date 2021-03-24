@@ -16,9 +16,11 @@
 package uk.dansiviter.juli.cdi;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.sameInstance;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.Mockito.verify;
 
 import java.util.logging.Handler;
@@ -28,6 +30,7 @@ import java.util.logging.Logger;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Event;
 import javax.enterprise.event.Observes;
+import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.CDI;
 import javax.inject.Inject;
 
@@ -49,23 +52,32 @@ class LogExtensionTest {
 	@Inject
 	Event<TestEvent> event;
 	@Inject
-	CdiLog log;
+	Log0 log0;
+	@Inject
+	Log1 log1;
 
 	@Test
 	void log(@Mock Handler handler) {
 		Logger.getLogger("").addHandler(handler);
 
-		this.log.doLog();
+		this.log0.doLog();
 
 		var recordCaptor = ArgumentCaptor.forClass(LogRecord.class);
 		verify(handler).publish(recordCaptor.capture());
 
 		var record = recordCaptor.getValue();
-		assertEquals(java.util.logging.Level.INFO, record.getLevel());
-		assertEquals("Hello", record.getMessage());
-		assertEquals("uk.dansiviter.juli.cdi.LogExtensionTest", record.getLoggerName());
-		assertEquals("uk.dansiviter.juli.cdi.LogExtensionTest", record.getSourceClassName());
-		assertEquals("log", record.getSourceMethodName());
+		assertThat(java.util.logging.Level.INFO, equalTo(record.getLevel()));
+		assertThat("Hello", equalTo(record.getMessage()));
+		assertThat("uk.dansiviter.juli.cdi.LogExtensionTest", equalTo(record.getLoggerName()));
+		assertThat("uk.dansiviter.juli.cdi.LogExtensionTest", equalTo(record.getSourceClassName()));
+		assertThat("log", equalTo(record.getSourceMethodName()));
+	}
+
+	@Test
+	void log_bean(BeanManager manager) {
+		var log0Bean = manager.resolve(manager.getBeans(Log0.class));
+		assertThat(log0Bean.getName(), equalTo(Log0.class.getName()));
+		assertThat(log0Bean.getTypes(), contains(Log0.class, Object.class));
 	}
 
 	@Test
@@ -87,35 +99,37 @@ class LogExtensionTest {
 	}
 
 	void log_cdi() {
-		CdiLog log = CDI.current().select(CdiLog.class).get();
+		Log0 log = CDI.current().select(Log0.class).get();
 		assertThat(log, notNullValue());
 	}
 
 	@ApplicationScoped
 	static class TestBean {
-		private final CdiLog constructor;
+		private final Log0 constructor;
 		@Inject
-		private CdiLog field;
-		private CdiLog method;
+		private Log0 field0;
+		@Inject
+		private Log1 field1;
+		private Log0 method;
 
 		@Inject
-		TestBean(CdiLog log) {
+		TestBean(Log0 log) {
 			this.constructor = log;
 		}
 
-		void log(@Observes TestEvent e, CdiLog log) {
+		void log(@Observes TestEvent e, Log0 log) {
 			this.method = log;
 		}
 
-		CdiLog getConstructor() {
+		Log0 getConstructor() {
 			return this.constructor;
 		}
 
-		CdiLog getField() {
-			return this.field;
+		Log0 getField() {
+			return this.field0;
 		}
 
-		CdiLog getMethod() {
+		Log0 getMethod() {
 			return this.method;
 		}
 	}

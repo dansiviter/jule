@@ -19,7 +19,7 @@ import uk.dansiviter.juli.annotations.Log;
 import uk.dansiviter.juli.annotations.Message;
 
 @Log
-public interface CdiLog {
+public interface Log0 {
 	@Message("Hello")
 	void doLog();
 }
