@@ -16,7 +16,7 @@
 package uk.dansiviter.juli.cdi;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.sameInstance;
@@ -76,7 +76,7 @@ class LogExtensionTest {
 	void log_bean(BeanManager manager) {
 		var log0Bean = manager.resolve(manager.getBeans(Log0.class));
 		assertThat(log0Bean.getName(), equalTo(Log0.class.getName()));
-		assertThat(log0Bean.getTypes(), contains(Log0.class, Object.class));
+		assertThat(log0Bean.getTypes(), containsInAnyOrder(Log0.class, Object.class));
 	}
 
 	@Test
