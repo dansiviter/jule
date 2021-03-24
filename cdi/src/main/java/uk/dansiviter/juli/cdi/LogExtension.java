@@ -34,7 +34,7 @@ import javax.enterprise.inject.spi.ProcessInjectionPoint;
 import uk.dansiviter.juli.annotations.Log;
 
 /**
- *
+ * Defines the CDI extension to inject log instances.
  */
 public class LogExtension implements Extension {
 	private final Map<Class<?>, Set<InjectionPoint>> found = new HashMap<>();
@@ -58,7 +58,7 @@ public class LogExtension implements Extension {
 
 	/**
 	 *
-	 * @param abd after bean discovery event.
+	 * @param abd the after bean discovery event.
 	 */
 	public void addBeans(@Observes AfterBeanDiscovery abd) {
 		this.found.forEach((k, v) -> createBean(abd, k, v));
@@ -67,9 +67,9 @@ public class LogExtension implements Extension {
 
 	/**
 	 *
-	 * @param abd the bean discovery event.
-	 * @param ip the injection point.
-	 * @return the created bean instance.
+	 * @param abd the after bean discovery event.
+	 * @param rawType the raw bean type.
+	 * @param ips the injection points.
 	 */
 	private void createBean(
 			@Nonnull AfterBeanDiscovery abd,
@@ -77,15 +77,18 @@ public class LogExtension implements Extension {
 			@Nonnull Set<InjectionPoint> ips)
 	{
 		abd.addBean()
-				.name(rawType.getSimpleName())
+				.name(rawType.getName())
 				.beanClass(rawType)
-				.types(rawType, Object.class)
+				.addType(rawType)
 				.produceWith(i -> {
 					var ip = i.select(InjectionPoint.class).get();
 					var member = ip.getMember();
 					return log(rawType, member.getDeclaringClass());
 				});
 	}
+
+
+	// --- Static Methods ---
 
 	/**
 	 *
