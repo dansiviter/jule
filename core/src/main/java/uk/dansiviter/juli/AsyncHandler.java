@@ -73,8 +73,6 @@ public abstract class AsyncHandler<R> extends Handler {
 
 	/**
 	 * Create an asynchronous {@code Handler} and configure it based on {@code LogManager} configuration properties.
-	 *
-	 * @param transformer perform preflight transformation. Avoid complicated, CPU intensive operations.
 	 */
 	protected AsyncHandler() {
 		var manager = Objects.requireNonNull(LogManager.getLogManager());
