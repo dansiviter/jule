@@ -55,9 +55,10 @@ public interface BaseLog {
 	}
 
 	/**
+	 * Checks if this logger will log.
 	 *
-	 * @param level
-	 * @return
+	 * @param level the log level.
+	 * @return {@code true} if this will log.
 	 */
 	default boolean isLoggable(@Nonnull Message.Level level) {
 		return delegate().isLoggable(level.julLevel);
