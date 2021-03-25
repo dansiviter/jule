@@ -86,7 +86,7 @@ class AsyncHandlerTest {
 		}
 	}
 
-	private static class TestHandler extends AsyncHandler {
+	private static class TestHandler extends AsyncHandler<LogRecord> {
 		private final List<LogRecord> records = new ArrayList<>();
 
 		@Override

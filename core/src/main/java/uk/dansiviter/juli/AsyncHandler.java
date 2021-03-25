@@ -24,8 +24,8 @@ import java.util.Optional;
 import java.util.concurrent.Flow;
 import java.util.concurrent.Flow.Subscriber;
 import java.util.concurrent.Flow.Subscription;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.SubmissionPublisher;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.ErrorManager;
 import java.util.logging.Filter;
 import java.util.logging.Formatter;
@@ -64,15 +64,17 @@ import javax.annotation.Nonnull;
  *        (defaults to {@link java.util.concurrent.Flow#defaultBufferSize()}). </li>
  * </ul>
  */
-public abstract class AsyncHandler extends Handler {
-	private final Subscriber<LogRecord> subscriber = new LogSubscriber();
-	private final SubmissionPublisher<LogRecord> publisher;
-
+public abstract class AsyncHandler<R> extends Handler {
+	private final Subscriber<R> subscriber = new LogSubscriber();
+	private final SubmissionPublisher<R> publisher;
 	/** Closed status */
 	protected final AtomicBoolean closed = new AtomicBoolean();
 
+
 	/**
 	 * Create an asynchronous {@code Handler} and configure it based on {@code LogManager} configuration properties.
+	 *
+	 * @param transformer perform preflight transformation. Avoid complicated, CPU intensive operations.
 	 */
 	protected AsyncHandler() {
 		var manager = Objects.requireNonNull(LogManager.getLogManager());
@@ -131,7 +133,18 @@ public abstract class AsyncHandler extends Handler {
 
 		record.getSourceClassName();  // ensure source is populated
 
-		this.publisher.submit(record);
+		this.publisher.submit(transform(record));
+	}
+
+	/**
+	 * Perform any pre-flight transformation of this record. This will be called on the log calling thread.
+	 *
+	 * @param record the record to transform.
+	 * @return the transformed record.
+	 */
+	@SuppressWarnings("unchecked")
+	protected R transform(LogRecord record) {
+		return (R) record;
 	}
 
 	/**
@@ -139,7 +152,7 @@ public abstract class AsyncHandler extends Handler {
 	 *
 	 * @param record the log record to process.
 	 */
-	protected abstract void doPublish(LogRecord record);
+	protected abstract void doPublish(R record);
 
 	@Override
 	public void flush() { }
@@ -165,7 +178,7 @@ public abstract class AsyncHandler extends Handler {
 	/**
 	 *
 	 */
-	private class LogSubscriber implements Subscriber<LogRecord> {
+	private class LogSubscriber implements Subscriber<R> {
 		private Subscription subscription;
 
 		@Override
@@ -175,7 +188,7 @@ public abstract class AsyncHandler extends Handler {
 		}
 
 		@Override
-		public void onNext(LogRecord item) {
+		public void onNext(R item) {
 			doPublish(item);
 			this.subscription.request(1);
 		}

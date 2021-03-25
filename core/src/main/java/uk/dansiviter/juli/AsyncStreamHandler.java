@@ -26,7 +26,7 @@ import javax.annotation.Nonnull;
 /**
  * Async implementation of {@link StreamHandler} which simply delegates.
  */
-public abstract class AsyncStreamHandler extends AsyncHandler {
+public abstract class AsyncStreamHandler extends AsyncHandler<LogRecord> {
 	/** Delegate {@code StreamHandler} */
 	protected final StreamHandler delegate;
 
