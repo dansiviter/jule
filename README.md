@@ -49,11 +49,10 @@ public interface MyLog {
 
   @Message(value = "Number {0}", Level.DEBUG)
   void number(int value);  // <- primitives only auto-boxed if the log level is consumed
-
 }
 ```
 
-This will generate a class `com.foo.MyLog$log` which actually does the logging.
+This will generate a class `com.foo.MyLog$log` which actually does the logging. This can be seen in the `target/generated-sources/annotations/` folder for reference.
 
 To get an instance use `uk.dansiviter.juli.LogProducer`:
 ```java
