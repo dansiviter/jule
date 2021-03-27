@@ -24,11 +24,14 @@ import java.util.WeakHashMap;
 
 import javax.annotation.Nonnull;
 
+import uk.dansiviter.juli.annotations.Log;
+
 /**
  * This class provides instances of the log wrappers.
  */
 public enum LogProducer { ;
 	private static final Map<String, ? super Object> LOGS = new WeakHashMap<>();
+	public static final String SUFFIX = "$log";
 
 	/**
 	 * Return an instance of the given type. This will attempt to walk the stack
@@ -63,9 +66,12 @@ public enum LogProducer { ;
 	 * @return log instance. This may come from a cache of instances.
 	 */
 	public static <L> L log(@Nonnull Class<L> log, @Nonnull String name) {
+		if (!log.isAnnotationPresent(Log.class)) {
+			throw new IllegalArgumentException(format("@Log annotation not present! [%s]", log.getName()));
+		}
 		var key = key(log, name);
 		return log.cast(LOGS.computeIfAbsent(key, k -> {
-			var className = log.getName() + "$log";
+			var className = log.getName().concat(SUFFIX);
 			try {
 				return Class.forName(className)
 					.getDeclaredConstructor(String.class)

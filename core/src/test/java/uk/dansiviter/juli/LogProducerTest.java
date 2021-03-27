@@ -48,9 +48,15 @@ class LogProducerTest {
 	}
 
 	@Test
+	void log_noAnnotation() {
+		var e = assertThrows(IllegalArgumentException.class, () -> LogProducer.log(NoAnnotation.class));
+		assertThat("@Log annotation not present! [uk.dansiviter.juli.LogProducerTest$NoAnnotation]", equalTo(e.getMessage()));
+	}
+
+	@Test
 	void log_classNotFound() {
-		IllegalStateException e = assertThrows(IllegalStateException.class, () -> LogProducer.log(Object.class));
-		assertThat("Unable to instantiate class! [java.lang.Object$log]", equalTo(e.getMessage()));
+		var e = assertThrows(IllegalStateException.class, () -> LogProducer.log(NoImplemenatation.class));
+		assertThat("Unable to instantiate class! [uk.dansiviter.juli.LogProducerTest$NoImplemenatation$log]", equalTo(e.getMessage()));
 	}
 
 
@@ -68,4 +74,9 @@ class LogProducerTest {
 			this.name = name;
 		}
 	}
+
+	@Log
+	interface NoImplemenatation { }
+
+	interface NoAnnotation { }
 }
