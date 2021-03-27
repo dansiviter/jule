@@ -46,6 +46,7 @@ import javax.lang.model.util.Elements;
 import javax.tools.JavaFileObject;
 
 import com.squareup.javapoet.TypeName;
+import com.squareup.javapoet.TypeVariableName;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -83,34 +84,35 @@ class LogProcessorTest {
 		@Mock RoundEnvironment roundEnv,
 		@Mock TypeElement typeElement,
 		@Mock Elements elements,
-		@Mock PackageElement packageElement,
+		@Mock PackageElement pkgElement,
 		@Mock Message message,
 		@Mock Messager messager,
 		@Mock TypeMirror typeMirror,
-		@Mock Name name,
 		@Mock ExecutableElement exeElement,
 		@Mock TypeMirror methodTypeMirror,
 		@Mock Filer filer,
-		@Mock JavaFileObject javaFileObject)
+		@Mock JavaFileObject javaFileObject,
+		@Mock TypeMirror pkgTypeMirror)
 	throws IOException
 	{
 		when(roundEnv.getElementsAnnotatedWith(annotation)).thenReturn((Set) singleton(typeElement));
 		when(processingEnv.getElementUtils()).thenReturn(elements);
-		when(elements.getPackageOf(typeElement)).thenReturn(packageElement);
+		when(elements.getPackageOf(typeElement)).thenReturn(pkgElement);
+		when(typeElement.getSimpleName()).thenReturn(new NameImpl("Foo"));
 		when(processingEnv.getMessager()).thenReturn(messager);
 		when(typeElement.asType()).thenReturn(typeMirror);
 		when(typeMirror.accept(any(), any())).thenReturn(TypeName.get(LogProcessorTest.class));
-		when(packageElement.getQualifiedName()).thenReturn(name);
 
 		when(typeElement.getEnclosedElements()).thenReturn((List) singletonList(exeElement));
 		when(exeElement.getKind()).thenReturn(ElementKind.METHOD);
 		when(exeElement.getAnnotation(any())).thenReturn(message);
-		when(exeElement.getSimpleName()).thenReturn(name);
+		when(exeElement.getSimpleName()).thenReturn(new NameImpl("foo"));
 		when(methodTypeMirror.accept(any(), any())).thenReturn(TypeName.VOID);
 		when(exeElement.getReturnType()).thenReturn(methodTypeMirror);
-		when(name.toString()).thenReturn("foo");
 		when(message.level()).thenReturn(Level.INFO);
 		when(message.value()).thenReturn("hello");
+
+		when(pkgElement.getQualifiedName()).thenReturn(new NameImpl("com.acme"));
 
 		when(processingEnv.getFiler()).thenReturn(filer);
 		when(filer.createSourceFile(any(), any())).thenReturn(javaFileObject);
@@ -120,19 +122,54 @@ class LogProcessorTest {
 		this.processor.process(singleton(annotation), roundEnv);
 
 		// although I don't like this, we are in the business of generating code
-		String expected = readFromInputStream(getClass().getResourceAsStream("LogProcessorTest.txt"));
+		var expected = readFromInputStream(getClass().getResourceAsStream("LogProcessorTest.txt"));
+
+		System.out.println(writer.toString());
 		assertThat(writer.toString(), equalTo(expected));
 	}
 
 	private static String readFromInputStream(InputStream inputStream)
   throws IOException {
-    StringBuilder resultStringBuilder = new StringBuilder();
+    var resultStringBuilder = new StringBuilder();
     try (var buf = new BufferedReader(new InputStreamReader(inputStream))) {
         String line;
         while ((line = buf.readLine()) != null) {
             resultStringBuilder.append(line).append("\n");
         }
     }
-  return resultStringBuilder.toString();
-}
+  	return resultStringBuilder.toString();
+	}
+
+	private static class NameImpl implements Name {
+		private final String delegate;
+
+		NameImpl(String delegate) {
+			this.delegate = delegate;
+		}
+
+		@Override
+		public int length() {
+			return this.delegate.length();
+		}
+
+		@Override
+		public char charAt(int index) {
+			return this.delegate.charAt(index);
+		}
+
+		@Override
+		public CharSequence subSequence(int start, int end) {
+			return this.delegate.subSequence(start, end);
+		}
+
+		@Override
+		public boolean contentEquals(CharSequence cs) {
+			return this.delegate.contentEquals(cs);
+		}
+
+		@Override
+		public String toString() {
+			return this.delegate;
+		}
+	}
 }
