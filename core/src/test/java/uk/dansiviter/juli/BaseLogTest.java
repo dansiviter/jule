@@ -25,6 +25,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
+import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
+import java.util.function.IntSupplier;
+import java.util.function.LongSupplier;
 import java.util.function.Supplier;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
@@ -101,9 +105,14 @@ class BaseLogTest {
 	void logp() {
 		when(this.delegate.getResourceBundleName()).thenReturn("myBundle");
 
-		this.baseLog.logp(Level.DEBUG, "hello",
+		this.baseLog.logp(Level.DEBUG,
+			"hello",
 			"world",
 			(Supplier<String>) () -> "foo",  // test expansion
+			(BooleanSupplier) () -> true,
+			(IntSupplier) () -> 2,
+			(LongSupplier) () -> 3L,
+			(DoubleSupplier) () -> 2.3,
 			Optional.of("bar"),
 			Optional.empty());  // test throwable
 
@@ -113,7 +122,7 @@ class BaseLogTest {
 		var record = recordCaptor.getValue();
 		assertThat(record.getLevel(), equalTo(Level.DEBUG.julLevel));
 		assertThat(record.getMessage(), equalTo("hello"));
-		assertThat(record.getParameters(), arrayContaining("world", "foo", "bar", null));
+		assertThat(record.getParameters(), arrayContaining("world", "foo", true, 2, 3L, 2.3, "bar", null));
 		assertThat(record.getThrown(), nullValue());
 		assertThat(record.getResourceBundleName(), equalTo("myBundle"));
 	}

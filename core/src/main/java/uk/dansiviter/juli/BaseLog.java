@@ -20,6 +20,10 @@ import static java.util.logging.Logger.getLogger;
 
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
+import java.util.function.IntSupplier;
+import java.util.function.LongSupplier;
 import java.util.function.Supplier;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
@@ -114,6 +118,18 @@ public interface BaseLog {
 		for (var i = 0; i < params.length; i++) {
 			if (params[i] instanceof Supplier) {
 				params[i] = ((Supplier<?>) params[i]).get();
+			}
+			if (params[i] instanceof BooleanSupplier) {
+				params[i] = ((BooleanSupplier) params[i]).getAsBoolean();
+			}
+			if (params[i] instanceof IntSupplier) {
+				params[i] = ((IntSupplier) params[i]).getAsInt();
+			}
+			if (params[i] instanceof LongSupplier) {
+				params[i] = ((LongSupplier) params[i]).getAsLong();
+			}
+			if (params[i] instanceof DoubleSupplier) {
+				params[i] = ((DoubleSupplier) params[i]).getAsDouble();
 			}
 			if (params[i] instanceof Optional) {
 				params[i] = ((Optional<?>) params[i]).orElse(null);
