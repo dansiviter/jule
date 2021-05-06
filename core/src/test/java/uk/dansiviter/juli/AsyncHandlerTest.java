@@ -21,20 +21,29 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.timeout;
+import static org.mockito.Mockito.verify;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.ErrorManager;
 import java.util.logging.Filter;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 /**
  * Unit test for {@link AsyncHandler}.
  */
+@ExtendWith(MockitoExtension.class)
 class AsyncHandlerTest {
 	private final Logger log = Logger.getLogger("TEST");
 
@@ -58,6 +67,18 @@ class AsyncHandlerTest {
 				assertThat(handler.records.get(0).getMessage(), equalTo("hello"));
 				assertThat(handler.records.get(1).getMessage(), equalTo("world"));
 			});
+	}
+
+	@Test
+	void doPublish_error(@Mock ErrorManager em) {
+		var handler = new FailingHandler();
+		handler.setErrorManager(em);
+		log.addHandler(handler);
+
+		log.info("hello0");
+		log.info("hello1");
+
+		verify(em, timeout(250).times(2)).error(any(), any(), eq(ErrorManager.WRITE_FAILURE));
 	}
 
 	@Test
@@ -92,6 +113,13 @@ class AsyncHandlerTest {
 		@Override
 		protected void doPublish(LogRecord record) {
 			records.add(record);
+		}
+	}
+
+	private static class FailingHandler extends AsyncHandler<LogRecord> {
+		@Override
+		protected void doPublish(LogRecord record) {
+			throw new RuntimeException();
 		}
 	}
 

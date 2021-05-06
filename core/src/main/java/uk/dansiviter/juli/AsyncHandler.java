@@ -15,27 +15,23 @@
  */
 package uk.dansiviter.juli;
 
-import static java.lang.String.format;
 import static java.util.concurrent.ForkJoinPool.commonPool;
+import static java.util.logging.ErrorManager.GENERIC_FAILURE;
+import static java.util.logging.ErrorManager.OPEN_FAILURE;
+import static java.util.logging.ErrorManager.WRITE_FAILURE;
 
 import java.io.UnsupportedEncodingException;
-import java.util.Objects;
-import java.util.Optional;
 import java.util.concurrent.Flow;
 import java.util.concurrent.Flow.Subscriber;
 import java.util.concurrent.Flow.Subscription;
 import java.util.concurrent.SubmissionPublisher;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.logging.ErrorManager;
 import java.util.logging.Filter;
 import java.util.logging.Formatter;
 import java.util.logging.Handler;
 import java.util.logging.Level;
-import java.util.logging.LogManager;
 import java.util.logging.LogRecord;
 import java.util.logging.SimpleFormatter;
-
-import javax.annotation.Nonnull;
 
 /**
  * An abstract {@link Handler} that asynchronously delivers log messages. This leverages
@@ -64,67 +60,38 @@ import javax.annotation.Nonnull;
  *        (defaults to {@link java.util.concurrent.Flow#defaultBufferSize()}). </li>
  * </ul>
  */
-public abstract class AsyncHandler<R> extends Handler {
+public abstract class AsyncHandler<R> extends AbstractHandler {
 	private final Subscriber<R> subscriber = new LogSubscriber();
 	private final SubmissionPublisher<R> publisher;
 	/** Closed status */
 	protected final AtomicBoolean closed = new AtomicBoolean();
 
-
 	/**
 	 * Create an asynchronous {@code Handler} and configure it based on {@code LogManager} configuration properties.
 	 */
 	protected AsyncHandler() {
-		var manager = Objects.requireNonNull(LogManager.getLogManager());
-
-		setLevel(property(manager, "level").map(Level::parse).orElse(Level.INFO));
-		setFilter(property(manager, "filter").map(AsyncHandler::<Filter>instance).orElse(null));
-		setFormatter(property(manager, "formatter").map(AsyncHandler::<Formatter>instance).orElseGet(SimpleFormatter::new));
+		setLevel(property("level").map(Level::parse).orElse(Level.INFO));
+		setFilter(property("filter").map(AsyncHandler::<Filter>instance).orElse(null));
+		setFormatter(property("formatter").map(AsyncHandler::<Formatter>instance).orElseGet(SimpleFormatter::new));
 		try {
-			setEncoding(property(manager, "encoding").orElse(null));
+			setEncoding(property("encoding").orElse(null));
 		} catch (UnsupportedEncodingException e) {
-			getErrorManager().error(e.getMessage(), e, ErrorManager.OPEN_FAILURE);
+			getErrorManager().error(e.getMessage(), e, OPEN_FAILURE);
 		}
 
-		var maxBuffer = property(manager, "maxBuffer").map(Integer::parseInt).orElseGet(Flow::defaultBufferSize);
+		var maxBuffer = property("maxBuffer").map(Integer::parseInt).orElseGet(Flow::defaultBufferSize);
 		this.publisher = new SubmissionPublisher<>(commonPool(), maxBuffer);
 		this.publisher.subscribe(this.subscriber);
-	}
-
-	/**
-	 * Extracts the {@link LogManager#getProperty(String)}.
-	 *
-	 * @param manager the manager instance.
-	 * @param name the name of the property.
-	 * @return the value as an {@link Optional}.
-	 */
-	protected Optional<String> property(@Nonnull LogManager manager, @Nonnull String name) {
-		return Optional.ofNullable(manager.getProperty(getClass().getName() + "." + name));
 	}
 
 
 	// --- Static Methods ---
 
-	/**
-	 * Creates an instance of the class given by it's name using no-args constructor.
-	 *
-	 * @param <T> the type.
-	 * @param name the class name
-	 * @return an instance of the class.
-	 * @throws IllegalArgumentException if the class cannot be created.
-	 */
-	@SuppressWarnings("unchecked")
-	static @Nonnull <T> T instance(@Nonnull String name) {
-		try {
-			Class<?> concreteCls = Class.forName(name);
-			return (T) concreteCls.getDeclaredConstructor().newInstance();
-		} catch (ReflectiveOperationException e) {
-			throw new IllegalArgumentException(format("Unable to create! [%s]", name), e);
-		}
-	}
-
 	@Override
 	public void publish(LogRecord record) {
+		if (isClosed()) {
+			throw new IllegalStateException("Closed!");
+		}
 		if (!isLoggable(record)) {
 			return;
 		}
@@ -151,9 +118,6 @@ public abstract class AsyncHandler<R> extends Handler {
 	 * @param record the log record to process.
 	 */
 	protected abstract void doPublish(R record);
-
-	@Override
-	public void flush() { }
 
 	/**
 	 * @return {@code true} if closed.
@@ -187,13 +151,18 @@ public abstract class AsyncHandler<R> extends Handler {
 
 		@Override
 		public void onNext(R item) {
-			doPublish(item);
+			try {
+				doPublish(item);
+			} catch (RuntimeException e) {
+				getErrorManager().error(e.getMessage(), e, WRITE_FAILURE);
+			}
 			this.subscription.request(1);
 		}
 
 		@Override
 		public void onError(Throwable t) {
-			getErrorManager().error(t.getMessage(), new Exception(t), ErrorManager.GENERIC_FAILURE);
+			getErrorManager().error(t.getMessage(), new Exception(t), GENERIC_FAILURE);
+			close();  // this handler is effectively dead, so prevent other log messages
 		}
 
 		@Override

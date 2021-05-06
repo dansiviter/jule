@@ -24,12 +24,16 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -46,7 +50,16 @@ import uk.dansiviter.juli.annotations.Message.Level;
  */
 @ExtendWith(MockitoExtension.class)
 class LogProducerTest {
+	private static Collection<Handler> HANDLERS;
+
 	private final MyLog log = LogProducer.log(MyLog.class);
+
+	@BeforeAll
+	public static void beforeAll() {
+		var root = Logger.getLogger("");
+		HANDLERS = Arrays.asList(root.getHandlers());
+		HANDLERS.forEach(root::removeHandler);
+	}
 
 	@Test
 	void equivalence() {
@@ -166,5 +179,11 @@ class LogProducerTest {
 		default void anotherMethods(String foo) {
 			throw new IllegalArgumentException();
 		}
+	}
+
+	@AfterAll
+	public static void afterAll() {
+		var root = Logger.getLogger("");
+		HANDLERS.forEach(root::addHandler);
 	}
 }
