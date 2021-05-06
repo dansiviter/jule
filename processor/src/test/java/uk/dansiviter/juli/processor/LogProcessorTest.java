@@ -46,7 +46,6 @@ import javax.lang.model.util.Elements;
 import javax.tools.JavaFileObject;
 
 import com.squareup.javapoet.TypeName;
-import com.squareup.javapoet.TypeVariableName;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -79,6 +78,7 @@ class LogProcessorTest {
 	}
 
 	@Test // horribly flaky test!
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	void process(
 		@Mock TypeElement annotation,
 		@Mock RoundEnvironment roundEnv,
@@ -124,7 +124,6 @@ class LogProcessorTest {
 		// although I don't like this, we are in the business of generating code
 		var expected = readFromInputStream(getClass().getResourceAsStream("LogProcessorTest.txt"));
 
-		System.out.println(writer.toString());
 		assertThat(writer.toString(), equalTo(expected));
 	}
 
