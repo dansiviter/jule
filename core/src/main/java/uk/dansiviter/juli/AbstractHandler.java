@@ -47,7 +47,6 @@ public abstract class AbstractHandler extends Handler {
  /**
 	 * Extracts the {@link LogManager#getProperty(String)}.
 	 *
-	 * @param manager the manager instance.
 	 * @param name the name of the property.
 	 * @return the value as an {@link Optional}.
 	 */
