@@ -16,9 +16,9 @@
 package uk.dansiviter.juli;
 
 import static java.util.Objects.requireNonNull;
+import static java.util.logging.ErrorManager.WRITE_FAILURE;
 
 import java.util.Optional;
-import java.util.logging.ErrorManager;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
 
@@ -68,14 +68,14 @@ public class FallbackHandler extends AbstractHandler {
 	}
 
 	@Override
-	public void publish(LogRecord record) {
+	public void publish(LogRecord r) {
 		try {
 			this.delegate.ifPresentOrElse(
-				h -> h.publish(record),
-				() -> this.fallback.publish(record));
+				h -> h.publish(r),
+				() -> this.fallback.publish(r));
 		} catch (RuntimeException e) {
-			getErrorManager().error(e.getMessage(), e, ErrorManager.WRITE_FAILURE);
-			this.fallback.publish(record);
+			getErrorManager().error(e.getMessage(), e, WRITE_FAILURE);
+			this.fallback.publish(r);
 		}
 	}
 
