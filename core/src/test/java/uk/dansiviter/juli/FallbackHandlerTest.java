@@ -70,6 +70,16 @@ class FallbackHandlerTest {
 	}
 
 	@Test
+	void configuredState_badDelegate() {
+		managerProperties().setProperty(FallbackHandler.class.getName() + ".delegate", "foo");
+
+		var handler = new FallbackHandler();
+
+		assertThat(handler.getDelegate().isPresent(), is(false));
+		assertThat(handler.getFallback(), isA(AsyncConsoleHandler.class));
+	}
+
+	@Test
 	void publish(@Mock Handler delegate, @Mock Handler fallback) {
 		var handler = new FallbackHandler();
 		handler.setDelegate(Optional.of(delegate));
