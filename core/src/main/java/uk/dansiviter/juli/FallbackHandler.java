@@ -16,6 +16,7 @@
 package uk.dansiviter.juli;
 
 import static java.util.Objects.requireNonNull;
+import static java.util.logging.ErrorManager.OPEN_FAILURE;
 import static java.util.logging.ErrorManager.WRITE_FAILURE;
 
 import java.util.Optional;
@@ -47,7 +48,7 @@ public class FallbackHandler extends AbstractHandler {
 	 * Default constructor.
 	 */
 	public FallbackHandler() {
-		this.delegate = property("delegate").map(FallbackHandler::<Handler>instance);
+		this.delegate = property("delegate").map(this::handlerOrNull);
 		this.fallback = property("fallback").map(FallbackHandler::<Handler>instance).orElseGet(AsyncConsoleHandler::new);
 	}
 
@@ -89,5 +90,17 @@ public class FallbackHandler extends AbstractHandler {
 	public void close() throws SecurityException {
 		this.delegate.ifPresent(Handler::close);
 		this.fallback.close();
+	}
+
+
+	// --- Static Methods ---
+
+	private Handler handlerOrNull(String name) {
+		try {
+			return instance(name);
+		} catch (IllegalArgumentException e) {
+			getErrorManager().error("Unable to create!", e, OPEN_FAILURE);
+			return null;
+		}
 	}
 }
