@@ -24,14 +24,17 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Optional;
-import java.util.Properties;
 import java.util.logging.ErrorManager;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.LogRecord;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -44,10 +47,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
  */
 @ExtendWith(MockitoExtension.class)
 class FallbackHandlerTest {
+	private LogManager manager;
+
 	@BeforeEach
 	void before() {
-		var properties = managerProperties();
-		properties.keySet().removeIf(v -> v.toString().startsWith(FallbackHandler.class.getName()));
+		manager = LogManager.getLogManager();
 	}
 
 	@Test
@@ -59,9 +63,14 @@ class FallbackHandlerTest {
 	}
 
 	@Test
-	void configuredState() {
-		managerProperties().setProperty(FallbackHandler.class.getName() + ".delegate", TestDelegate.class.getName());
-		managerProperties().setProperty(FallbackHandler.class.getName() + ".fallback", TestFallback.class.getName());
+	void configuredState() throws IOException {
+		var config = String.format(
+			"%s.delegate=%s\n%s.fallback=%s\n",
+			FallbackHandler.class.getName(), TestDelegate.class.getName(),
+			FallbackHandler.class.getName(), TestFallback.class.getName());
+		try (InputStream is = new ByteArrayInputStream(config.getBytes())) {
+			this.manager.readConfiguration(is);
+		}
 
 		var handler = new FallbackHandler();
 
@@ -70,8 +79,13 @@ class FallbackHandlerTest {
 	}
 
 	@Test
-	void configuredState_badDelegate() {
-		managerProperties().setProperty(FallbackHandler.class.getName() + ".delegate", "foo");
+	void configuredState_badDelegate() throws IOException {
+		var config = String.format(
+			"$s.delegate=foo\n",
+			FallbackHandler.class.getName());
+		try (InputStream is = new ByteArrayInputStream(config.getBytes())) {
+			this.manager.readConfiguration(is);
+		}
 
 		var handler = new FallbackHandler();
 
@@ -159,15 +173,9 @@ class FallbackHandlerTest {
 		verify(fallback).close();
 	}
 
-	private static Properties managerProperties() {
-		try {
-			var manager = LogManager.getLogManager();
-			var props = manager.getClass().getDeclaredField("props");
-			props.trySetAccessible();
-			return (Properties) props.get(manager);
-		} catch (ReflectiveOperationException e) {
-			throw new IllegalStateException(e);
-		}
+	@AfterAll
+	public static void afterAll() {
+		LogManager.getLogManager().reset();
 	}
 
 	public static class TestDelegate extends AbstractHandler {

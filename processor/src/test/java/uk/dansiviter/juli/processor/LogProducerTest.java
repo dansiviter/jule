@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uk.dansiviter.juli;
+package uk.dansiviter.juli.processor;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -40,6 +40,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import uk.dansiviter.juli.LogProducer;
 import uk.dansiviter.juli.annotations.Log;
 import uk.dansiviter.juli.annotations.Message;
 import uk.dansiviter.juli.annotations.Message.Level;
@@ -91,9 +92,9 @@ class LogProducerTest {
 
 		var record = records.next();
 		assertEquals(java.util.logging.Level.INFO, record.getLevel());
-		assertEquals("uk.dansiviter.juli.LogProducerTest", record.getLoggerName());
+		assertEquals(getClass().getName(), record.getLoggerName());
 		assertEquals("Hello world!", record.getMessage());
-		assertEquals("uk.dansiviter.juli.LogProducerTest", record.getSourceClassName());
+		assertEquals(getClass().getName(), record.getSourceClassName());
 		assertEquals("logInjected", record.getSourceMethodName());
 		assertNull(record.getParameters());
 		assertNull(record.getThrown());
