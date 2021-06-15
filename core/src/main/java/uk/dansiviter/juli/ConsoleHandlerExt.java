@@ -21,7 +21,7 @@ import java.util.logging.ConsoleHandler;
 import java.util.logging.LogManager;
 
 /**
- * Variant of ConsoleHandler where I can actually set if it uses {@code STDOUT} or {@STDERR}.
+ * Variant of ConsoleHandler where I can actually set if it uses {@code STDOUT} or {@code STDERR}.
  * <b>Configuration:</b>
  * Using the following {@code LogManager} configuration properties, where {@code <handler-name>} refers to the
  * fully-qualified class name of the handler:
