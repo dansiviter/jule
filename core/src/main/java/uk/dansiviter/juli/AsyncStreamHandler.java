@@ -47,6 +47,13 @@ public abstract class AsyncStreamHandler extends AsyncHandler<LogRecord> {
 		}
 	}
 
+	/**
+	 * @return the delegate.
+	 */
+	protected StreamHandler delegate() {
+		return this.delegate;
+	}
+
 	@Override
 	protected void doPublish(LogRecord record) {
 		delegate.publish(record);
