@@ -15,16 +15,36 @@
  */
 package uk.dansiviter.juli;
 
-import java.util.logging.ConsoleHandler;
-
 /**
- * Async implementation of {@link ConsoleHandler} which simply delegates.
+ * Async implementation which simply delegates to {@link ConsoleHandlerExt}.
  */
 public class AsyncConsoleHandler extends AsyncStreamHandler {
 	/**
-	 * Constructs an asynchronous {@code ConsoleHandler}
+	 * Constructs an asynchronous {@code ConsoleHandlerExt}
 	 */
 	public AsyncConsoleHandler() {
-		super(new ConsoleHandler());
+		super(new ConsoleHandlerExt());
+		property("stdOut")
+			.map(Boolean::parseBoolean)
+			.ifPresent(this::setStdOut);
+	}
+
+	@Override
+	protected ConsoleHandlerExt delegate() {
+		return (ConsoleHandlerExt) super.delegate();
+	}
+
+	/**
+	 * @return {@code true} if using {@link System#out}.
+	 */
+	public boolean isStdOut() {
+		return delegate().isStdOut();
+	}
+
+	/**
+	 * @param stdOut if {@code true} this uses {@link System#out}.
+	 */
+	public void setStdOut(boolean stdOut) {
+		delegate().setStdOut(stdOut);
 	}
 }
