@@ -6,8 +6,12 @@
 		<artifactId>juli-project</artifactId>
 		<version>0.2.0-SNAPSHOT</version>
 	</parent>
-	<artifactId>core</artifactId>
+	<artifactId>juli</artifactId>
 	<name>Core</name>
+
+	<properties>
+		<module.name>${project.groupId}</module.name>
+	</properties>
 
 	<dependencies>
 		<dependency>
