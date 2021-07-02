@@ -61,7 +61,7 @@ public interface MyLog {
 }
 ```
 
-This will generate a class `com.foo.MyLog$log` which actually does the logging. For Maven this can be seen in the `target/generated-sources/annotations/` folder for reference.
+This will generate a class `com.foo.MyLog$impl` which actually does the logging. For Maven this can be seen in the `target/generated-sources/annotations/` folder for reference.
 
 To get an instance use `uk.dansiviter.juli.LogProducer`:
 ```java
