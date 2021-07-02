@@ -31,19 +31,19 @@ import uk.dansiviter.juli.annotations.Log;
 class LogProducerTest {
 	@Test
 	void log() {
-		var log = (MyLog$log) LogProducer.log(MyLog.class);
+		var log = (MyLog$impl) LogProducer.log(MyLog.class);
 		assertThat("uk.dansiviter.juli.LogProducerTest", equalTo(log.name));
 	}
 
 	@Test
 	void log_class() {
-		var log = (MyLog$log) LogProducer.log(MyLog.class, String.class);
+		var log = (MyLog$impl) LogProducer.log(MyLog.class, String.class);
 		assertThat("java.lang.String", equalTo(log.name));
 	}
 
 	@Test
 	void log_name() {
-		var log = (MyLog$log) LogProducer.log(MyLog.class, "foo");
+		var log = (MyLog$impl) LogProducer.log(MyLog.class, "foo");
 		assertThat("foo", equalTo(log.name));
 	}
 
@@ -56,7 +56,7 @@ class LogProducerTest {
 	@Test
 	void log_classNotFound() {
 		var e = assertThrows(IllegalStateException.class, () -> LogProducer.log(NoImplemenatation.class));
-		assertThat("Unable to instantiate class! [uk.dansiviter.juli.LogProducerTest$NoImplemenatation$log]", equalTo(e.getMessage()));
+		assertThat("Unable to instantiate class! [uk.dansiviter.juli.LogProducerTest$NoImplemenatation$impl]", equalTo(e.getMessage()));
 	}
 
 
@@ -68,9 +68,9 @@ class LogProducerTest {
 	/**
 	 * This would normally be auto-generated.
 	 */
-	public static class MyLog$log implements MyLog {
+	public static class MyLog$impl implements MyLog {
 		final String name;
-		MyLog$log(String name) {
+		MyLog$impl(String name) {
 			this.name = name;
 		}
 	}

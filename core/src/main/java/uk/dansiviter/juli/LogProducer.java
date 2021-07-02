@@ -31,7 +31,7 @@ import uk.dansiviter.juli.annotations.Log;
  */
 public enum LogProducer { ;
 	private static final Map<String, ? super Object> LOGS = new WeakHashMap<>();
-	public static final String SUFFIX = "$log";
+	public static final String SUFFIX = "$impl";
 
 	/**
 	 * Return an instance of the given type. This will attempt to walk the stack
