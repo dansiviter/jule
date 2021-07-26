@@ -83,7 +83,7 @@ public abstract class AbstractHandler extends Handler {
 	 * @param name the name of the property.
 	 * @return the value as an {@link Optional}.
 	 */
-	public static Optional<String> property(@Nonnull LogManager manager, Class<? extends Handler> cls, @Nonnull String name) {
+	public static Optional<String> property(@Nonnull LogManager manager, Class<?> cls, @Nonnull String name) {
 		return Optional.ofNullable(manager.getProperty(format("%s.%s", cls.getName(), name)));
 	}
 }
