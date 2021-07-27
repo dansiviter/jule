@@ -15,10 +15,10 @@
  */
 package uk.dansiviter.juli;
 
-import static uk.dansiviter.juli.AbstractHandler.property;
+import static java.util.logging.LogManager.getLogManager;
+import static uk.dansiviter.juli.JulUtil.property;
 
 import java.util.logging.ConsoleHandler;
-import java.util.logging.LogManager;
 
 /**
  * Variant of ConsoleHandler where I can actually set if it uses {@code STDOUT} or {@code STDERR}.
@@ -38,7 +38,7 @@ public class ConsoleHandlerExt extends ConsoleHandler {
 	 * Default constructor that uses permits setting of output.
 	 */
 	public ConsoleHandlerExt() {
-		property(LogManager.getLogManager(), getClass(), "stdOut")
+		property(getLogManager(), getClass(), "stdOut")
 			.map(Boolean::parseBoolean)
 			.ifPresentOrElse(this::setStdOut, () -> setStdOut(true));
 	}

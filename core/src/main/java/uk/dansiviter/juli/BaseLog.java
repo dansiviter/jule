@@ -54,8 +54,8 @@ public interface BaseLog {
 	 * @return the logger instance.
 	 */
 	default Logger delegate(@Nonnull String name) {
-		var resourceBundleName = log().resourceBundleName();
-		return getLogger(name, resourceBundleName.isBlank() ? null : resourceBundleName);
+		var bundleName = log().resourceBundleName();
+		return getLogger(name, bundleName.isBlank() ? null : bundleName);
 	}
 
 	/**

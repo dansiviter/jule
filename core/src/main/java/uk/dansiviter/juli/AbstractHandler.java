@@ -51,7 +51,7 @@ public abstract class AbstractHandler extends Handler {
 	 * @return the value as an {@link Optional}.
 	 */
 	protected Optional<String> property(@Nonnull String name) {
-		return property(manager, getClass(), name);
+		return JulUtil.property(manager, getClass(), name);
 	}
 
 
@@ -68,22 +68,10 @@ public abstract class AbstractHandler extends Handler {
 	@SuppressWarnings("unchecked")
 	protected static @Nonnull <T> T instance(@Nonnull String name) {
 		try {
-			Class<?> concreteCls = Class.forName(name);
+			var concreteCls = Class.forName(name);
 			return (T) concreteCls.getDeclaredConstructor().newInstance();
 		} catch (ReflectiveOperationException e) {
 			throw new IllegalArgumentException(format("Unable to create! [%s]", name), e);
 		}
-	}
-
-	/**
-	 * Extracts the {@link LogManager#getProperty(String)}.
-	 *
-	 * @param manager the log manager.
-	 * @param cls the handler class.
-	 * @param name the name of the property.
-	 * @return the value as an {@link Optional}.
-	 */
-	public static Optional<String> property(@Nonnull LogManager manager, Class<?> cls, @Nonnull String name) {
-		return Optional.ofNullable(manager.getProperty(format("%s.%s", cls.getName(), name)));
 	}
 }

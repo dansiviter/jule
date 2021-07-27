@@ -15,6 +15,7 @@
  */
 package uk.dansiviter.juli;
 
+import static java.lang.String.format;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.isA;
@@ -64,7 +65,7 @@ class FallbackHandlerTest {
 
 	@Test
 	void configuredState() throws IOException {
-		var config = String.format(
+		var config = format(
 			"%s.delegate=%s\n%s.fallback=%s\n",
 			FallbackHandler.class.getName(), TestDelegate.class.getName(),
 			FallbackHandler.class.getName(), TestFallback.class.getName());
@@ -80,7 +81,7 @@ class FallbackHandlerTest {
 
 	@Test
 	void configuredState_badDelegate() throws IOException {
-		var config = String.format(
+		var config = format(
 			"$s.delegate=foo\n",
 			FallbackHandler.class.getName());
 		try (InputStream is = new ByteArrayInputStream(config.getBytes())) {

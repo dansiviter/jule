@@ -15,6 +15,8 @@
  */
 package uk.dansiviter.juli;
 
+import static org.hamcrest.MatcherAssert.*;
+import static org.hamcrest.Matchers.*;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 
@@ -41,6 +43,17 @@ class AsyncStreamHandlerTest {
 		handler.flush();
 
 		verify(delegate, timeout(500)).publish(record);
+	}
+
+	@Test
+	void transform(@Mock StreamHandler delegate) {
+		var handler = new AsyncStreamHandler(delegate) { };
+
+		var record = new LogRecord(Level.INFO, "Hello {0}");
+		record.setParameters(new Object[] { "world" });
+		record = handler.transform(record);
+
+		assertThat(record.getMessage(), endsWith("Hello world" + System.lineSeparator()));
 	}
 
 	@Test

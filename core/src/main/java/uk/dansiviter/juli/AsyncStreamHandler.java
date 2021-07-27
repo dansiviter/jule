@@ -18,6 +18,7 @@ package uk.dansiviter.juli;
 import java.io.UnsupportedEncodingException;
 import java.util.Objects;
 import java.util.logging.ErrorManager;
+import java.util.logging.Formatter;
 import java.util.logging.LogRecord;
 import java.util.logging.StreamHandler;
 
@@ -39,7 +40,7 @@ public abstract class AsyncStreamHandler extends AsyncHandler<LogRecord> {
 		this.delegate = Objects.requireNonNull(delegate);
 		this.delegate.setLevel(getLevel());
 		this.delegate.setFilter(getFilter());
-		this.delegate.setFormatter(getFormatter());
+		this.delegate.setFormatter(new NoopFormatter());
 		try {
 			this.delegate.setEncoding(getEncoding());
 		} catch (UnsupportedEncodingException e) {
@@ -55,6 +56,12 @@ public abstract class AsyncStreamHandler extends AsyncHandler<LogRecord> {
 	}
 
 	@Override
+	protected LogRecord transform(LogRecord record) {
+		record.setMessage(getFormatter().format(record));  // format retaining thread context
+		return super.transform(record);
+	}
+
+	@Override
 	protected void doPublish(LogRecord record) {
 		delegate.publish(record);
 	}
@@ -67,5 +74,15 @@ public abstract class AsyncStreamHandler extends AsyncHandler<LogRecord> {
 	@Override
 	public void close() throws SecurityException {
 		this.delegate.close();
+	}
+
+
+	// --- Inner Classes ---
+
+	private static class NoopFormatter extends Formatter {
+		@Override
+		public String format(LogRecord record) {
+			return record.getMessage();
+		}
 	}
 }
