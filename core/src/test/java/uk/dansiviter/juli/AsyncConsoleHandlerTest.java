@@ -16,6 +16,7 @@
 package uk.dansiviter.juli;
 
 import static java.lang.String.format;
+import static java.util.logging.LogManager.getLogManager;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
@@ -36,7 +37,7 @@ public class AsyncConsoleHandlerTest {
 
 	@BeforeEach
 	void before() {
-		manager = LogManager.getLogManager();
+		this.manager = getLogManager();
 	}
 
 	@Test
@@ -61,6 +62,6 @@ public class AsyncConsoleHandlerTest {
 
 	@AfterAll
 	public static void afterAll() {
-		LogManager.getLogManager().reset();
+		getLogManager().reset();
 	}
 }
