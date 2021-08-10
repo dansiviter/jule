@@ -1,7 +1,7 @@
 name: Publish Release
 on:
   release:
-    types: [ created ]
+    types: [ published ]
 jobs:
   publish:
     runs-on: ubuntu-latest
@@ -23,4 +23,3 @@ jobs:
         MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
         MAVEN_CENTRAL_TOKEN: ${{ secrets.MAVEN_CENTRAL_TOKEN }}
         MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
-
