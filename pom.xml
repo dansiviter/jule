@@ -7,11 +7,11 @@
 	<packaging>pom</packaging>
 	<name>Java Util Logger Improver (JULI)</name>
 
-	<url>https://github.com/dansiviter/juni</url>
+	<url>https://github.com/dansiviter/juli</url>
 	<scm>
 		<developerConnection>scm:git:git@github.com:dansiviter/juli.git</developerConnection>
-		<tag>juli-project-0.2.1</tag>
-  </scm>
+		<tag>HEAD</tag>
+	</scm>
 
 	<licenses>
 		<license>
@@ -33,7 +33,7 @@
 		<sonar.organization>dansiviter-github</sonar.organization>
 		<sonar.moduleKey>${project.groupId}:${project.artifactId}</sonar.moduleKey>
 		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
-		        
+
 		<module.name>${project.groupId}.${project.artifactId}</module.name>
 	</properties>
 
@@ -55,7 +55,7 @@
 	</modules>
 
 	<dependencyManagement>
-    <dependencies>
+		<dependencies>
 			<dependency>
 				<groupId>org.junit.jupiter</groupId>
 				<artifactId>junit-jupiter</artifactId>
@@ -172,7 +172,18 @@
 						</goals>
 					</execution>
 				</executions>
-				</plugin>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-gpg-plugin</artifactId>
+				<version>3.0.1</version>
+				<configuration>
+					<gpgArguments>
+						<arg>--pinentry-mode</arg>
+						<arg>loopback</arg>
+					</gpgArguments>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 
@@ -184,7 +195,7 @@
 				<module>processor</module>
 				<module>cdi</module>
 				<module>benchmarks</module>
-			</modules>		
+			</modules>
 		</profile>
 	</profiles>
 </project>
