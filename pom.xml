@@ -6,11 +6,16 @@
 	<version>0.2.5-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>Java Util Logger Improver (JULI)</name>
+	<description>Library to help simplfy and improve java.util.logger</description>
 
 	<url>https://github.com/dansiviter/juli</url>
+	<inceptionYear>2020</inceptionYear>
+
 	<scm>
 		<developerConnection>scm:git:git@github.com:dansiviter/juli.git</developerConnection>
-		<tag>juli-project-0.2.4</tag>
+		<connection>scm:git:git@github.com:dansiviter/juli.git</connection>
+		<url>https://github.com/dansiviter/juli</url>
+		<tag>HEAD</tag>
 	</scm>
 
 	<licenses>
@@ -20,6 +25,13 @@
 			<distribution>manual</distribution>
 		</license>
 	</licenses>
+
+	<developers>
+		<developer>
+			<name>Daniel Siviter</name>
+			<email>dansiviter@gmail.com</email>
+		</developer>
+	</developers>
 
 	<properties>
 		<java.version>11</java.version>
@@ -173,17 +185,6 @@
 					</execution>
 				</executions>
 			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-gpg-plugin</artifactId>
-				<version>3.0.1</version>
-				<configuration>
-					<gpgArguments>
-						<arg>--pinentry-mode</arg>
-						<arg>loopback</arg>
-					</gpgArguments>
-				</configuration>
-			</plugin>
 		</plugins>
 	</build>
 
@@ -196,6 +197,28 @@
 				<module>cdi</module>
 				<module>benchmarks</module>
 			</modules>
+		</profile>
+
+		<profile>
+			<id>release</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-gpg-plugin</artifactId>
+						<version>3.0.1</version>
+						<executions>
+							<execution>
+								<id>sign-artifacts</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
 		</profile>
 	</profiles>
 </project>
