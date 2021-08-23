@@ -3,14 +3,14 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>uk.dansiviter.juli</groupId>
 	<artifactId>juli-project</artifactId>
-	<version>0.2.4-SNAPSHOT</version>
+	<version>0.2.4</version>
 	<packaging>pom</packaging>
 	<name>Java Util Logger Improver (JULI)</name>
 
 	<url>https://github.com/dansiviter/juli</url>
 	<scm>
 		<developerConnection>scm:git:git@github.com:dansiviter/juli.git</developerConnection>
-		<tag>HEAD</tag>
+		<tag>juli-project-0.2.4</tag>
 	</scm>
 
 	<licenses>
