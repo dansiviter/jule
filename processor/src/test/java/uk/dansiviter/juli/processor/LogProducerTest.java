@@ -27,6 +27,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Optional;
+import java.util.function.LongSupplier;
 import java.util.function.Supplier;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
@@ -154,7 +155,7 @@ class LogProducerTest {
 		void doLog(String foo);
 
 		@Message("Hello world! {0}")
-		void doLog(Supplier<Long> foo);
+		void doLog(LongSupplier foo);
 
 		@Message("Hello world! {0}")
 		void doLog(int foo);

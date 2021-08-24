@@ -1,14 +1,14 @@
-[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/dansiviter/juli/Build?style=flat-square)](https://github.com/dansiviter/juli/actions/workflows/build.yaml) [![Known Vulnerabilities](https://snyk.io/test/github/dansiviter/juli/badge.svg?style=flat-square)](https://snyk.io/test/github/dansiviter/juli) [![Sonar Coverage](https://img.shields.io/sonar/coverage/dansiviter_juli?server=https%3A%2F%2Fsonarcloud.io&style=flat-square)](https://sonarcloud.io/dashboard?id=dansiviter_juli) ![Maven Central](https://img.shields.io/maven-central/v/uk.dansiviter.juli/juli-project?style=flat-square) ![Java 11+](https://img.shields.io/badge/-Java%2011%2B-informational?style=flat-square)
+[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/dansiviter/juli/Build?style=flat-square)](https://github.com/dansiviter/juli/actions/workflows/build.yaml) [![Known Vulnerabilities](https://snyk.io/test/github/dansiviter/juli/badge.svg?style=flat-square)](https://snyk.io/test/github/dansiviter/juli) [![Sonar Coverage](https://img.shields.io/sonar/coverage/dansiviter_juli?server=https%3A%2F%2Fsonarcloud.io&style=flat-square)](https://sonarcloud.io/dashboard?id=dansiviter_juli) [![Maven Central](https://img.shields.io/maven-central/v/uk.dansiviter.juli/juli-project?style=flat-square)](https://search.maven.org/artifact/uk.dansiviter.juli/juli-project) ![Java 11+](https://img.shields.io/badge/-Java%2011%2B-informational?style=flat-square)
 
 
 # Java Util Logging Improver (JULI) #
 
 Although rarely the preferred framework `java.util.logging` (JUL) is embedded into Java so aids minimal applications but is not the easiest to use. This library is here to make life a little easier:
-* Minimal layer to improve:
+* Minimal (~21KB for v0.3.0) layer to improve:
   * Type-safety to reduce errors,
   * Improve maintenance overhead by reducing complexity,
   * Simplify unit testing (especially with CDI),
-  * Reduce improve performance by deferring array initialisation and auto-boxing until actually needed,
+  * Reduce performance impact by deferring array initialisation and auto-boxing until actually needed,
   * Automatic unwrapping of `java.util.function.*Supplier` and `java.util.Optional` parameters.
 * Asynchronous handlers to mitigate logging impact on critical path,
 * Fallback handlers to mitigate loss of logs to aid debugging.
@@ -56,7 +56,7 @@ public interface MyLog {
   @Message("Number {0}")
   void number(int value);  // <- primitives only auto-boxed if the log level is consumed. w00t!
 
-  @Message("Another umber {0}")
+  @Message("Another number {0}")
   void numberUnwrap(IntSuppler value);  // <- primitive suppliers work too!
 }
 ```
@@ -75,6 +75,7 @@ public class MyClass {
 ```
 
 > :information_source: The log levels are reduced to just `ERROR`, `WARN`, `INFO`, `DEBUG` and `TRACE` as, frankly, that's all you really need.
+
 
 ## CDI ##
 
@@ -102,14 +103,14 @@ public class MyClass {
 
 This will inject a `@Dependent` scoped instance of the logger to prevent proxying.
 
-> :information_source: Testing can be done easily by injecting a mock of `MyLog` which helps validating behaviour which is especially pertinent for warning and error messages.
+> :information_source: Testing can be done easily by injecting a mock of `MyLog` which helps validating behaviour which is especially pertinent for `WARN` and `ERROR` messages.
 
 
 ## Asynchronous Handlers ##
 
-JUL handlers are all synchronous which puts IO directly within the path of execution; this is a bottleneck. To address this, this library has a very simple `uk.dansiviter.juli.AsyncHandler` implementation that uses `java.util.concurrent.Flow` to asynchronously process log events. Using this can dramatically improve the performance of 'chatty' logging at the expense of a little memory and CPU. There is only one concrete implementation as the moment which is `uk.dansiviter.juli.AsyncConsoleHandler` which can be used as a direct replacement for `java.util.logging.ConsoleHandler`.
+JUL handlers are all synchronous which puts IO directly within the path of execution; this is a bottleneck. To address this, this library has a very simple `uk.dansiviter.juli.AsyncHandler` implementation that uses `java.util.concurrent.Flow` to asynchronously process log events. Using this can significantly improve the execution performance of methods that have 'chatty' logging at the expense of a little memory and CPU. There is only one concrete implementation as the moment which is `uk.dansiviter.juli.AsyncConsoleHandler` which can be used as a direct replacement for `java.util.logging.ConsoleHandler`.
 
-> :warning: If the buffer saturates, then the much of the performance benefits of the asynchronous handler can be lost. However, once the pressure is reduced this will return, due to this it _should_ still outperform a synchronous implementation.
+> :warning: If the buffer saturates, then the much of the performance benefits of the asynchronous handler can be lost. However, once the back-pressure is reduced this will return, due to this it _should_ still outperform a synchronous implementation.
 
 > :information_source: `com.lmax:disruptor` has been trialed as an alternative to using Java 9 `Flow` but its bulk (~90KB) and no significant out-of-the-box performance improvement is has been discounted (see [#6](../../issues/6)).
 
