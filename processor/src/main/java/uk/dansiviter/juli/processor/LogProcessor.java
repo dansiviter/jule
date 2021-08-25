@@ -22,7 +22,9 @@ import static javax.lang.model.element.Modifier.STATIC;
 import static javax.tools.Diagnostic.Kind.NOTE;
 
 import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
@@ -33,6 +35,7 @@ import javax.annotation.processing.Generated;
 import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.annotation.processing.SupportedSourceVersion;
+import javax.lang.model.AnnotatedConstruct;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
@@ -53,14 +56,19 @@ import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 
 import org.graalvm.nativeimage.hosted.Feature;
-import org.graalvm.nativeimage.hosted.RuntimeReflection;
 import org.graalvm.nativeimage.hosted.Feature.BeforeAnalysisAccess;
+import org.graalvm.nativeimage.hosted.RuntimeReflection;
 
 import uk.dansiviter.juli.BaseLog;
 import uk.dansiviter.juli.LogProducer;
+import uk.dansiviter.juli.annotations.DEBUG;
+import uk.dansiviter.juli.annotations.ERROR;
+import uk.dansiviter.juli.annotations.INFO;
 import uk.dansiviter.juli.annotations.Log;
 import uk.dansiviter.juli.annotations.Message;
+import uk.dansiviter.juli.annotations.TRACE;
 import uk.dansiviter.juli.annotations.Message.Level;
+import uk.dansiviter.juli.annotations.WARN;
 
 /**
  * Processes {@link Log} annotations.
@@ -68,6 +76,12 @@ import uk.dansiviter.juli.annotations.Message.Level;
 @SupportedAnnotationTypes("uk.dansiviter.juli.annotations.Log")
 @SupportedSourceVersion(SourceVersion.RELEASE_11)
 public class LogProcessor extends AbstractProcessor {
+	private static final Map<Class<? extends Annotation>, Message.Level> TYPES = Map.of(
+		ERROR.class, Level.ERROR,
+		WARN.class, Level.WARN,
+		INFO.class, Level.WARN,
+		DEBUG.class, Level.DEBUG,
+		TRACE.class, Level.TRACE);
 
 	@Override
 	public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
@@ -132,7 +146,7 @@ public class LogProcessor extends AbstractProcessor {
 
 		element.getEnclosedElements().stream()
 			.filter(e -> e.getKind() == ElementKind.METHOD)
-			.filter(e -> e.getAnnotation(Message.class) != null)
+			.filter(e -> hasAnnotation(e, Message.class) || hasAnnotation(e, INFO.class) || hasAnnotation(e, WARN.class))
 			.forEach(e -> processMethod(typeBuilder, (ExecutableElement) e));
 
 		typeBuilder.addType(createGraalFeature(className, element, concreteName, pkg));
@@ -146,12 +160,40 @@ public class LogProcessor extends AbstractProcessor {
 		}
 	}
 
-	private void processMethod(@Nonnull TypeSpec.Builder builder, @Nonnull ExecutableElement e) {
-		var message = e.getAnnotation(Message.class);
-
-		if (message.value() == null || message.value().isEmpty()) {
-			processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, "Message cannot be empty!", e);
+	private void processMethod(TypeSpec.Builder builder, ExecutableElement e) {
+		var msg = e.getAnnotation(Message.class);
+		if (msg != null) {
+			processMethod(builder, e, msg.value(), msg.level(), msg.once());
 		}
+		var error = e.getAnnotation(ERROR.class);
+		if (error != null) {
+			processMethod(builder, e, error.value(), Level.ERROR, error.once());
+		}
+		var warn = e.getAnnotation(WARN.class);
+		if (warn != null) {
+			processMethod(builder, e, warn.value(), Level.WARN, warn.once());
+		}
+		var info = e.getAnnotation(INFO.class);
+		if (info != null) {
+			processMethod(builder, e, info.value(), Level.INFO, info.once());
+		}
+		var debug = e.getAnnotation(DEBUG.class);
+		if (debug != null) {
+			processMethod(builder, e, debug.value(), Level.DEBUG, debug.once());
+		}
+		var trace = e.getAnnotation(TRACE.class);
+		if (trace != null) {
+			processMethod(builder, e, trace.value(), Level.TRACE, trace.once());
+		}
+	}
+
+	private void processMethod(
+			TypeSpec.Builder builder,
+			ExecutableElement e,
+			String msg,
+			Level level,
+			boolean once)
+	{
 
 		var method = MethodSpec.methodBuilder(e.getSimpleName().toString())
 				.addAnnotation(Override.class)
@@ -162,11 +204,11 @@ public class LogProcessor extends AbstractProcessor {
 
 		var returnThis = builder.superinterfaces.contains(TypeName.get(e.getReturnType()));
 
-		method.beginControlFlow("if (!isLoggable($T.$N))", Level.class, message.level().name())
+		method.beginControlFlow("if (!isLoggable($T.$N))", Level.class, level.name())
 					.addStatement(returnThis ? "return this" : "return")
 					.endControlFlow();
 
-		if (message.once()) {
+		if (once) {
 			var onceField = "ONCE__".concat(e.getSimpleName().toString());
 			var onceSpec = FieldSpec.builder(AtomicBoolean.class, onceField, PRIVATE, STATIC, FINAL)
 					.initializer("new $T()", AtomicBoolean.class)
@@ -183,7 +225,7 @@ public class LogProcessor extends AbstractProcessor {
 		}
 		statement.append(')');
 
-		method.addStatement(statement.toString(), Level.class, message.level().name(), message.value());
+		method.addStatement(statement.toString(), Level.class, level.name(), msg);
 
 		if (returnThis) {
 			method.addStatement("return this");
@@ -229,5 +271,9 @@ public class LogProcessor extends AbstractProcessor {
 		}
 
 		return String.join("$", types);
+	}
+
+	private static boolean hasAnnotation(AnnotatedConstruct ac, Class<? extends Annotation> cls) {
+		return ac.getAnnotation(cls) != null;
 	}
 }

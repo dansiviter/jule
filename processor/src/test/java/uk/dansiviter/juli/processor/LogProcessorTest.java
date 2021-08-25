@@ -105,7 +105,7 @@ class LogProcessorTest {
 
 		when(typeElement.getEnclosedElements()).thenReturn((List) singletonList(exeElement));
 		when(exeElement.getKind()).thenReturn(ElementKind.METHOD);
-		when(exeElement.getAnnotation(any())).thenReturn(message);
+		when(exeElement.getAnnotation(Message.class)).thenReturn(message);
 		when(exeElement.getSimpleName()).thenReturn(new NameImpl("foo"));
 		when(methodTypeMirror.accept(any(), any())).thenReturn(TypeName.VOID);
 		when(exeElement.getReturnType()).thenReturn(methodTypeMirror);

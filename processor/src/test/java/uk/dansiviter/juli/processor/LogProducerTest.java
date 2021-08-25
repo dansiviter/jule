@@ -45,6 +45,7 @@ import uk.dansiviter.juli.LogProducer;
 import uk.dansiviter.juli.annotations.Log;
 import uk.dansiviter.juli.annotations.Message;
 import uk.dansiviter.juli.annotations.Message.Level;
+import uk.dansiviter.juli.annotations.WARN;
 
 /**
  * Unit test for {@link LogProducer}. This has to be in a different project as
@@ -177,6 +178,9 @@ class LogProducerTest {
 
 		@Message(value = "Hello once!", once = true)
 		MyLog doOnce();
+
+		@WARN("Warn message")
+		void warn();
 
 		default void anotherMethods(String foo) {
 			throw new IllegalArgumentException();
