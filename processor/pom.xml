@@ -29,6 +29,13 @@
 			<artifactId>svm</artifactId>
 			<version>[21.0,22.0)</version>
 		</dependency>
+
+		<dependency>
+			<groupId>com.google.testing.compile</groupId>
+			<artifactId>compile-testing</artifactId>
+			<version>0.19</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 
 	<build>

@@ -112,7 +112,7 @@ JUL handlers are all synchronous which puts IO directly within the path of execu
 
 > :warning: If the buffer saturates, then the much of the performance benefits of the asynchronous handler can be lost. However, once the back-pressure is reduced this will return, due to this it _should_ still outperform a synchronous implementation.
 
-> :information_source: `com.lmax:disruptor` has been trialed as an alternative to using Java 9 `Flow` but its bulk (~90KB) and no significant out-of-the-box performance improvement is has been discounted (see [#6](../../issues/6)).
+> :information_source: `com.lmax:disruptor` has been trialed as an alternative to using Java 9 `Flow` but its bulk (~90KB) and no significant out-of-the-box performance improvement it has been discounted (see [#6](../../issues/6)).
 
 
 ## Fallback Handler ##
@@ -125,3 +125,9 @@ uk.dansiviter.juli.FallbackHandler.delegate=com.acme.MyRemoteHandler
 uk.dansiviter.juli.FallbackHandler.fallback=java.util.logging.ConsoleHandler
 ```
 With the above configuration, if either `MyRemoteHandler` `delegate` cannot be created or `Handler#publish(...)` fails the `fallback` handler will be used instead. If no `fallback` is defined then `AsyncConsoleHandler` is used.
+
+## FAQ ##
+
+### Does this work in an IDE? ###
+
+This uses vanilla Annotation Processing so there is no reason for it not to work. It's known to work fine with VSCode (with Java Tools Pack) out of the box and Eclipse and IntelliJ when Annotation Processing is enabled.

@@ -78,8 +78,8 @@ class LogProducerTest {
 		log.doLog();
 		log.doLog("foo");
 		log.doLog(5);
-		log.doLog(new RuntimeException("Expected"))
-				.doLog(() -> 123L);  // chained call
+		log.doLog(new RuntimeException("Expected"));
+		log.doLog(() -> 123L);
 		log.trace(() -> { throw new RuntimeException("Not expected"); });
 		log.doOnce();
 		log.doOnce();
@@ -146,8 +146,13 @@ class LogProducerTest {
 		verifyNoMoreInteractions(handler);
 	}
 
+	interface MySuperLog {
+		@Message("Hello world!")
+		void doSuperLog();
+	}
+
 	@Log
-	interface MyLog {
+	interface MyLog extends MySuperLog {
 		@Message("Hello world!")
 		void doLog();
 
@@ -161,7 +166,7 @@ class LogProducerTest {
 		void doLog(int foo);
 
 		@Message(value = "Hello world!", level = Level.ERROR)
-		MyLog doLog(Throwable t);
+		void doLog(Throwable t);
 
 		@Message(value = "Hello world! {0}", level = Level.ERROR)
 		void doLog(String foo, Throwable t);
@@ -176,7 +181,7 @@ class LogProducerTest {
 		void trace(Supplier<Long> foo);
 
 		@Message(value = "Hello once!", once = true)
-		MyLog doOnce();
+		void doOnce();
 
 		default void anotherMethods(String foo) {
 			throw new IllegalArgumentException();

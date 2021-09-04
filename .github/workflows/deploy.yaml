@@ -23,7 +23,7 @@ jobs:
       with:
         distribution: 'adopt'
         java-version: '11'
-        server-id: ossrh
+        server-id: ossrh-snapshot
         server-username: MAVEN_USERNAME
         server-password: MAVEN_CENTRAL_TOKEN
     - name: Publish to Apache Maven Central Snapshot Repo
