@@ -25,7 +25,7 @@ Lets get started... first import dependencies:
 ```xml
 <dependency>
   <groupId>uk.dansiviter.juli</groupId>
-  <artifactId>core</artifactId>
+  <artifactId>juli</artifactId>
   <version>${juli.version}</version>
 </dependency>
 <dependency>
