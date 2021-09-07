@@ -22,4 +22,6 @@ module uk.dansiviter.juli.cdi {
 	requires jsr305;
 
 	exports uk.dansiviter.juli.cdi;
+
+	provides javax.enterprise.inject.spi.Extension with uk.dansiviter.juli.cdi.LogExtension;
 }
