@@ -9,10 +9,6 @@
 	<artifactId>juli-cdi</artifactId>
 	<name>CDI</name>
 
-	<properties>
-		<module.name>${project.groupId}.cdi</module.name>
-	</properties>
-
 	<dependencies>
 		<dependency>
 			<groupId>${project.groupId}</groupId>

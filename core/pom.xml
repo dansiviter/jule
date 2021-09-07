@@ -7,11 +7,7 @@
 		<version>0.3.1-SNAPSHOT</version>
 	</parent>
 	<artifactId>juli</artifactId>
-	<name>Core</name>
-
-	<properties>
-		<module.name>${project.groupId}</module.name>
-	</properties>
+	<name>JULI</name>
 
 	<dependencies>
 		<dependency>

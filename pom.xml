@@ -40,13 +40,12 @@
 		<maven.compiler.target>${java.version}</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<surefire.useModulePath>false</surefire.useModulePath>
 
 		<sonar.projectKey>dansiviter_juli</sonar.projectKey>
 		<sonar.organization>dansiviter-github</sonar.organization>
 		<sonar.moduleKey>${project.groupId}:${project.artifactId}</sonar.moduleKey>
 		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
-
-		<module.name>${project.groupId}.${project.artifactId}</module.name>
 	</properties>
 
 	<distributionManagement>
@@ -135,9 +134,6 @@
 							<manifest>
 								<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
 							</manifest>
-							<manifestEntries>
-								<Automatic-Module-Name>${module.name}</Automatic-Module-Name>
-							</manifestEntries>
 						</archive>
 					</configuration>
 				</plugin>

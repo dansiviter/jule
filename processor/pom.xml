@@ -9,10 +9,6 @@
 	<artifactId>juli-processor</artifactId>
 	<name>Annotation Processor</name>
 
-	<properties>
-		<module.name>${project.groupId}.processor</module.name>
-	</properties>
-
 	<dependencies>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
