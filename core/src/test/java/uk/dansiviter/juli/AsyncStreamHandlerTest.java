@@ -15,8 +15,8 @@
  */
 package uk.dansiviter.juli;
 
-import static org.hamcrest.MatcherAssert.*;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.endsWith;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 

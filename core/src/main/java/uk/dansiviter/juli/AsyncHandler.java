@@ -71,8 +71,8 @@ public abstract class AsyncHandler<R> extends AbstractHandler {
 	 */
 	protected AsyncHandler() {
 		setLevel(property("level").map(Level::parse).orElse(Level.INFO));
-		setFilter(property("filter").map(AsyncHandler::<Filter>instance).orElse(null));
-		setFormatter(property("formatter").map(AsyncHandler::<Formatter>instance).orElseGet(SimpleFormatter::new));
+		setFilter(property("filter").map(JulUtil::<Filter>newInstance).orElse(null));
+		setFormatter(property("formatter").map(JulUtil::<Formatter>newInstance).orElseGet(SimpleFormatter::new));
 		try {
 			setEncoding(property("encoding").orElse(null));
 		} catch (UnsupportedEncodingException e) {
@@ -88,36 +88,36 @@ public abstract class AsyncHandler<R> extends AbstractHandler {
 	// --- Static Methods ---
 
 	@Override
-	public void publish(LogRecord record) {
+	public void publish(LogRecord r) {
 		if (isClosed()) {
 			throw new IllegalStateException("Closed!");
 		}
-		if (!isLoggable(record)) {
+		if (!isLoggable(r)) {
 			return;
 		}
 
-		record.getSourceClassName();  // ensure source is populated
+		r.getSourceClassName();  // ensure source is populated
 
-		this.publisher.submit(transform(record));
+		this.publisher.submit(transform(r));
 	}
 
 	/**
 	 * Perform any pre-flight transformation of this record. This will be called on the log calling thread.
 	 *
-	 * @param record the record to transform.
+	 * @param r the record to transform.
 	 * @return the transformed record.
 	 */
 	@SuppressWarnings("unchecked")
-	protected R transform(LogRecord record) {
-		return (R) record;
+	protected R transform(LogRecord r) {
+		return (R) r;
 	}
 
 	/**
 	 * This will be called asynchronously.
 	 *
-	 * @param record the log record to process.
+	 * @param r the log record to process.
 	 */
-	protected abstract void doPublish(R record);
+	protected abstract void doPublish(R r);
 
 	/**
 	 * @return {@code true} if closed.

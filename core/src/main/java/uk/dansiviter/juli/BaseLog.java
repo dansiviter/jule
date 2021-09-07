@@ -28,8 +28,6 @@ import java.util.function.Supplier;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
-import javax.annotation.Nonnull;
-
 import uk.dansiviter.juli.annotations.Log;
 import uk.dansiviter.juli.annotations.Message;
 
@@ -53,7 +51,7 @@ public interface BaseLog {
 	 * @param name the name of the log.
 	 * @return the logger instance.
 	 */
-	default Logger delegate(@Nonnull String name) {
+	default Logger delegate(String name) {
 		var bundleName = log().resourceBundleName();
 		return getLogger(name, bundleName.isBlank() ? null : bundleName);
 	}
@@ -64,7 +62,7 @@ public interface BaseLog {
 	 * @param level the log level.
 	 * @return {@code true} if this will log.
 	 */
-	default boolean isLoggable(@Nonnull Message.Level level) {
+	default boolean isLoggable(Message.Level level) {
 		return delegate().isLoggable(level.julLevel);
 	}
 
@@ -76,33 +74,33 @@ public interface BaseLog {
 	 * @param params the message parameters. If these are {@link Optional} or {@link Supplier} then they will be
 	 * expanded.
 	 */
-	default void logp(@Nonnull Message.Level level, @Nonnull String msg, @Nonnull Object... params) {
+	default void logp(Message.Level level, String msg, Object... params) {
 		// isLoggable check will already be done
 		expand(params);
 
 		var delegate = delegate();
-		var record = new LogRecord(level.julLevel, msg);
-		record.setLoggerName(delegate.getName());
+		var r = new LogRecord(level.julLevel, msg);
+		r.setLoggerName(delegate.getName());
 		if (params.length > 0) {
 			if (params[params.length - 1] instanceof Throwable) {
-				record.setThrown((Throwable) params[params.length - 1]);
+				r.setThrown((Throwable) params[params.length - 1]);
 				params = Arrays.copyOfRange(params, 0, params.length - 1);
 			}
 			if (params.length > 0) {
-				record.setParameters(params);
+				r.setParameters(params);
 			}
 		}
 		var frame = frame(3).orElseThrow();
-		record.setSourceClassName(frame.getClassName());
-		record.setSourceMethodName(frame.getMethodName());
+		r.setSourceClassName(frame.getClassName());
+		r.setSourceMethodName(frame.getMethodName());
 
 		var resourceBundleName = delegate.getResourceBundleName();
 		if (resourceBundleName != null) {
-			record.setResourceBundleName(resourceBundleName);
+			r.setResourceBundleName(resourceBundleName);
 			// only look up if needed as potentially expensive operation
-			record.setResourceBundle(delegate.getResourceBundle());
+			r.setResourceBundle(delegate.getResourceBundle());
 		}
-		delegate.log(record);
+		delegate.log(r);
 	}
 
 

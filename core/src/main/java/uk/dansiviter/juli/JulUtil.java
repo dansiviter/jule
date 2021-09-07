@@ -16,11 +16,10 @@
 package uk.dansiviter.juli;
 
 import static java.lang.String.format;
+import static java.util.Objects.requireNonNull;
 
 import java.util.Optional;
 import java.util.logging.LogManager;
-
-import javax.annotation.Nonnull;
 
 /**
  * {@code java.util.logging} utilities.
@@ -34,7 +33,25 @@ public enum JulUtil { ;
 	 * @param name the name of the property.
 	 * @return the value as an {@link Optional}.
 	 */
-	public static Optional<String> property(@Nonnull LogManager manager, Class<?> cls, @Nonnull String name) {
-		return Optional.ofNullable(manager.getProperty(format("%s.%s", cls.getName(), name)));
+	public static Optional<String> property(LogManager manager, Class<?> cls, String name) {
+		return Optional.ofNullable(manager.getProperty(format("%s.%s", cls.getName(), requireNonNull(name))));
+	}
+
+	/**
+	 * Creates an instance of the class given by it's name using no-args constructor.
+	 *
+	 * @param <T> the type.
+	 * @param name the class name
+	 * @return an instance of the class.
+	 * @throws IllegalArgumentException if the class cannot be created.
+	 */
+	@SuppressWarnings("unchecked")
+	static <T> T newInstance(String className) {
+		try {
+			var concreteCls = Class.forName(className);
+			return (T) concreteCls.getDeclaredConstructor().newInstance();
+		} catch (ReflectiveOperationException e) {
+			throw new IllegalArgumentException(format("Unable to create! [%s]", className), e);
+		}
 	}
 }
