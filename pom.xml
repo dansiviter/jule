@@ -96,14 +96,6 @@
 	</dependencyManagement>
 
 	<dependencies>
-		<dependency>
-			<groupId>com.google.code.findbugs</groupId>
-			<artifactId>jsr305</artifactId>
-			<version>[3.0,4.0)</version>
-			<scope>provided</scope>
-		</dependency>
-
-
 		<!-- Test Dependencies -->
 
 		<dependency>
@@ -144,6 +136,15 @@
 				<plugin>
 					<artifactId>maven-surefire-plugin</artifactId>
 					<version>3.0.0-M5</version>
+					<configuration>
+						<properties>
+								<configurationParameters>
+									junit.jupiter.execution.parallel.enabled=true
+									junit.jupiter.execution.parallel.config.strategy=dynamic
+									junit.jupiter.execution.parallel.mode.classes.default = concurrent
+								</configurationParameters>
+						</properties>
+					</configuration>
 				</plugin>
 				<plugin>
 					<artifactId>maven-failsafe-plugin</artifactId>
@@ -152,6 +153,9 @@
 				<plugin>
 					<artifactId>maven-release-plugin</artifactId>
 					<version>3.0.0-M1</version>
+					<configuration>
+            <scmCommentPrefix>[skip ci]</scmCommentPrefix>
+        	</configuration>
 				</plugin>
 				<plugin>
 					<groupId>org.jboss.jandex</groupId>
