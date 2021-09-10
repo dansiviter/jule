@@ -9,7 +9,6 @@ import javax.annotation.processing.Generated;
 import org.graalvm.nativeimage.hosted.Feature;
 import org.graalvm.nativeimage.hosted.RuntimeReflection;
 import uk.dansiviter.juli.BaseLog;
-import uk.dansiviter.juli.LogProducer;
 import uk.dansiviter.juli.annotations.Log;
 import uk.dansiviter.juli.annotations.Message;
 
@@ -22,22 +21,14 @@ public final class Good$impl implements BaseLog, Good {
 
   private final Log log;
 
-  private final Logger delegate;
-
   public final String key;
 
-  public Good$impl(String name) {
-    this.log = Good.class.getAnnotation(Log.class);
-    this.key = LogProducer.key(Good.class, name);
-    this.delegate = delegate(name);
-  }
+  private final Logger delegate;
 
-  /**
-   * @returns the annotation instance.
-   */
-  @Override
-  public final Log log() {
-    return this.log;
+  public Good$impl(String name, String key) {
+    this.log = Good.class.getAnnotation(Log.class);
+    this.key = key;
+    this.delegate = delegate(name);
   }
 
   /**
@@ -46,6 +37,14 @@ public final class Good$impl implements BaseLog, Good {
   @Override
   public final Logger delegate() {
     return this.delegate;
+  }
+
+  /**
+   * @returns the annotation instance.
+   */
+  @Override
+  public final Log log() {
+    return this.log;
   }
 
   @Override

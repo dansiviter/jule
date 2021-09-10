@@ -18,12 +18,11 @@ package uk.dansiviter.juli;
 import static java.util.Objects.requireNonNull;
 import static java.util.logging.ErrorManager.OPEN_FAILURE;
 import static java.util.logging.ErrorManager.WRITE_FAILURE;
+import static uk.dansiviter.juli.JulUtil.newInstance;
 
 import java.util.Optional;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
-
-import javax.annotation.Nonnull;
 
 /**
  * A handler that delegates to a handler, but if that errors it will log via the fallback handler.
@@ -49,7 +48,7 @@ public class FallbackHandler extends AbstractHandler {
 	 */
 	public FallbackHandler() {
 		this.delegate = property("delegate").map(this::handlerOrNull);
-		this.fallback = property("fallback").map(FallbackHandler::<Handler>instance).orElseGet(AsyncConsoleHandler::new);
+		this.fallback = property("fallback").map(JulUtil::<Handler>newInstance).orElseGet(AsyncConsoleHandler::new);
 	}
 
 	public Optional<Handler> getDelegate() {
@@ -57,14 +56,14 @@ public class FallbackHandler extends AbstractHandler {
 	}
 
 	public void setDelegate(Optional<Handler> delegate) {
-		this.delegate = requireNonNull(delegate);
+		this.delegate = delegate;
 	}
 
 	public Handler getFallback() {
 		return fallback;
 	}
 
-	public void setFallback(@Nonnull Handler fallback) {
+	public void setFallback(Handler fallback) {
 		this.fallback = requireNonNull(fallback);
 	}
 
@@ -97,7 +96,7 @@ public class FallbackHandler extends AbstractHandler {
 
 	private Handler handlerOrNull(String name) {
 		try {
-			return instance(name);
+			return newInstance(name);
 		} catch (IllegalArgumentException e) {
 			getErrorManager().error("Unable to create!", e, OPEN_FAILURE);
 			return null;

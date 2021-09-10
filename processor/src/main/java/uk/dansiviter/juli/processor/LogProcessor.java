@@ -30,7 +30,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 
-import javax.annotation.Nonnull;
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.Generated;
 import javax.annotation.processing.RoundEnvironment;
@@ -77,7 +76,7 @@ public class LogProcessor extends AbstractProcessor {
 		return true;
 	}
 
-	private void process(@Nonnull TypeElement element) {
+	private void process(TypeElement element) {
 		var pkg = this.processingEnv.getElementUtils().getPackageOf(element);
 		var type = element.asType();
 		var className = className(element);
@@ -86,11 +85,11 @@ public class LogProcessor extends AbstractProcessor {
 	}
 
 	private void createConcrete(
-		@Nonnull String className,
-		@Nonnull TypeElement type,
-		@Nonnull TypeMirror typeMirror,
-		@Nonnull String concreteName,
-		@Nonnull PackageElement pkg)
+		String className,
+		TypeElement type,
+		TypeMirror typeMirror,
+		String concreteName,
+		PackageElement pkg)
 	{
 		processingEnv.getMessager().printMessage(
 			NOTE,
@@ -100,8 +99,9 @@ public class LogProcessor extends AbstractProcessor {
 		var constructor = MethodSpec.constructorBuilder()
 				.addModifiers(Modifier.PUBLIC)
 				.addParameter(String.class, "name")
+				.addParameter(String.class, "key")
 				.addStatement("this.log = $T.class.getAnnotation($T.class)", typeMirror, Log.class)
-				.addStatement("this.key = $T.key($T.class, name)", LogProducer.class, typeMirror)
+				.addStatement("this.key = key")
 				.addStatement("this.delegate = delegate(name)")
 				.build();
 		var delegateMethod = MethodSpec.methodBuilder("delegate")
@@ -130,14 +130,14 @@ public class LogProcessor extends AbstractProcessor {
 				.addSuperinterface(typeMirror)
 				.addMethod(constructor)
 				.addField(Log.class, "log", PRIVATE, FINAL)
-				.addMethod(logMethod)
-				.addField(Logger.class, "delegate", PRIVATE, FINAL)
 				.addMethod(delegateMethod)
-				.addField(String.class, "key", PUBLIC, FINAL);  // purposefully public
+				.addField(String.class, "key", PUBLIC, FINAL)  // purposefully public
+				.addMethod(logMethod)
+				.addField(Logger.class, "delegate", PRIVATE, FINAL);
 
 		methods(type).forEach(m -> processMethod(typeBuilder, m));
 
-		typeBuilder.addType(createGraalFeature(className, type, concreteName, pkg));
+		typeBuilder.addType(createGraalFeature(concreteName, pkg));
 
 		var javaFile = JavaFile.builder(pkg.getQualifiedName().toString(), typeBuilder.build()).build();
 
@@ -151,17 +151,17 @@ public class LogProcessor extends AbstractProcessor {
 	private Stream<? extends ExecutableElement> methods(TypeElement type) {
 		var methods = type.getEnclosedElements().stream()
 			.filter(e -> e.getKind() == ElementKind.METHOD && e.getAnnotation(Message.class) != null)
-			.map(e -> (ExecutableElement) e);
+			.map(ExecutableElement.class::cast);
 
 		var interfaceMethods = type.getInterfaces().stream()
 			.map(processingEnv.getTypeUtils()::asElement)
-			.map(e-> (TypeElement) e)
+			.map(TypeElement.class::cast)
 			.flatMap(this::methods);
 
 		return Stream.concat(methods, interfaceMethods);
 	}
 
-	private void processMethod(@Nonnull TypeSpec.Builder builder, @Nonnull ExecutableElement e) {
+	private void processMethod(TypeSpec.Builder builder, ExecutableElement e) {
 		var message = e.getAnnotation(Message.class);
 
 		if (message.value().isEmpty()) {
@@ -203,10 +203,8 @@ public class LogProcessor extends AbstractProcessor {
 	}
 
 	private TypeSpec createGraalFeature(
-		@Nonnull String className,
-		@Nonnull TypeElement element,
-		@Nonnull String concreteName,
-		@Nonnull PackageElement pkg)
+		String concreteName,
+		PackageElement pkg)
 	{
 		var beforeAnalysisMethod = MethodSpec.methodBuilder("beforeAnalysis")
 			.addAnnotation(Override.class)
@@ -227,7 +225,7 @@ public class LogProcessor extends AbstractProcessor {
 				.build();
 	}
 
-	private static String className(@Nonnull TypeElement typeElement) {
+	private static String className(TypeElement typeElement) {
 		var types = new ArrayList<CharSequence>();
 
 		Element e = typeElement;

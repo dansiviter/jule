@@ -32,7 +32,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Tests for {@link AsyncConsoleHandler}.
  */
-public class AsyncConsoleHandlerTest {
+class AsyncConsoleHandlerTest {
 	private LogManager manager;
 
 	@BeforeEach
@@ -41,13 +41,13 @@ public class AsyncConsoleHandlerTest {
 	}
 
 	@Test
-	public void init() throws IOException {
+	void init() throws IOException {
 		var handler = new AsyncConsoleHandler();
 		assertThat(handler.isStdOut(), is(true));
 	}
 
 	@Test
-	public void init_stdErr() throws IOException {
+	void init_stdErr() throws IOException {
 		var config = format(
 			"%s.stdOut=%s\n",
 			AsyncConsoleHandler.class.getName(),
@@ -61,7 +61,7 @@ public class AsyncConsoleHandlerTest {
 	}
 
 	@AfterAll
-	public static void afterAll() {
+	static void afterAll() {
 		getLogManager().reset();
 	}
 }
