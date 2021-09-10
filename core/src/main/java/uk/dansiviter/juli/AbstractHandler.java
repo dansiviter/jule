@@ -22,8 +22,6 @@ import java.util.Optional;
 import java.util.logging.Handler;
 import java.util.logging.LogManager;
 
-import javax.annotation.Nonnull;
-
 /**
  * Base {@link Handler} implementation.
  */
@@ -50,7 +48,7 @@ public abstract class AbstractHandler extends Handler {
 	 * @param name the name of the property.
 	 * @return the value as an {@link Optional}.
 	 */
-	protected Optional<String> property(@Nonnull String name) {
+	protected Optional<String> property(String name) {
 		return JulUtil.property(manager, getClass(), name);
 	}
 
@@ -66,7 +64,7 @@ public abstract class AbstractHandler extends Handler {
 	 * @throws IllegalArgumentException if the class cannot be created.
 	 */
 	@SuppressWarnings("unchecked")
-	protected static @Nonnull <T> T instance(@Nonnull String name) {
+	protected static <T> T instance(String name) {
 		try {
 			var concreteCls = Class.forName(name);
 			return (T) concreteCls.getDeclaredConstructor().newInstance();

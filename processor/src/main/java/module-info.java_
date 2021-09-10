@@ -13,9 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-module uk.dansiviter.juli {
-	requires transitive java.logging;
+open module uk.dansiviter.juli.processor {
+	requires transitive java.compiler;
+	requires transitive uk.dansiviter.juli;
+	requires com.squareup.javapoet;
+	requires svm;
+	requires org.graalvm.sdk;
 
-	exports uk.dansiviter.juli;
-	exports uk.dansiviter.juli.annotations;
+	exports uk.dansiviter.juli.processor;
+
+	uses javax.annotation.processing.Processor;
+	provides javax.annotation.processing.Processor with uk.dansiviter.juli.processor.LogProcessor;
 }

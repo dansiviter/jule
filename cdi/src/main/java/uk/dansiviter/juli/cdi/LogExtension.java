@@ -24,7 +24,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import javax.annotation.Nonnull;
 import javax.enterprise.event.Observes;
 import javax.enterprise.inject.spi.AfterBeanDiscovery;
 import javax.enterprise.inject.spi.Extension;
@@ -72,9 +71,9 @@ public class LogExtension implements Extension {
 	 * @param ips the injection points.
 	 */
 	private void createBean(
-			@Nonnull AfterBeanDiscovery abd,
-			@Nonnull Class<?> rawType,
-			@Nonnull Set<InjectionPoint> ips)
+		AfterBeanDiscovery abd,
+		Class<?> rawType,
+		Set<InjectionPoint> ips)
 	{
 		abd.addBean()
 				.name(rawType.getName())
@@ -96,7 +95,7 @@ public class LogExtension implements Extension {
 	 * @return the found raw type.asy
 	 * @throws IllegalStateException if unable to find raw type.
 	 */
-	private static Class<?> rawType(@Nonnull Type type) {
+	private static Class<?> rawType(Type type) {
 		if (type instanceof Class) {
 			return (Class<?>) type;
 		}

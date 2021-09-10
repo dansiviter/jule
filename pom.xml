@@ -40,7 +40,7 @@
 		<maven.compiler.target>${java.version}</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<surefire.useModulePath>false</surefire.useModulePath>
+		<!-- <surefire.useModulePath>false</surefire.useModulePath> -->
 
 		<sonar.projectKey>dansiviter_juli</sonar.projectKey>
 		<sonar.organization>dansiviter-github</sonar.organization>
@@ -95,14 +95,6 @@
 	</dependencyManagement>
 
 	<dependencies>
-		<dependency>
-			<groupId>com.google.code.findbugs</groupId>
-			<artifactId>jsr305</artifactId>
-			<version>[3.0,4.0)</version>
-			<scope>provided</scope>
-		</dependency>
-
-
 		<!-- Test Dependencies -->
 
 		<dependency>

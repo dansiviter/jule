@@ -23,8 +23,6 @@ import java.util.Optional;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
 
-import javax.annotation.Nonnull;
-
 /**
  * A handler that delegates to a handler, but if that errors it will log via the fallback handler.
  * <p>
@@ -64,7 +62,7 @@ public class FallbackHandler extends AbstractHandler {
 		return fallback;
 	}
 
-	public void setFallback(@Nonnull Handler fallback) {
+	public void setFallback(Handler fallback) {
 		this.fallback = requireNonNull(fallback);
 	}
 

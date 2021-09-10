@@ -20,8 +20,6 @@ import static java.lang.String.format;
 import java.util.Optional;
 import java.util.logging.LogManager;
 
-import javax.annotation.Nonnull;
-
 /**
  * {@code java.util.logging} utilities.
  */
@@ -34,7 +32,7 @@ public enum JulUtil { ;
 	 * @param name the name of the property.
 	 * @return the value as an {@link Optional}.
 	 */
-	public static Optional<String> property(@Nonnull LogManager manager, Class<?> cls, @Nonnull String name) {
+	public static Optional<String> property(LogManager manager, Class<?> cls, String name) {
 		return Optional.ofNullable(manager.getProperty(format("%s.%s", cls.getName(), name)));
 	}
 }

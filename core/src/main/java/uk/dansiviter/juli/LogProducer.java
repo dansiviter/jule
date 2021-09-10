@@ -22,8 +22,6 @@ import static java.util.Objects.requireNonNull;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-import javax.annotation.Nonnull;
-
 import uk.dansiviter.juli.annotations.Log;
 
 /**
@@ -41,7 +39,7 @@ public enum LogProducer { ;
 	 * @param log the log class type.
 	 * @return log instance. This may come from a cache of instances.
 	 */
-	public static <L> L log(@Nonnull Class<L> log) {
+	public static <L> L log(Class<L> log) {
 		return log(log, StackWalker.getInstance(RETAIN_CLASS_REFERENCE).getCallerClass().getName());
 	}
 
@@ -53,7 +51,7 @@ public enum LogProducer { ;
 	 * @param name the log name.
 	 * @return log instance. This may come from a cache of instances.
 	 */
-	public static <L> L log(@Nonnull Class<L> log, @Nonnull Class<?> name) {
+	public static <L> L log(Class<L> log, Class<?> name) {
 		return log(log, name.getName());
 	}
 
@@ -65,7 +63,7 @@ public enum LogProducer { ;
 	 * @param name the log ename.
 	 * @return log instance. This may come from a cache of instances.
 	 */
-	public static <L> L log(@Nonnull Class<L> log, @Nonnull String name) {
+	public static <L> L log(Class<L> log, String name) {
 		if (!log.isAnnotationPresent(Log.class)) {
 			throw new IllegalArgumentException(format("@Log annotation not present! [%s]", log.getName()));
 		}
@@ -90,7 +88,7 @@ public enum LogProducer { ;
 	 * @param name the log name.
 	 * @return the key.
 	 */
-	public static String key(@Nonnull Class<?> log, @Nonnull String name) {
+	public static String key(Class<?> log, String name) {
 		return format("%s-%s", log.getName(), requireNonNull(name)).intern();
 	}
 }

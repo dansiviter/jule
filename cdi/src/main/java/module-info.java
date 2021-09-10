@@ -19,7 +19,6 @@ module uk.dansiviter.juli.cdi {
 	requires transitive uk.dansiviter.juli;
 	requires jakarta.inject.api;
 	requires transitive jakarta.enterprise.cdi.api;
-	requires jsr305;
 
 	exports uk.dansiviter.juli.cdi;
 

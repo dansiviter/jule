@@ -15,14 +15,13 @@
  */
 package uk.dansiviter.juli;
 
+import static java.util.Objects.requireNonNull;
+
 import java.io.UnsupportedEncodingException;
-import java.util.Objects;
 import java.util.logging.ErrorManager;
 import java.util.logging.Formatter;
 import java.util.logging.LogRecord;
 import java.util.logging.StreamHandler;
-
-import javax.annotation.Nonnull;
 
 /**
  * Async implementation of {@link StreamHandler} which simply delegates.
@@ -36,8 +35,8 @@ public abstract class AsyncStreamHandler extends AsyncHandler<LogRecord> {
 	 *
 	 * @param delegate the delegate {@code StreamHandler}.
 	 */
-	protected AsyncStreamHandler(@Nonnull StreamHandler delegate) {
-		this.delegate = Objects.requireNonNull(delegate);
+	protected AsyncStreamHandler(StreamHandler delegate) {
+		this.delegate = requireNonNull(delegate);
 		this.delegate.setLevel(getLevel());
 		this.delegate.setFilter(getFilter());
 		this.delegate.setFormatter(new NoopFormatter());
