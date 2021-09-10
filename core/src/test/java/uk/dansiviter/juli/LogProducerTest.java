@@ -70,8 +70,10 @@ class LogProducerTest {
 	 */
 	public static class MyLog$impl implements MyLog {
 		final String name;
-		MyLog$impl(String name) {
+		final String key;
+		MyLog$impl(String name, String key) {
 			this.name = name;
+			this.key = key;
 		}
 	}
 

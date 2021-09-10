@@ -75,8 +75,8 @@ public enum LogProducer { ;
 		var className = logClass.getName().concat(SUFFIX);
 		try {
 			return Class.forName(className)
-				.getDeclaredConstructor(String.class)
-				.newInstance(name);
+				.getDeclaredConstructor(String.class, String.class)
+				.newInstance(name, key);
 		} catch (ReflectiveOperationException e) {
 			throw new IllegalStateException(format("Unable to instantiate class! [%s]", className), e);
 		}

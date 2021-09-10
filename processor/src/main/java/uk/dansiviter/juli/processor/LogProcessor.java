@@ -99,8 +99,9 @@ public class LogProcessor extends AbstractProcessor {
 		var constructor = MethodSpec.constructorBuilder()
 				.addModifiers(Modifier.PUBLIC)
 				.addParameter(String.class, "name")
+				.addParameter(String.class, "key")
 				.addStatement("this.log = $T.class.getAnnotation($T.class)", typeMirror, Log.class)
-				.addStatement("this.key = $T.key($T.class, name)", LogProducer.class, typeMirror)
+				.addStatement("this.key = key")
 				.addStatement("this.delegate = delegate(name)")
 				.build();
 		var delegateMethod = MethodSpec.methodBuilder("delegate")
@@ -129,10 +130,10 @@ public class LogProcessor extends AbstractProcessor {
 				.addSuperinterface(typeMirror)
 				.addMethod(constructor)
 				.addField(Log.class, "log", PRIVATE, FINAL)
-				.addMethod(logMethod)
-				.addField(Logger.class, "delegate", PRIVATE, FINAL)
 				.addMethod(delegateMethod)
-				.addField(String.class, "key", PUBLIC, FINAL);  // purposefully public
+				.addField(String.class, "key", PUBLIC, FINAL)  // purposefully public
+				.addMethod(logMethod)
+				.addField(Logger.class, "delegate", PRIVATE, FINAL);
 
 		methods(type).forEach(m -> processMethod(typeBuilder, m));
 
