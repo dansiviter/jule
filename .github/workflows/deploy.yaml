@@ -28,6 +28,7 @@ jobs:
         server-password: MAVEN_CENTRAL_TOKEN
     - name: Publish to Apache Maven Central Snapshot Repo
       env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
         MAVEN_CENTRAL_TOKEN: ${{ secrets.MAVEN_CENTRAL_TOKEN }}
