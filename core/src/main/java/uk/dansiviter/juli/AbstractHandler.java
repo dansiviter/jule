@@ -15,8 +15,6 @@
  */
 package uk.dansiviter.juli;
 
-import static java.lang.String.format;
-
 import java.util.Objects;
 import java.util.Optional;
 import java.util.logging.Handler;

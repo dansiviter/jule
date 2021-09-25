@@ -15,10 +15,13 @@
  */
 package uk.dansiviter.juli.processor;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.arrayContaining;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -92,56 +95,43 @@ class LogProducerTest {
 		var records = recordCaptor.getAllValues().iterator();
 
 		var record = records.next();
-		assertEquals(java.util.logging.Level.INFO, record.getLevel());
-		assertEquals(getClass().getName(), record.getLoggerName());
-		assertEquals("Hello world!", record.getMessage());
-		assertEquals(getClass().getName(), record.getSourceClassName());
-		assertEquals("logInjected", record.getSourceMethodName());
-		assertNull(record.getParameters());
-		assertNull(record.getThrown());
+		assertThat(java.util.logging.Level.INFO, is(record.getLevel()));
+		assertThat(getClass().getName(), is(record.getLoggerName()));
+		assertThat("Hello world!", is(record.getMessage()));
+		assertThat(getClass().getName(), is(record.getSourceClassName()));
+		assertThat("logInjected", is(record.getSourceMethodName()));
+		assertThat(record.getParameters(), nullValue());
+		assertThat(record.getThrown(), nullValue());
 
 		record = records.next();
-		assertEquals(java.util.logging.Level.SEVERE, record.getLevel());
-		assertEquals("Hello world! {0}", record.getMessage());
-		assertEquals(1, record.getParameters().length);
-		assertNull(record.getThrown());
+		assertThat(java.util.logging.Level.SEVERE, is(record.getLevel()));
+		assertThat("Hello world! {0}", is(record.getMessage()));
+		assertThat(record.getParameters(), arrayContaining("foo"));
 
 		record = records.next();
-		assertEquals(java.util.logging.Level.INFO, record.getLevel());
-		assertEquals("Hello world! {0}", record.getMessage());
-		assertEquals(Integer.valueOf(5), record.getParameters()[0]);
-		assertNull(record.getThrown());
+		assertThat("Hello world! {0}", is(record.getMessage()));
+		assertThat(record.getParameters(), arrayContaining(Integer.valueOf(5)));
 
 		record = records.next();
-		assertEquals(java.util.logging.Level.SEVERE, record.getLevel());
-		assertEquals("Hello world!", record.getMessage());
-		assertNotNull(record.getThrown());
-		assertNull(record.getParameters());
+		assertThat(java.util.logging.Level.SEVERE, is(record.getLevel()));
+		assertThat("Hello world!", is(record.getMessage()));
+		assertThat(record.getThrown(), notNullValue());
+		assertThat(record.getParameters(), nullValue());
 
 		record = records.next();
-		assertEquals(java.util.logging.Level.INFO, record.getLevel());
-		assertEquals("Hello world! {0}", record.getMessage());
-		assertEquals(1, record.getParameters().length);
-		assertEquals(123L, record.getParameters()[0]);
-		assertNull(record.getThrown());
+		assertThat("Hello world! {0}", is(record.getMessage()));
+		assertThat(record.getParameters(), arrayContaining(123L));
 
 		record = records.next();
-		assertEquals(java.util.logging.Level.INFO, record.getLevel());
-		assertEquals("Hello once!", record.getMessage());
+		assertThat("Hello once!", is(record.getMessage()));
 
 		record = records.next();
-		assertEquals(java.util.logging.Level.INFO, record.getLevel());
-		assertEquals("Hello world! {0}", record.getMessage());
-		assertEquals(1, record.getParameters().length);
-		assertEquals("foo", record.getParameters()[0]);
-		assertNull(record.getThrown());
+		assertThat("Hello world! {0}", is(record.getMessage()));
+		assertThat(record.getParameters(), arrayContaining("foo"));
 
 		record = records.next();
-		assertEquals(java.util.logging.Level.INFO, record.getLevel());
-		assertEquals("Hello world! {0}", record.getMessage());
-		assertEquals(1, record.getParameters().length);
-		assertEquals(null, record.getParameters()[0]);
-		assertNull(record.getThrown());
+		assertThat("Hello world! {0}", is(record.getMessage()));
+		assertThat(record.getParameters(), arrayContaining((Object) null));
 
 		verifyNoMoreInteractions(handler);
 	}

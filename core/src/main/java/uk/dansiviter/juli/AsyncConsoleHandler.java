@@ -18,7 +18,7 @@ package uk.dansiviter.juli;
 /**
  * Async implementation which simply delegates to {@link ConsoleHandlerExt}.
  */
-public class AsyncConsoleHandler extends AsyncStreamHandler {
+public class AsyncConsoleHandler extends AsyncStreamHandler<ConsoleHandlerExt> {
 	/**
 	 * Constructs an asynchronous {@code ConsoleHandlerExt}
 	 */
@@ -29,22 +29,17 @@ public class AsyncConsoleHandler extends AsyncStreamHandler {
 			.ifPresent(this::setStdOut);
 	}
 
-	@Override
-	protected ConsoleHandlerExt delegate() {
-		return (ConsoleHandlerExt) super.delegate();
-	}
-
 	/**
 	 * @return {@code true} if using {@link System#out}.
 	 */
 	public boolean isStdOut() {
-		return delegate().isStdOut();
+		return this.delegate.isStdOut();
 	}
 
 	/**
 	 * @param stdOut if {@code true} this uses {@link System#out}.
 	 */
 	public void setStdOut(boolean stdOut) {
-		delegate().setStdOut(stdOut);
+		this.delegate.setStdOut(stdOut);
 	}
 }
