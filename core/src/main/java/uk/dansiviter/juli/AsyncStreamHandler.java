@@ -24,16 +24,16 @@ import java.util.logging.StreamHandler;
 /**
  * Async implementation of {@link StreamHandler} which simply delegates.
  */
-public abstract class AsyncStreamHandler extends AsyncHandler<LogRecord> {
+public abstract class AsyncStreamHandler<H extends StreamHandler> extends AsyncHandler<LogRecord> {
 	/** Delegate {@code StreamHandler} */
-	protected final StreamHandler delegate;
+	protected final H delegate;
 
 	/**
 	 * Construct a asynchronous version of {@link StreamHandler} by delegating.
 	 *
 	 * @param delegate the delegate {@code StreamHandler}.
 	 */
-	protected AsyncStreamHandler(StreamHandler delegate) {
+	protected AsyncStreamHandler(H delegate) {
 		this.delegate = delegate;
 		this.delegate.setLevel(getLevel());
 		this.delegate.setFilter(getFilter());
@@ -45,13 +45,6 @@ public abstract class AsyncStreamHandler extends AsyncHandler<LogRecord> {
 		}
 	}
 
-	/**
-	 * @return the delegate.
-	 */
-	protected StreamHandler delegate() {
-		return this.delegate;
-	}
-
 	@Override
 	protected LogRecord transform(LogRecord r) {
 		r.setMessage(getFormatter().format(r));  // format retaining thread context
@@ -60,7 +53,7 @@ public abstract class AsyncStreamHandler extends AsyncHandler<LogRecord> {
 
 	@Override
 	protected void doPublish(LogRecord r) {
-		delegate.publish(r);
+		this.delegate.publish(r);
 	}
 
 	@Override

@@ -36,7 +36,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class AsyncStreamHandlerTest {
 	@Test
 	void doPublish(@Mock StreamHandler delegate) {
-		var handler = new AsyncStreamHandler(delegate) { };
+		var handler = new AsyncStreamHandler<StreamHandler>(delegate) { };
 
 		var record = new LogRecord(Level.INFO, "hello");
 		handler.doPublish(record);
@@ -47,7 +47,7 @@ class AsyncStreamHandlerTest {
 
 	@Test
 	void transform(@Mock StreamHandler delegate) {
-		var handler = new AsyncStreamHandler(delegate) { };
+		var handler = new AsyncStreamHandler<>(delegate) { };
 
 		var record = new LogRecord(Level.INFO, "Hello {0}");
 		record.setParameters(new Object[] { "world" });
@@ -58,7 +58,7 @@ class AsyncStreamHandlerTest {
 
 	@Test
 	void flush(@Mock StreamHandler delegate) {
-		var handler = new AsyncStreamHandler(delegate) { };
+		var handler = new AsyncStreamHandler<>(delegate) { };
 
 		handler.flush();
 
@@ -67,7 +67,7 @@ class AsyncStreamHandlerTest {
 
 	@Test
 	void close(@Mock StreamHandler delegate) {
-		var handler = new AsyncStreamHandler(delegate) { };
+		var handler = new AsyncStreamHandler<>(delegate) { };
 
 		handler.close();
 
