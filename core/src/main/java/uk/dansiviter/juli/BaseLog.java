@@ -79,28 +79,28 @@ public interface BaseLog {
 		expand(params);
 
 		var delegate = delegate();
-		var record = new LogRecord(level.julLevel, msg);
-		record.setLoggerName(delegate.getName());
+		var r = new LogRecord(level.julLevel, msg);
+		r.setLoggerName(delegate.getName());
 		if (params.length > 0) {
 			if (params[params.length - 1] instanceof Throwable) {
-				record.setThrown((Throwable) params[params.length - 1]);
+				r.setThrown((Throwable) params[params.length - 1]);
 				params = Arrays.copyOfRange(params, 0, params.length - 1);
 			}
 			if (params.length > 0) {
-				record.setParameters(params);
+				r.setParameters(params);
 			}
 		}
 		var frame = frame(3).orElseThrow();
-		record.setSourceClassName(frame.getClassName());
-		record.setSourceMethodName(frame.getMethodName());
+		r.setSourceClassName(frame.getClassName());
+		r.setSourceMethodName(frame.getMethodName());
 
 		var resourceBundleName = delegate.getResourceBundleName();
 		if (resourceBundleName != null) {
-			record.setResourceBundleName(resourceBundleName);
+			r.setResourceBundleName(resourceBundleName);
 			// only look up if needed as potentially expensive operation
-			record.setResourceBundle(delegate.getResourceBundle());
+			r.setResourceBundle(delegate.getResourceBundle());
 		}
-		delegate.log(record);
+		delegate.log(r);
 	}
 
 

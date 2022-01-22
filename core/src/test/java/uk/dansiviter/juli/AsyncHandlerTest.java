@@ -25,6 +25,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
+import static uk.dansiviter.juli.JulUtil.newInstance;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,12 +58,9 @@ class AsyncHandlerTest {
 
 		handler.flush();
 
-		new Thread(() -> {
-			log.info("world");
-		}).start();
+		new Thread(() -> log.info("world")).start();
 
-		await().atMost(1, TimeUnit.SECONDS).untilAsserted(
-			() -> {
+		await().atMost(1, TimeUnit.SECONDS).untilAsserted(() -> {
 				assertThat(handler.records, hasSize(2));
 				assertThat(handler.records.get(0).getMessage(), equalTo("hello"));
 				assertThat(handler.records.get(1).getMessage(), equalTo("world"));
@@ -95,7 +93,7 @@ class AsyncHandlerTest {
 
 	@Test
 	void instance() {
-		var filter = AsyncHandler.instance(NoopFilter.class.getName());
+		var filter = newInstance(NoopFilter.class.getName());
 		assertThat(filter, notNullValue());
 	}
 

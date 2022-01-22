@@ -1,0 +1,49 @@
+name: Bug
+description: File a bug report
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report!
+  - type: input
+    id: juli-version
+    attributes:
+      label: JULI Version
+      description: What version of JULI did this happen?
+      placeholder: 1.2.3
+    validations:
+      required: true
+  - type: input
+    id: jdk-version
+    attributes:
+      label: JDK Version
+      description: What version of JDK did this happen?
+      placeholder: 17.0.1+12 (Temurin)
+  - type: input
+    id: ods
+    attributes:
+      label: OS
+      description: What OS were you usingn?
+      placeholder: MacOS 11.6.1 (BigSur)
+  - type: textarea
+    id: expected
+    attributes:
+      label: What should happen?
+      description: A description of what you expected to happen?
+      placeholder: It should...
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: What actually happen?
+      description: A description of what actually happened?
+      placeholder: Oh, it was awful!
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional Context
+      description: Anything else that would help such as logs, stacktraces, etc.,.

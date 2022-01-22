@@ -19,12 +19,11 @@ import static uk.dansiviter.juli.LogProducer.log;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import javax.enterprise.event.Observes;
+import javax.enterprise.inject.Instance;
 import javax.enterprise.inject.spi.AfterBeanDiscovery;
 import javax.enterprise.inject.spi.Extension;
 import javax.enterprise.inject.spi.InjectionPoint;
@@ -36,7 +35,7 @@ import uk.dansiviter.juli.annotations.Log;
  * Defines the CDI extension to inject log instances.
  */
 public class LogExtension implements Extension {
-	private final Map<Class<?>, Set<InjectionPoint>> found = new HashMap<>();
+	private final Set<Class<?>> found = new LinkedHashSet<>();
 
 	/**
 	 *
@@ -45,13 +44,7 @@ public class LogExtension implements Extension {
 	public void findBody(@Observes ProcessInjectionPoint<?, ?> pip) {
 		var rawType = rawType(pip.getInjectionPoint().getType());
 		if (rawType.isAnnotationPresent(Log.class)) {
-			found.compute(rawType, (k, v) -> {
-				if (v == null) {
-					v = new HashSet<>();
-				}
-				v.add(pip.getInjectionPoint());
-				return v;
-			});
+			found.add(rawType);
 		}
 	}
 
@@ -60,7 +53,7 @@ public class LogExtension implements Extension {
 	 * @param abd the after bean discovery event.
 	 */
 	public void addBeans(@Observes AfterBeanDiscovery abd) {
-		this.found.forEach((k, v) -> createBean(abd, k, v));
+		this.found.forEach(v -> createBean(abd, v));
 		this.found.clear();
 	}
 
@@ -68,22 +61,16 @@ public class LogExtension implements Extension {
 	 *
 	 * @param abd the after bean discovery event.
 	 * @param rawType the raw bean type.
-	 * @param ips the injection points.
 	 */
 	private void createBean(
-		AfterBeanDiscovery abd,
-		Class<?> rawType,
-		Set<InjectionPoint> ips)
+			AfterBeanDiscovery abd,
+			Class<?> rawType)
 	{
 		abd.addBean()
 				.name(rawType.getName())
 				.beanClass(rawType)
 				.addType(rawType)
-				.produceWith(i -> {
-					var ip = i.select(InjectionPoint.class).get();
-					var member = ip.getMember();
-					return log(rawType, member.getDeclaringClass());
-				});
+				.produceWith(i -> produce(i, rawType));
 	}
 
 
@@ -103,5 +90,10 @@ public class LogExtension implements Extension {
 			return (Class<?>) ((ParameterizedType) type).getRawType();
 		}
 		throw new IllegalStateException("Unable to decipher bean type! [" + type + "]");
+	}
+
+	private static Object produce(Instance<Object> i, Class<?> rawType) {
+		var ip = i.select(InjectionPoint.class).get();
+		return log(rawType, ip.getMember().getDeclaringClass());
 	}
 }

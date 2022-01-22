@@ -1,12 +1,9 @@
-[
-  {
-    "name": "uk.dansiviter.juli.AsyncConsoleHandler",
-    "allDeclaredConstructors": true,
-    "allPublicMethods": true
-  },
-  {
-    "name": "uk.dansiviter.juli.FallbackHandler",
-    "allDeclaredConstructors": true,
-    "allPublicMethods": true
-  }
-]
+[{
+  "name": "uk.dansiviter.juli.AsyncConsoleHandler",
+  "allDeclaredConstructors": true,
+  "allPublicMethods": true
+},{
+  "name": "uk.dansiviter.juli.FallbackHandler",
+  "allDeclaredConstructors": true,
+  "allPublicMethods": true
+}]

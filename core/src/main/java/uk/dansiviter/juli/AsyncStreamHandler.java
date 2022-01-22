@@ -26,16 +26,16 @@ import java.util.logging.StreamHandler;
 /**
  * Async implementation of {@link StreamHandler} which simply delegates.
  */
-public abstract class AsyncStreamHandler extends AsyncHandler<LogRecord> {
+public abstract class AsyncStreamHandler<H extends StreamHandler> extends AsyncHandler<LogRecord> {
 	/** Delegate {@code StreamHandler} */
-	protected final StreamHandler delegate;
+	protected final H delegate;
 
 	/**
 	 * Construct a asynchronous version of {@link StreamHandler} by delegating.
 	 *
 	 * @param delegate the delegate {@code StreamHandler}.
 	 */
-	protected AsyncStreamHandler(StreamHandler delegate) {
+	protected AsyncStreamHandler(H delegate) {
 		this.delegate = requireNonNull(delegate);
 		this.delegate.setLevel(getLevel());
 		this.delegate.setFilter(getFilter());
@@ -47,22 +47,15 @@ public abstract class AsyncStreamHandler extends AsyncHandler<LogRecord> {
 		}
 	}
 
-	/**
-	 * @return the delegate.
-	 */
-	protected StreamHandler delegate() {
-		return this.delegate;
+	@Override
+	protected LogRecord transform(LogRecord r) {
+		r.setMessage(getFormatter().format(r));  // format retaining thread context
+		return super.transform(r);
 	}
 
 	@Override
-	protected LogRecord transform(LogRecord record) {
-		record.setMessage(getFormatter().format(record));  // format retaining thread context
-		return super.transform(record);
-	}
-
-	@Override
-	protected void doPublish(LogRecord record) {
-		delegate.publish(record);
+	protected void doPublish(LogRecord r) {
+		this.delegate.publish(r);
 	}
 
 	@Override
@@ -80,8 +73,8 @@ public abstract class AsyncStreamHandler extends AsyncHandler<LogRecord> {
 
 	private static class NoopFormatter extends Formatter {
 		@Override
-		public String format(LogRecord record) {
-			return record.getMessage();
+		public String format(LogRecord r) {
+			return r.getMessage();
 		}
 	}
 }

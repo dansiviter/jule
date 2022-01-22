@@ -1,0 +1,33 @@
+name: Feature Request
+description: File a bug report
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to ask for an enhancement.
+  - type: input
+    id: juli-version
+    attributes:
+      label: JULI Version
+      description: What version of JULI did this happen?
+      placeholder: 1.2.3
+  - type: textarea
+    id: feature
+    attributes:
+      label: What would you like?
+      description: A description of what you'd like to see?
+      placeholder: It should...
+    validations:
+      required: true
+  - type: textarea
+    id: alternative
+    attributes:
+      label: Have you tried any alternatives?
+      description: Any alternative approaches you've tried.
+      placeholder: I tried this, but it was...
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional Context
+      description: Anything else that would help.

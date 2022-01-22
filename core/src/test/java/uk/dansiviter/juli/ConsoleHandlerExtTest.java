@@ -32,7 +32,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Tests for {@link ConsoleHandlerExt}.
  */
-public class ConsoleHandlerExtTest {
+class ConsoleHandlerExtTest {
 	private LogManager manager;
 
 	@BeforeEach
@@ -41,13 +41,13 @@ public class ConsoleHandlerExtTest {
 	}
 
 	@Test
-	public void init() throws IOException {
+	void init() throws IOException {
 		var handler = new ConsoleHandlerExt();
 		assertThat(handler.isStdOut(), is(true));
 	}
 
 	@Test
-	public void init_stdErr() throws IOException {
+	void init_stdErr() throws IOException {
 		var config = format(
 			"%s.stdOut=%s\n",
 			ConsoleHandlerExt.class.getName(),
@@ -61,7 +61,7 @@ public class ConsoleHandlerExtTest {
 	}
 
 	@AfterAll
-	public static void afterAll() {
+	static void afterAll() {
 		getLogManager().reset();
 	}
 }

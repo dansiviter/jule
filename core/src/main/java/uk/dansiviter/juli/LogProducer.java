@@ -59,25 +59,27 @@ public enum LogProducer { ;
 	 * Return an instance of the given type and name of class.
 	 *
 	 * @param <L>  the log type.
-	 * @param log  the log class type.
+	 * @param logClass  the log class type.
 	 * @param name the log ename.
 	 * @return log instance. This may come from a cache of instances.
 	 */
-	public static <L> L log(Class<L> log, String name) {
-		if (!log.isAnnotationPresent(Log.class)) {
-			throw new IllegalArgumentException(format("@Log annotation not present! [%s]", log.getName()));
+	public static <L> L log(Class<L> logClass, String name) {
+		if (!logClass.isAnnotationPresent(Log.class)) {
+			throw new IllegalArgumentException(format("@Log annotation not present! [%s]", logClass.getName()));
 		}
-		var key = key(log, name);
-		return log.cast(LOGS.computeIfAbsent(key, k -> {
-			var className = log.getName().concat(SUFFIX);
-			try {
-				return Class.forName(className)
-					.getDeclaredConstructor(String.class)
-					.newInstance(name);
-			} catch (ReflectiveOperationException e) {
-				throw new IllegalStateException(format("Unable to instantiate class! [%s]", className), e);
-			}
-		}));
+		var key = key(logClass, name);
+		return logClass.cast(LOGS.computeIfAbsent(key, k -> create(key, logClass, name)));
+	}
+
+	private static Object create(String key, Class<?> logClass, String name) {
+		var className = logClass.getName().concat(SUFFIX);
+		try {
+			return Class.forName(className)
+				.getDeclaredConstructor(String.class, String.class)
+				.newInstance(name, key);
+		} catch (ReflectiveOperationException e) {
+			throw new IllegalStateException(format("Unable to instantiate class! [%s]", className), e);
+		}
 	}
 
 	/**

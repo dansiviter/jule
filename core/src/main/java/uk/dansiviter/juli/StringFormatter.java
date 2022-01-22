@@ -24,9 +24,9 @@ import java.util.logging.SimpleFormatter;
  */
 public class StringFormatter extends SimpleFormatter {
 	@Override
-	public String formatMessage(LogRecord record) {
-		var format = record.getMessage();
-		var bundle = record.getResourceBundle();
+	public String formatMessage(LogRecord r) {
+		var format = r.getMessage();
+		var bundle = r.getResourceBundle();
 		if (bundle != null) {
 			try {
 				format = bundle.getString(format);
@@ -35,7 +35,7 @@ public class StringFormatter extends SimpleFormatter {
 			}
 		}
 		try {
-			var parameters = record.getParameters();
+			var parameters = r.getParameters();
 			if (parameters == null || parameters.length == 0) {
 				return format;
 			}

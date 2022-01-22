@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>uk.dansiviter.juli</groupId>
 	<artifactId>juli-project</artifactId>
-	<version>0.3.1-SNAPSHOT</version>
+	<version>0.4.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>Java Util Logger Improver (JULI)</name>
 	<description>Library to help simplfy and improve java.util.logger</description>
@@ -70,13 +70,13 @@
 			<dependency>
 				<groupId>org.junit.jupiter</groupId>
 				<artifactId>junit-jupiter</artifactId>
-				<version>[5.7.1,5.8)</version>
+				<version>5.8.2</version>
 				<scope>test</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.mockito</groupId>
 				<artifactId>mockito-junit-jupiter</artifactId>
-				<version>3.11.2</version>
+				<version>4.2.0</version>
 				<scope>test</scope>
 			</dependency>
 			<dependency>
@@ -88,7 +88,7 @@
 			<dependency>
 				<groupId>org.awaitility</groupId>
 				<artifactId>awaitility</artifactId>
-				<version>4.1.0</version>
+				<version>4.1.1</version>
 				<scope>test</scope>
 			</dependency>
 		</dependencies>
@@ -132,6 +132,15 @@
 				<plugin>
 					<artifactId>maven-surefire-plugin</artifactId>
 					<version>3.0.0-M5</version>
+					<configuration>
+						<properties>
+								<configurationParameters>
+									junit.jupiter.execution.parallel.enabled=true
+									junit.jupiter.execution.parallel.config.strategy=dynamic
+									junit.jupiter.execution.parallel.mode.classes.default = concurrent
+								</configurationParameters>
+						</properties>
+					</configuration>
 				</plugin>
 				<plugin>
 					<artifactId>maven-failsafe-plugin</artifactId>
@@ -140,16 +149,19 @@
 				<plugin>
 					<artifactId>maven-release-plugin</artifactId>
 					<version>3.0.0-M1</version>
+					<configuration>
+            <scmCommentPrefix>[skip ci]</scmCommentPrefix>
+        	</configuration>
 				</plugin>
 				<plugin>
 					<groupId>org.jboss.jandex</groupId>
 					<artifactId>jandex-maven-plugin</artifactId>
-					<version>1.0.8</version>
+					<version>1.2.1</version>
 				</plugin>
 				<plugin>
 					<groupId>org.jacoco</groupId>
 					<artifactId>jacoco-maven-plugin</artifactId>
-					<version>0.8.6</version>
+					<version>0.8.7</version>
 				</plugin>
 			</plugins>
 		</pluginManagement>

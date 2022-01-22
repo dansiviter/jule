@@ -15,8 +15,6 @@
  */
 package uk.dansiviter.juli;
 
-import static java.lang.String.format;
-
 import java.util.Objects;
 import java.util.Optional;
 import java.util.logging.Handler;
@@ -38,11 +36,11 @@ public abstract class AbstractHandler extends Handler {
 	}
 
 	@Override
-	public void close() throws SecurityException {
+	public void close() {
 		// nothing to see here
 	}
 
- /**
+  /**
 	 * Extracts the {@link LogManager#getProperty(String)}.
 	 *
 	 * @param name the name of the property.
@@ -50,26 +48,5 @@ public abstract class AbstractHandler extends Handler {
 	 */
 	protected Optional<String> property(String name) {
 		return JulUtil.property(manager, getClass(), name);
-	}
-
-
-	// --- Static Methods ---
-
-	/**
-	 * Creates an instance of the class given by it's name using no-args constructor.
-	 *
-	 * @param <T> the type.
-	 * @param name the class name
-	 * @return an instance of the class.
-	 * @throws IllegalArgumentException if the class cannot be created.
-	 */
-	@SuppressWarnings("unchecked")
-	protected static <T> T instance(String name) {
-		try {
-			var concreteCls = Class.forName(name);
-			return (T) concreteCls.getDeclaredConstructor().newInstance();
-		} catch (ReflectiveOperationException e) {
-			throw new IllegalArgumentException(format("Unable to create! [%s]", name), e);
-		}
 	}
 }
