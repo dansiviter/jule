@@ -15,7 +15,8 @@
  */
 package uk.dansiviter.juli;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.time.Duration.ofSeconds;
+import static java.util.concurrent.CompletableFuture.runAsync;
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -58,9 +59,9 @@ class AsyncHandlerTest {
 
 		handler.flush();
 
-		new Thread(() -> log.info("world")).start();
+		runAsync(() -> log.info("world"));
 
-		await().atMost(1, SECONDS).untilAsserted(() -> {
+		await().atMost(ofSeconds(1)).untilAsserted(() -> {
 				assertThat(handler.records, hasSize(2));
 				assertThat(handler.records.get(0).getMessage(), equalTo("hello"));
 				assertThat(handler.records.get(1).getMessage(), equalTo("world"));
