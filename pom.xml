@@ -40,6 +40,7 @@
 		<maven.compiler.target>${java.version}</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<surefire.useModulePath>false</surefire.useModulePath>
 
 		<sonar.projectKey>dansiviter_juli</sonar.projectKey>
 		<sonar.organization>dansiviter-github</sonar.organization>
@@ -141,7 +142,7 @@
 								<configurationParameters>
 									junit.jupiter.execution.parallel.enabled=true
 									junit.jupiter.execution.parallel.config.strategy=dynamic
-									junit.jupiter.execution.parallel.mode.classes.default = concurrent
+									junit.jupiter.execution.parallel.mode.classes.default=concurrent
 								</configurationParameters>
 						</properties>
 					</configuration>
