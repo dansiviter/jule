@@ -137,7 +137,7 @@
 								<configurationParameters>
 									junit.jupiter.execution.parallel.enabled=true
 									junit.jupiter.execution.parallel.config.strategy=dynamic
-									junit.jupiter.execution.parallel.mode.classes.default = concurrent
+									junit.jupiter.execution.parallel.mode.classes.default=concurrent
 								</configurationParameters>
 						</properties>
 					</configuration>

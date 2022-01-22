@@ -15,6 +15,7 @@
  */
 package uk.dansiviter.juli;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -27,9 +28,8 @@ import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 import static uk.dansiviter.juli.JulUtil.newInstance;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
+import java.util.Vector;
 import java.util.logging.ErrorManager;
 import java.util.logging.Filter;
 import java.util.logging.LogRecord;
@@ -60,7 +60,7 @@ class AsyncHandlerTest {
 
 		new Thread(() -> log.info("world")).start();
 
-		await().atMost(1, TimeUnit.SECONDS).untilAsserted(() -> {
+		await().atMost(1, SECONDS).untilAsserted(() -> {
 				assertThat(handler.records, hasSize(2));
 				assertThat(handler.records.get(0).getMessage(), equalTo("hello"));
 				assertThat(handler.records.get(1).getMessage(), equalTo("world"));
@@ -106,7 +106,7 @@ class AsyncHandlerTest {
 	}
 
 	private static class TestHandler extends AsyncHandler<LogRecord> {
-		private final List<LogRecord> records = new ArrayList<>();
+		private final List<LogRecord> records = new Vector<>();
 
 		@Override
 		protected void doPublish(LogRecord record) {
