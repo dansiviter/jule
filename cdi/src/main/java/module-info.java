@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Daniel Siviter
+ * Copyright 2022 Daniel Siviter
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 module uk.dansiviter.juli.cdi {
-	requires java.base;
-	requires java.compiler;
+	requires static java.compiler;
 	requires transitive uk.dansiviter.juli;
 	requires jakarta.inject.api;
 	requires transitive jakarta.enterprise.cdi.api;

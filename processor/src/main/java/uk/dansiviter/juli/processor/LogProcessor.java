@@ -203,8 +203,6 @@ public class LogProcessor extends AbstractProcessor {
 	}
 
 	private TypeSpec createGraalFeature(
-		String className,
-		TypeElement element,
 		String concreteName,
 		PackageElement pkg)
 	{
