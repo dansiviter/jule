@@ -51,6 +51,14 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<argLine>
+						--add-opens jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED
+					</argLine>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 </project>
