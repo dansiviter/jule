@@ -25,6 +25,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
+import java.util.OptionalDouble;
+import java.util.OptionalInt;
+import java.util.OptionalLong;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.IntSupplier;
@@ -114,7 +117,10 @@ class BaseLogTest {
 			(LongSupplier) () -> 3L,
 			(DoubleSupplier) () -> 2.3,
 			Optional.of("bar"),
-			Optional.empty());  // test throwable
+			Optional.empty(),
+			OptionalInt.of(5),
+			OptionalLong.of(6),
+			OptionalDouble.of(3.2));
 
 		var recordCaptor = ArgumentCaptor.forClass(LogRecord.class);
 		verify(this.delegate).log(recordCaptor.capture());
@@ -122,7 +128,7 @@ class BaseLogTest {
 		var record = recordCaptor.getValue();
 		assertThat(record.getLevel(), equalTo(Level.DEBUG.julLevel));
 		assertThat(record.getMessage(), equalTo("hello"));
-		assertThat(record.getParameters(), arrayContaining("world", "foo", true, 2, 3L, 2.3, "bar", null));
+		assertThat(record.getParameters(), arrayContaining("world", "foo", true, 2, 3L, 2.3, "bar", null, 5, 6L, 3.2));
 		assertThat(record.getThrown(), nullValue());
 		assertThat(record.getResourceBundleName(), equalTo("myBundle"));
 	}
