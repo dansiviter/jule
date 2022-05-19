@@ -20,6 +20,9 @@ import static java.util.logging.Logger.getLogger;
 
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.OptionalDouble;
+import java.util.OptionalInt;
+import java.util.OptionalLong;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.IntSupplier;
@@ -131,6 +134,18 @@ public interface BaseLog {
 			}
 			if (params[i] instanceof Optional) {
 				params[i] = ((Optional<?>) params[i]).orElse(null);
+			}
+			if (params[i] instanceof OptionalInt) {
+				var optional = (OptionalInt) params[i];
+				params[i] = optional.isPresent() ? optional.getAsInt() : null;
+			}
+			if (params[i] instanceof OptionalLong) {
+				var optional = (OptionalLong) params[i];
+				params[i] = optional.isPresent() ? optional.getAsLong() : null;
+			}
+			if (params[i] instanceof OptionalDouble) {
+				var optional = (OptionalDouble) params[i];
+				params[i] = optional.isPresent() ? optional.getAsDouble() : null;
 			}
 		}
 	}
