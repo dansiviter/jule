@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>uk.dansiviter.juli</groupId>
 	<artifactId>juli-project</artifactId>
-	<version>0.5.2-SNAPSHOT</version>
+	<version>0.6.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>Java Util Logger Improver (JULI)</name>
 	<description>Library to help simplfy and improve java.util.logger</description>
@@ -72,13 +72,13 @@
 			<dependency>
 				<groupId>org.junit.jupiter</groupId>
 				<artifactId>junit-jupiter</artifactId>
-				<version>5.8.2</version>
+				<version>[5.8,6.0)</version>
 				<scope>test</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.mockito</groupId>
 				<artifactId>mockito-junit-jupiter</artifactId>
-				<version>4.3.1</version>
+				<version>[4.6,5.0)</version>
 				<scope>test</scope>
 			</dependency>
 			<dependency>
@@ -90,7 +90,7 @@
 			<dependency>
 				<groupId>org.awaitility</groupId>
 				<artifactId>awaitility</artifactId>
-				<version>4.1.1</version>
+				<version>[4.2,5.0)</version>
 				<scope>test</scope>
 			</dependency>
 		</dependencies>
@@ -118,11 +118,11 @@
 			<plugins>
 				<plugin>
 					<artifactId>maven-compiler-plugin</artifactId>
-					<version>3.8.1</version>
+					<version>3.10.1</version>
 				</plugin>
 				<plugin>
 					<artifactId>maven-jar-plugin</artifactId>
-					<version>3.2.0</version>
+					<version>3.2.2</version>
 					<configuration>
 						<archive>
 							<manifest>
@@ -136,7 +136,7 @@
 				</plugin>
 				<plugin>
 					<artifactId>maven-surefire-plugin</artifactId>
-					<version>3.0.0-M5</version>
+					<version>3.0.0-M7</version>
 					<configuration>
 						<properties>
 								<configurationParameters>
@@ -149,11 +149,11 @@
 				</plugin>
 				<plugin>
 					<artifactId>maven-failsafe-plugin</artifactId>
-					<version>3.0.0-M5</version>
+					<version>3.0.0-M7</version>
 				</plugin>
 				<plugin>
 					<artifactId>maven-release-plugin</artifactId>
-					<version>3.0.0-M1</version>
+					<version>3.0.0-M6</version>
 					<configuration>
             <scmCommentPrefix>[skip ci]</scmCommentPrefix>
         	</configuration>
@@ -161,12 +161,12 @@
 				<plugin>
 					<groupId>org.jboss.jandex</groupId>
 					<artifactId>jandex-maven-plugin</artifactId>
-					<version>1.2.1</version>
+					<version>1.2.3</version>
 				</plugin>
 				<plugin>
 					<groupId>org.jacoco</groupId>
 					<artifactId>jacoco-maven-plugin</artifactId>
-					<version>0.8.7</version>
+					<version>0.8.8</version>
 				</plugin>
 			</plugins>
 		</pluginManagement>

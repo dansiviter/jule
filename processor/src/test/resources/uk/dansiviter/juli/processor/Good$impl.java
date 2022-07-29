@@ -1,13 +1,10 @@
 package uk.dansiviter.juli.processor;
 
-import com.oracle.svm.core.annotate.AutomaticFeature;
 import java.lang.Override;
 import java.lang.String;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
 import javax.annotation.processing.Generated;
-import org.graalvm.nativeimage.hosted.Feature;
-import org.graalvm.nativeimage.hosted.RuntimeReflection;
 import uk.dansiviter.juli.BaseLog;
 import uk.dansiviter.juli.annotations.Log;
 import uk.dansiviter.juli.annotations.Message;
@@ -56,17 +53,5 @@ public final class Good$impl implements BaseLog, Good {
       return;
     }
     logp(Message.Level.INFO, "hello {0}", world);
-  }
-
-  @AutomaticFeature
-  public static final class GraalFeature implements Feature {
-    @Override
-    public final void beforeAnalysis(Feature.BeforeAnalysisAccess access) {
-      var clazz = access.findClassByName("uk.dansiviter.juli.processor.Good$impl");
-      RuntimeReflection.register(clazz);
-      RuntimeReflection.register(clazz.getDeclaredConstructors());
-      RuntimeReflection.register(clazz.getDeclaredFields());
-      RuntimeReflection.register(clazz.getDeclaredMethods());
-    }
   }
 }

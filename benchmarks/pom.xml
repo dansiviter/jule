@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>uk.dansiviter.juli</groupId>
 		<artifactId>juli-project</artifactId>
-		<version>0.3.0</version>
+		<version>0.5.2-SNAPSHOT</version>
 	</parent>
 	<artifactId>benchmarks</artifactId>
 
@@ -33,19 +33,18 @@
 		</dependency>
 	</dependencies>
 
-
 	<build>
 		<plugins>
 			<plugin>
         <groupId>com.google.cloud.tools</groupId>
         <artifactId>jib-maven-plugin</artifactId>
-        <version>2.8.0</version>
+        <version>3.2.1</version>
         <configuration>
 					<container>
 						<mainClass>uk.dansiviter.juli.JmhMain</mainClass>
 					</container>
 					<from>
-						<image>openjdk:16-jdk-alpine</image>
+						<image>openjdk:17-jdk-alpine</image>
 					</from>
         </configuration>
         <executions>

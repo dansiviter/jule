@@ -29,12 +29,14 @@ import java.util.logging.Logger;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.event.Event;
 import jakarta.enterprise.event.Observes;
+import jakarta.enterprise.inject.Produces;
 import jakarta.enterprise.inject.spi.BeanManager;
 import jakarta.enterprise.inject.spi.CDI;
 import jakarta.inject.Inject;
 
 import org.jboss.weld.junit5.auto.AddExtensions;
 import org.jboss.weld.junit5.auto.EnableAutoWeld;
+import org.jboss.weld.junit5.auto.ExcludeBean;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -55,8 +57,13 @@ class LogExtensionTest {
 	@Inject
 	Log1 log1;
 
+	@Mock
+	@ExcludeBean
+	@Produces
+	Handler handler;
+
 	@Test
-	void log(@Mock Handler handler) {
+	void log() {
 		Logger.getLogger("").addHandler(handler);
 
 		this.log0.doLog();
