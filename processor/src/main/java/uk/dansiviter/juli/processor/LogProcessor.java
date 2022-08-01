@@ -148,13 +148,13 @@ public class LogProcessor extends AbstractProcessor {
 		try {
 				// would be nice to have SOURCE_OUTPUT but for some reason Maven isn't processing it
 				var resourceFile = processingEnv.getFiler().createResource(CLASS_OUTPUT, "", resourceFileName);
-				try (var out = resourceFile.openOutputStream()) {
+				try (var out = Json.createWriter(resourceFile.openOutputStream())) {
 					var array = Json.createArrayBuilder().add(
 						Json.createObjectBuilder()
 							.add("name", format("%s.%s", pkg.getQualifiedName(), concreteName))
 							.add("allDeclaredConstructors", true)
 							.add("allPublicMethods", true));
-					Json.createWriter(out).writeArray(array.build());
+					out.writeArray(array.build());
 				}
 		} catch (IOException e) {
 				processingEnv.getMessager().printMessage(ERROR, e.getMessage(), type);
