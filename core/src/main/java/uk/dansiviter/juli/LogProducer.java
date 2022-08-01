@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Daniel Siviter
+ * Copyright 2022 Daniel Siviter
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -74,7 +74,7 @@ public enum LogProducer { ;
 	private static Object create(String key, Class<?> logClass, String name) {
 		var className = logClass.getName().concat(SUFFIX);
 		try {
-			return Class.forName(className)
+			return Class.forName(className, true, logClass.getClassLoader())
 				.getDeclaredConstructor(String.class, String.class)
 				.newInstance(name, key);
 		} catch (ReflectiveOperationException e) {

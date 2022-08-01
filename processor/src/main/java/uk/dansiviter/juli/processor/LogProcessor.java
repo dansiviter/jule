@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Daniel Siviter
+ * Copyright 2022 Daniel Siviter
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import static javax.lang.model.element.Modifier.PUBLIC;
 import static javax.lang.model.element.Modifier.STATIC;
 import static javax.tools.Diagnostic.Kind.ERROR;
 import static javax.tools.Diagnostic.Kind.NOTE;
+import static javax.tools.StandardLocation.CLASS_OUTPUT;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -45,17 +46,14 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeMirror;
 
-import com.oracle.svm.core.annotate.AutomaticFeature;
+import jakarta.json.Json;
+
 import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
-
-import org.graalvm.nativeimage.hosted.Feature;
-import org.graalvm.nativeimage.hosted.Feature.BeforeAnalysisAccess;
-import org.graalvm.nativeimage.hosted.RuntimeReflection;
 
 import uk.dansiviter.juli.BaseLog;
 import uk.dansiviter.juli.LogProducer;
@@ -123,7 +121,7 @@ public class LogProcessor extends AbstractProcessor {
 				.addModifiers(PUBLIC, FINAL)
 				.addAnnotation(AnnotationSpec
 					.builder(Generated.class)
-					.addMember("value", "\"" + getClass().getName() + "\"")
+					.addMember("value", format("\"%s\"", getClass().getName()))
 					.addMember("comments", "\"https://juli.dansiviter.uk/\"")
 					.build())
 				.addSuperinterface(BaseLog.class)
@@ -137,26 +135,41 @@ public class LogProcessor extends AbstractProcessor {
 
 		methods(type).forEach(m -> processMethod(typeBuilder, m));
 
-		typeBuilder.addType(createGraalFeature(concreteName, pkg));
-
 		var javaFile = JavaFile.builder(pkg.getQualifiedName().toString(), typeBuilder.build()).build();
 
 		try {
 			javaFile.writeTo(processingEnv.getFiler());
 		} catch (IOException e) {
 			processingEnv.getMessager().printMessage(ERROR, e.getMessage(), type);
+			return;
+		}
+
+		var resourceFileName = format("META-INF/native-image/%s/%s/native-image.json", pkg.getQualifiedName(), className);
+		try {
+				// would be nice to have SOURCE_OUTPUT but for some reason Maven isn't processing it
+				var resourceFile = processingEnv.getFiler().createResource(CLASS_OUTPUT, "", resourceFileName);
+				try (var out = Json.createWriter(resourceFile.openOutputStream())) {
+					var array = Json.createArrayBuilder().add(
+						Json.createObjectBuilder()
+							.add("name", format("%s.%s", pkg.getQualifiedName(), concreteName))
+							.add("allDeclaredConstructors", true)
+							.add("allPublicMethods", true));
+					out.writeArray(array.build());
+				}
+		} catch (IOException e) {
+				processingEnv.getMessager().printMessage(ERROR, e.getMessage(), type);
 		}
 	}
 
 	private Stream<? extends ExecutableElement> methods(TypeElement type) {
 		var methods = type.getEnclosedElements().stream()
-			.filter(e -> e.getKind() == ElementKind.METHOD && e.getAnnotation(Message.class) != null)
-			.map(ExecutableElement.class::cast);
+				.filter(e -> e.getKind() == ElementKind.METHOD && e.getAnnotation(Message.class) != null)
+				.map(ExecutableElement.class::cast);
 
 		var interfaceMethods = type.getInterfaces().stream()
-			.map(processingEnv.getTypeUtils()::asElement)
-			.map(TypeElement.class::cast)
-			.flatMap(this::methods);
+				.map(processingEnv.getTypeUtils()::asElement)
+				.map(TypeElement.class::cast)
+				.flatMap(this::methods);
 
 		return Stream.concat(methods, interfaceMethods);
 	}
@@ -177,14 +190,14 @@ public class LogProcessor extends AbstractProcessor {
 		e.getParameters().forEach(p -> method.addParameter(TypeName.get(p.asType()), p.getSimpleName().toString()));
 
 		method.beginControlFlow("if (!isLoggable($T.$N))", Level.class, message.level().name())
-					.addStatement("return")
-					.endControlFlow();
+				.addStatement("return")
+				.endControlFlow();
 
 		if (message.once()) {
 			var onceField = "ONCE__".concat(e.getSimpleName().toString());
 			var onceSpec = FieldSpec.builder(AtomicBoolean.class, onceField, PRIVATE, STATIC, FINAL)
 					.initializer("new $T()", AtomicBoolean.class)
-				  .build();
+					.build();
 			builder.addField(onceSpec);
 			method.beginControlFlow("if ($N.getAndSet(true))", onceField)
 					.addStatement("return")
@@ -200,29 +213,6 @@ public class LogProcessor extends AbstractProcessor {
 		method.addStatement(statement.toString(), Level.class, message.level().name(), message.value());
 
 		builder.addMethod(method.build());
-	}
-
-	private TypeSpec createGraalFeature(
-		String concreteName,
-		PackageElement pkg)
-	{
-		var beforeAnalysisMethod = MethodSpec.methodBuilder("beforeAnalysis")
-			.addAnnotation(Override.class)
-			.addModifiers(PUBLIC, FINAL)
-			.addParameter(BeforeAnalysisAccess.class, "access")
-			.addStatement("var clazz = access.findClassByName(\"$N.$N\")", pkg.getQualifiedName(), concreteName)
-			.addStatement("$T.register(clazz)", RuntimeReflection.class)
-			.addStatement("$T.register(clazz.getDeclaredConstructors())", RuntimeReflection.class)
-			.addStatement("$T.register(clazz.getDeclaredFields())", RuntimeReflection.class)
-			.addStatement("$T.register(clazz.getDeclaredMethods())", RuntimeReflection.class)
-			.build();
-
-		return TypeSpec.classBuilder("GraalFeature")
-				.addModifiers(PUBLIC, STATIC, FINAL)
-				.addSuperinterface(Feature.class)
-				.addAnnotation(AutomaticFeature.class)
-				.addMethod(beforeAnalysisMethod)
-				.build();
 	}
 
 	private static String className(TypeElement typeElement) {
