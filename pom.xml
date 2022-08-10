@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>uk.dansiviter.juli</groupId>
-	<artifactId>juli-project</artifactId>
-	<version>0.6.1-SNAPSHOT</version>
+	<groupId>uk.dansiviter.jule</groupId>
+	<artifactId>jule-project</artifactId>
+	<version>0.7.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
-	<name>Java Util Logger Improver (JULI)</name>
+	<name>Java Util Logger Enhancer (JULE)</name>
 	<description>Library to help simplfy and improve java.util.logger</description>
 
-	<url>https://github.com/dansiviter/juli</url>
+	<url>https://github.com/dansiviter/jule</url>
 	<inceptionYear>2020</inceptionYear>
 
 	<scm>
-		<developerConnection>scm:git:git@github.com:dansiviter/juli.git</developerConnection>
-		<connection>scm:git:git@github.com:dansiviter/juli.git</connection>
-		<url>https://github.com/dansiviter/juli</url>
-		<tag>juli-project-0.5.1</tag>
+		<developerConnection>scm:git:git@github.com:dansiviter/jule.git</developerConnection>
+		<connection>scm:git:git@github.com:dansiviter/jule.git</connection>
+		<url>https://github.com/dansiviter/jule</url>
+		<tag>jule-project-0.5.1</tag>
 	</scm>
 
 	<licenses>
@@ -42,7 +42,7 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<surefire.useModulePath>false</surefire.useModulePath>
 
-		<sonar.projectKey>dansiviter_juli</sonar.projectKey>
+		<sonar.projectKey>dansiviter_jule</sonar.projectKey>
 		<sonar.organization>dansiviter-github</sonar.organization>
 		<sonar.moduleKey>${project.groupId}:${project.artifactId}</sonar.moduleKey>
 		<sonar.host.url>https://sonarcloud.io</sonar.host.url>

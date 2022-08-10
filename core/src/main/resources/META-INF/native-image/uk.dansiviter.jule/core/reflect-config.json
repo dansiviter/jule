@@ -1,0 +1,9 @@
+[{
+  "name": "uk.dansiviter.jule.AsyncConsoleHandler",
+  "allDeclaredConstructors": true,
+  "allPublicMethods": true
+},{
+  "name": "uk.dansiviter.jule.FallbackHandler",
+  "allDeclaredConstructors": true,
+  "allPublicMethods": true
+}]
