@@ -7,10 +7,10 @@ body:
       value: |
         Thanks for taking the time to ask for an enhancement.
   - type: input
-    id: juli-version
+    id: jule-version
     attributes:
-      label: JULI Version
-      description: What version of JULI did this happen?
+      label: JULE Version
+      description: What version of JULE did this happen?
       placeholder: 1.2.3
   - type: textarea
     id: feature

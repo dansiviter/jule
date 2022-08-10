@@ -2,11 +2,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>uk.dansiviter.juli</groupId>
-		<artifactId>juli-project</artifactId>
-		<version>0.6.1-SNAPSHOT</version>
+		<groupId>uk.dansiviter.jule</groupId>
+		<artifactId>jule-project</artifactId>
+		<version>0.7.0-SNAPSHOT</version>
 	</parent>
-	<artifactId>juli-processor</artifactId>
+	<artifactId>jule-processor</artifactId>
 	<name>Annotation Processor</name>
 
 	<properties>
@@ -16,7 +16,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
-			<artifactId>juli</artifactId>
+			<artifactId>jule</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>

@@ -1,7 +1,7 @@
-[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/dansiviter/juli/Build?style=flat-square)](https://github.com/dansiviter/juli/actions/workflows/build.yaml) [![Known Vulnerabilities](https://snyk.io/test/github/dansiviter/juli/badge.svg?style=flat-square)](https://snyk.io/test/github/dansiviter/juli) [![Sonar Coverage](https://img.shields.io/sonar/coverage/dansiviter_juli?server=https%3A%2F%2Fsonarcloud.io&style=flat-square)](https://sonarcloud.io/dashboard?id=dansiviter_juli) [![Maven Central](https://img.shields.io/maven-central/v/uk.dansiviter.juli/juli-project?style=flat-square)](https://search.maven.org/artifact/uk.dansiviter.juli/juli-project) ![Java 11+](https://img.shields.io/badge/-Java%2011%2B-informational?style=flat-square)
+[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/dansiviter/jule/Build?style=flat-square)](https://github.com/dansiviter/jule/actions/workflows/build.yaml) [![Known Vulnerabilities](https://snyk.io/test/github/dansiviter/jule/badge.svg?style=flat-square)](https://snyk.io/test/github/dansiviter/jule) [![Sonar Coverage](https://img.shields.io/sonar/coverage/dansiviter_jule?server=https%3A%2F%2Fsonarcloud.io&style=flat-square)](https://sonarcloud.io/dashboard?id=dansiviter_jule) [![Maven Central](https://img.shields.io/maven-central/v/uk.dansiviter.jule/jule-project?style=flat-square)](https://search.maven.org/artifact/uk.dansiviter.jule/jule-project) ![Java 11+](https://img.shields.io/badge/-Java%2011%2B-informational?style=flat-square)
 
 
-# Java Util Logging Improver (JULI) #
+# Java Util Logging Enhancer (JULE) #
 
 Although rarely the preferred framework `java.util.logging` (JUL) is embedded into Java so aids minimal applications but is not the easiest to use. This library is here to make life a little easier:
 * Minimal (~21KB for v0.3.0) layer to improve:
@@ -24,14 +24,14 @@ Lets get started... first import dependencies:
 
 ```xml
 <dependency>
-  <groupId>uk.dansiviter.juli</groupId>
-  <artifactId>juli</artifactId>
-  <version>${juli.version}</version>
+  <groupId>uk.dansiviter.jule</groupId>
+  <artifactId>jule</artifactId>
+  <version>${jule.version}</version>
 </dependency>
 <dependency>
-  <groupId>uk.dansiviter.juli</groupId>
-  <artifactId>processor</artifactId>
-  <version>${juli.version}</version>
+  <groupId>uk.dansiviter.jule</groupId>
+  <artifactId>jule-processor</artifactId>
+  <version>${jule.version}</version>
   <scope>provided</scope> <!-- only needed during compilation -->
   <optional>true</optional>
 </dependency>
@@ -63,7 +63,7 @@ public interface MyLog {
 
 This will generate a class `com.foo.MyLog$impl` which actually does the logging. For Maven this can be seen in the `target/generated-sources/annotations/` folder for reference.
 
-To get an instance use `uk.dansiviter.juli.LogProducer`:
+To get an instance use `uk.dansiviter.jule.LogProducer`:
 ```java
 public class MyClass {
   private final static MyLog LOG = LogProducer.log(MyLog.class);
@@ -83,9 +83,9 @@ This can perform automatic injection of dependencies via CDI:
 
 ```xml
 <dependency>
-  <groupId>uk.dansiviter.juli</groupId>
+  <groupId>uk.dansiviter.jule</groupId>
   <artifactId>cdi</artifactId>
-  <version>${juli.version}</version>
+  <version>${jule.version}</version>
 </dependency>
 ```
 
@@ -108,7 +108,7 @@ This will inject a `@Dependent` scoped instance of the logger to prevent proxyin
 
 ## Asynchronous Handlers ##
 
-JUL handlers are all synchronous which puts IO directly within the path of execution; this is a bottleneck. To address this, this library has a very simple `uk.dansiviter.juli.AsyncHandler` implementation that uses `java.util.concurrent.Flow` to asynchronously process log events. Using this can significantly improve the execution performance of methods that have 'chatty' logging at the expense of a little memory and CPU. There is only one concrete implementation as the moment which is `uk.dansiviter.juli.AsyncConsoleHandler` which can be used as a direct replacement for `java.util.logging.ConsoleHandler`.
+JUL handlers are all synchronous which puts IO directly within the path of execution; this is a bottleneck. To address this, this library has a very simple `uk.dansiviter.jule.AsyncHandler` implementation that uses `java.util.concurrent.Flow` to asynchronously process log events. Using this can significantly improve the execution performance of methods that have 'chatty' logging at the expense of a little memory and CPU. There is only one concrete implementation as the moment which is `uk.dansiviter.jule.AsyncConsoleHandler` which can be used as a direct replacement for `java.util.logging.ConsoleHandler`.
 
 > :warning: If the buffer saturates, then the much of the performance benefits of the asynchronous handler can be lost. However, once the back-pressure is reduced this will return, due to this it _should_ still outperform a synchronous implementation.
 
@@ -117,12 +117,12 @@ JUL handlers are all synchronous which puts IO directly within the path of execu
 
 ## Fallback Handler ##
 
-Some handlers have external factors that may prevent a log record being flushed. This might include a remote log aggregator where a network failure prevents the message being delivered. To prevent loss of log records the `uk.dansiviter.juli.FallbackHandler` can be used to manage this case. For example:
+Some handlers have external factors that may prevent a log record being flushed. This might include a remote log aggregator where a network failure prevents the message being delivered. To prevent loss of log records the `uk.dansiviter.jule.FallbackHandler` can be used to manage this case. For example:
 
 ```
-handlers=uk.dansiviter.juli.FallbackHandler
-uk.dansiviter.juli.FallbackHandler.delegate=com.acme.MyRemoteHandler
-uk.dansiviter.juli.FallbackHandler.fallback=java.util.logging.ConsoleHandler
+handlers=uk.dansiviter.jule.FallbackHandler
+uk.dansiviter.jule.FallbackHandler.delegate=com.acme.MyRemoteHandler
+uk.dansiviter.jule.FallbackHandler.fallback=java.util.logging.ConsoleHandler
 ```
 With the above configuration, if either `MyRemoteHandler` `delegate` cannot be created or `Handler#publish(...)` fails the `fallback` handler will be used instead. If no `fallback` is defined then `AsyncConsoleHandler` is used.
 
