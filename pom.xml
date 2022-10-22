@@ -15,7 +15,7 @@
 		<developerConnection>scm:git:git@github.com:dansiviter/jule.git</developerConnection>
 		<connection>scm:git:git@github.com:dansiviter/jule.git</connection>
 		<url>https://github.com/dansiviter/jule</url>
-		<tag>jule-project-0.5.1</tag>
+		<tag>HEAD</tag>
 	</scm>
 
 	<licenses>

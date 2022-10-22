@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Daniel Siviter
+ * Copyright 2022 Daniel Siviter
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ import java.lang.annotation.Target;
  * <p>
  * Usage:
  * <pre>
- * &#064;Message(value = "Oh no! The value was {0}!")
+ * &#064;Message(value = "Oh no! The value was %d!")
  * void error(int myInteger, IllegalStateException e);
  * </pre>
  */
@@ -55,23 +55,14 @@ public @interface Message {
 	 */
 	public enum Level {
 		/** Error level */
-		ERROR(java.util.logging.Level.SEVERE),
+		ERROR,
 		/** Warning level */
-		WARN(java.util.logging.Level.WARNING),
+		WARN,
 		/** Information Level */
-		INFO(java.util.logging.Level.INFO),
+		INFO,
 		/** Debug level */
-		DEBUG(java.util.logging.Level.FINE),
+		DEBUG,
 		/** Trace level */
-		TRACE(java.util.logging.Level.FINER);
-
-		/**
-		 * The JUL {@code Level}
-		 */
-		public final java.util.logging.Level julLevel;
-
-		Level(java.util.logging.Level julLevel) {
-			this.julLevel = julLevel;
-		}
+		TRACE
 	}
 }

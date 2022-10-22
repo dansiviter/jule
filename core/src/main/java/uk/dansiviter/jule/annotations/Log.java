@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Daniel Siviter
+ * Copyright 2022 Daniel Siviter
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,4 +44,24 @@ public @interface Log {
 	 * @see java.util.logging.Logger#setResourceBundle(java.util.ResourceBundle)
 	 */
 	String resourceBundleName() default "";
+
+	/**
+	 * @return the generated log type.
+	 */
+	Type type() default Type.JUL;
+
+	public enum Type {
+		/**
+		 * Uses {@link java.util.logging.Logger} as delegate.
+		 */
+		JUL,
+		/**
+		 * Uses {@link java.lang.System.Logger} as delegate.
+		 *
+		 * <p/>
+		 * <strong>Note:</strong> This will not report accurate positioning (i.e. source class and method) as the API does
+		 * not support it.
+		 */
+		SYSTEM
+	}
 }

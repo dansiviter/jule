@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Daniel Siviter
+ * Copyright 2022 Daniel Siviter
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,7 @@
  */
 package uk.dansiviter.jule;
 
-import static java.lang.StackWalker.Option.RETAIN_CLASS_REFERENCE;
-import static java.util.logging.Logger.getLogger;
+import static java.lang.String.format;
 
 import java.util.Arrays;
 import java.util.Optional;
@@ -28,8 +27,6 @@ import java.util.function.DoubleSupplier;
 import java.util.function.IntSupplier;
 import java.util.function.LongSupplier;
 import java.util.function.Supplier;
-import java.util.logging.LogRecord;
-import java.util.logging.Logger;
 
 import uk.dansiviter.jule.annotations.Log;
 import uk.dansiviter.jule.annotations.Message;
@@ -37,11 +34,11 @@ import uk.dansiviter.jule.annotations.Message;
 /**
  * Defines the base implementation of the logger interface.
  */
-public interface BaseLog {
+public interface BaseLog<L> {
 	/**
 	 * @return the delegate logger.
 	 */
-	Logger delegate();
+	L delegate();
 
 	/**
 	 * @return the {@link Log} instance.
@@ -54,10 +51,7 @@ public interface BaseLog {
 	 * @param name the name of the log.
 	 * @return the logger instance.
 	 */
-	default Logger delegate(String name) {
-		var bundleName = log().resourceBundleName();
-		return getLogger(name, bundleName.isBlank() ? null : bundleName);
-	}
+	L delegate(String name);
 
 	/**
 	 * Checks if this logger will log.
@@ -65,9 +59,7 @@ public interface BaseLog {
 	 * @param level the log level.
 	 * @return {@code true} if this will log.
 	 */
-	default boolean isLoggable(Message.Level level) {
-		return delegate().isLoggable(level.julLevel);
-	}
+	boolean isLoggable(Message.Level level);
 
 	/**
 	 * Log a message.
@@ -79,32 +71,21 @@ public interface BaseLog {
 	 */
 	default void logp(Message.Level level, String msg, Object... params) {
 		// isLoggable check will already be done
-		expand(params);
+		BaseLog.expand(params);
 
-		var delegate = delegate();
-		var r = new LogRecord(level.julLevel, msg);
-		r.setLoggerName(delegate.getName());
+		Throwable thrown = null;
 		if (params.length > 0) {
 			if (params[params.length - 1] instanceof Throwable) {
-				r.setThrown((Throwable) params[params.length - 1]);
+				thrown = (Throwable) params[params.length - 1];
 				params = Arrays.copyOfRange(params, 0, params.length - 1);
 			}
-			if (params.length > 0) {
-				r.setParameters(params);
-			}
 		}
-		var frame = frame(3).orElseThrow();
-		r.setSourceClassName(frame.getClassName());
-		r.setSourceMethodName(frame.getMethodName());
 
-		var resourceBundleName = delegate.getResourceBundleName();
-		if (resourceBundleName != null) {
-			r.setResourceBundleName(resourceBundleName);
-			// only look up if needed as potentially expensive operation
-			r.setResourceBundle(delegate.getResourceBundle());
-		}
-		delegate.log(r);
+		var finalParams = params;
+		log(level, () -> format(msg, finalParams), thrown);
 	}
+
+	void log(Message.Level level, Supplier<String> msg, Throwable thrown);
 
 
 	// --- Static Methods ---
@@ -112,7 +93,7 @@ public interface BaseLog {
 	/**
 	 * @param params the parameters to expand to get lazy values.
 	 */
-	private static void expand(Object[] params) {
+	public static void expand(Object[] params) {
 		if (params.length == 0) {
 			return;
 		}
@@ -148,10 +129,5 @@ public interface BaseLog {
 				params[i] = optional.isPresent() ? optional.getAsDouble() : null;
 			}
 		}
-	}
-
-	private static Optional<StackWalker.StackFrame> frame(int skip) {
-		var walker = StackWalker.getInstance(RETAIN_CLASS_REFERENCE);
-		return walker.walk(s -> s.skip(skip).findFirst());
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Daniel Siviter
+ * Copyright 2022 Daniel Siviter
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 package uk.dansiviter.jule.processor;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.arrayContaining;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
@@ -95,43 +94,41 @@ class LogProducerTest {
 		var records = recordCaptor.getAllValues().iterator();
 
 		var record = records.next();
-		assertThat(java.util.logging.Level.INFO, is(record.getLevel()));
-		assertThat(getClass().getName(), is(record.getLoggerName()));
-		assertThat("Hello world!", is(record.getMessage()));
-		assertThat(getClass().getName(), is(record.getSourceClassName()));
-		assertThat("logInjected", is(record.getSourceMethodName()));
+		assertThat(record.getLevel(), is(java.util.logging.Level.INFO));
+		assertThat(record.getLoggerName(), is(getClass().getName()));
+		assertThat(record.getMessage(), is("Hello world!"));
 		assertThat(record.getParameters(), nullValue());
 		assertThat(record.getThrown(), nullValue());
 
 		record = records.next();
-		assertThat(java.util.logging.Level.SEVERE, is(record.getLevel()));
-		assertThat("Hello world! {0}", is(record.getMessage()));
-		assertThat(record.getParameters(), arrayContaining("foo"));
+		assertThat(record.getLevel(), is(java.util.logging.Level.SEVERE));
+		assertThat(record.getMessage(), is("Hello world! foo"));
+		assertThat(record.getParameters(), nullValue());
 
 		record = records.next();
-		assertThat("Hello world! {0}", is(record.getMessage()));
-		assertThat(record.getParameters(), arrayContaining(Integer.valueOf(5)));
+		assertThat(record.getMessage(), is("Hello world! 5"));
+		assertThat(record.getParameters(), nullValue());
 
 		record = records.next();
-		assertThat(java.util.logging.Level.SEVERE, is(record.getLevel()));
-		assertThat("Hello world!", is(record.getMessage()));
+		assertThat(record.getLevel(), is(java.util.logging.Level.SEVERE));
+		assertThat(record.getMessage(), is("Hello world!"));
 		assertThat(record.getThrown(), notNullValue());
 		assertThat(record.getParameters(), nullValue());
 
 		record = records.next();
-		assertThat("Hello world! {0}", is(record.getMessage()));
-		assertThat(record.getParameters(), arrayContaining(123L));
+		assertThat(record.getMessage(), is("Hello world! 123"));
+		assertThat(record.getParameters(), nullValue());
 
 		record = records.next();
-		assertThat("Hello once!", is(record.getMessage()));
+		assertThat(record.getMessage(), is("Hello once!"));
 
 		record = records.next();
-		assertThat("Hello world! {0}", is(record.getMessage()));
-		assertThat(record.getParameters(), arrayContaining("foo"));
+		assertThat(record.getMessage(), is("Hello world! foo"));
+		assertThat(record.getParameters(), nullValue());
 
 		record = records.next();
-		assertThat("Hello world! {0}", is(record.getMessage()));
-		assertThat(record.getParameters(), arrayContaining((Object) null));
+		assertThat(record.getMessage(), is("Hello world! null"));
+		assertThat(record.getParameters(), nullValue());
 
 		verifyNoMoreInteractions(handler);
 	}
@@ -146,28 +143,28 @@ class LogProducerTest {
 		@Message("Hello world!")
 		void doLog();
 
-		@Message(value = "Hello world! {0}", level = Level.ERROR)
+		@Message(value = "Hello world! %s", level = Level.ERROR)
 		void doLog(String foo);
 
-		@Message("Hello world! {0}")
+		@Message("Hello world! %s")
 		void doLog(LongSupplier foo);
 
-		@Message("Hello world! {0}")
+		@Message("Hello world! %s")
 		void doLog(int foo);
 
 		@Message(value = "Hello world!", level = Level.ERROR)
 		void doLog(Throwable t);
 
-		@Message(value = "Hello world! {0}", level = Level.ERROR)
+		@Message(value = "Hello world! %s", level = Level.ERROR)
 		void doLog(String foo, Throwable t);
 
 		@Message("Hello world!")
 		void doLog(String... foo);
 
-		@Message("Hello world! {0}")
+		@Message("Hello world! %s")
 		void doLog(Optional<String> foo);
 
-		@Message(value = "Hello world! {0}", level = Level.TRACE)
+		@Message(value = "Hello world! %s", level = Level.TRACE)
 		void trace(Supplier<Long> foo);
 
 		@Message(value = "Hello once!", once = true)

@@ -5,7 +5,7 @@ import java.lang.String;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
 import javax.annotation.processing.Generated;
-import uk.dansiviter.jule.BaseLog;
+import uk.dansiviter.jule.BaseJulLog;
 import uk.dansiviter.jule.annotations.Log;
 import uk.dansiviter.jule.annotations.Message;
 
@@ -13,7 +13,7 @@ import uk.dansiviter.jule.annotations.Message;
     value = "uk.dansiviter.jule.processor.LogProcessor",
     comments = "https://jule.dansiviter.uk/"
 )
-public final class Good$impl implements BaseLog, Good {
+public final class Good$impl implements BaseJulLog, Good {
   private static final AtomicBoolean ONCE__foo = new AtomicBoolean();
 
   private final Log log;
@@ -52,6 +52,6 @@ public final class Good$impl implements BaseLog, Good {
     if (ONCE__foo.getAndSet(true)) {
       return;
     }
-    logp(Message.Level.INFO, "hello {0}", world);
+    logp(Message.Level.INFO, "hello %s", world);
   }
 }

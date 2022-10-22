@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Daniel Siviter
+ * Copyright 2022 Daniel Siviter
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@ package uk.dansiviter.jule.cdi;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.*;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.mockito.Mockito.verify;
@@ -72,11 +72,9 @@ class LogExtensionTest {
 		verify(handler).publish(recordCaptor.capture());
 
 		var record = recordCaptor.getValue();
-		assertThat(java.util.logging.Level.INFO, equalTo(record.getLevel()));
-		assertThat("Hello", equalTo(record.getMessage()));
-		assertThat("uk.dansiviter.jule.cdi.LogExtensionTest", equalTo(record.getLoggerName()));
-		assertThat("uk.dansiviter.jule.cdi.LogExtensionTest", equalTo(record.getSourceClassName()));
-		assertThat("log", equalTo(record.getSourceMethodName()));
+		assertThat(record.getLevel(), is(java.util.logging.Level.INFO));
+		assertThat(record.getMessage(), is("Hello"));
+		assertThat(record.getLoggerName(), is("uk.dansiviter.jule.cdi.LogExtensionTest"));
 	}
 
 	@Test
