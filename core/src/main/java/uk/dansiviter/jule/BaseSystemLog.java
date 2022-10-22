@@ -30,10 +30,11 @@ import uk.dansiviter.jule.annotations.Message;
 public interface BaseSystemLog extends BaseLog<Logger> {
 	@Override
 	default Logger delegate(String name) {
-		if (log().resourceBundleName().isEmpty()) {
+		var bundleName = log().resourceBundleName();
+		if (bundleName.isEmpty()) {
 			return getLogger(name);
 		}
-		var bundle = ResourceBundle.getBundle(log().resourceBundleName());
+		var bundle = ResourceBundle.getBundle(bundleName);
 		return getLogger(name, bundle);
 	}
 
