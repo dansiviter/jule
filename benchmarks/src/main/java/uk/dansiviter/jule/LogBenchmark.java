@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Daniel Siviter
+ * Copyright 2022 Daniel Siviter
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,20 +55,20 @@ public class LogBenchmark {
 
 	@Benchmark
 	public void legLog(LegacyState state) {
-		if (state.log.isLoggable(Level.INFO.julLevel)) {
-			state.log.log(Level.INFO.julLevel, "Hello {0}", 1);
+		if (state.log.isLoggable(java.util.logging.Level.INFO)) {
+			state.log.log(java.util.logging.Level.INFO, "Hello %d", 1);
 		}
-		if (state.log.isLoggable(Level.DEBUG.julLevel)) {
-			state.log.log(Level.DEBUG.julLevel, "Hello {0}", 2);
+		if (state.log.isLoggable(java.util.logging.Level.FINE)) {
+			state.log.log(java.util.logging.Level.FINE, "Hello %d", 2);
 		}
 	}
 
 	@Log
 	public interface BenchmarkLog {
-		@Message("Hello {0}")
+		@Message("Hello %d")
 		void hello(int i);
 
-		@Message(value = "Hello {0}", level = Level.DEBUG)
+		@Message(value = "Hello %d", level = Level.DEBUG)
 		void debugHello(int i);
 	}
 }

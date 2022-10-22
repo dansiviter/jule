@@ -44,19 +44,19 @@ package com.foo;
 
 @Log
 public interface MyLog {
-  @Message("Hello {0}")  // <- defaults to `Info` level
+  @Message("Hello %s")  // <- defaults to `Info` level
   void hello(String name);
 
-  @Message(value = "Oh no! {0}", level = Level.ERROR)  // <- 'Error' level
+  @Message(value = "Oh no! %s", level = Level.ERROR)  // <- 'Error' level
   void error(String name, Throwable t);  // <- Throwables must be last parameter
 
-  @Message("Hello {0}")
+  @Message("Hello %s")
   void unwrap(Supplier<String> name);  // <- value extracted on the calling thread if #isLoggable passes
 
-  @Message("Number {0}")
+  @Message("Number %d")
   void number(int value);  // <- primitives only auto-boxed if the log level is consumed. w00t!
 
-  @Message("Another number {0}")
+  @Message("Another number %d")
   void numberUnwrap(IntSuppler value);  // <- primitive suppliers work too!
 }
 ```

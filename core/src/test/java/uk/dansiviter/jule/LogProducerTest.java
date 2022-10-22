@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Daniel Siviter
+ * Copyright 2022 Daniel Siviter
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
 
-import uk.dansiviter.jule.LogProducer;
 import uk.dansiviter.jule.annotations.Log;
 
 /**

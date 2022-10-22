@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Daniel Siviter
+ * Copyright 2022 Daniel Siviter
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,6 @@ import com.google.testing.compile.Compilation;
 import com.google.testing.compile.JavaFileObjects;
 
 import org.junit.jupiter.api.Test;
-
-import uk.dansiviter.jule.processor.LogProcessor;
 
 /**
  * Tests for {@link LogProcessor}

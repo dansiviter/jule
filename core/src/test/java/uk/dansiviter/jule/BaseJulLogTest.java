@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Daniel Siviter
+ * Copyright 2022 Daniel Siviter
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,10 @@ package uk.dansiviter.jule;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.isA;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
-import static org.hamcrest.collection.ArrayMatching.arrayContaining;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -33,7 +33,6 @@ import java.util.function.DoubleSupplier;
 import java.util.function.IntSupplier;
 import java.util.function.LongSupplier;
 import java.util.function.Supplier;
-import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -43,25 +42,24 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import uk.dansiviter.jule.BaseLog;
 import uk.dansiviter.jule.annotations.Log;
 import uk.dansiviter.jule.annotations.Message.Level;
 
 /**
- * Tests for {@link BaseLog}.
+ * Tests for {@link BaseJulLog}.
  */
 @ExtendWith(MockitoExtension.class)
-class BaseLogTest {
+class BaseJulLogTest {
 	@Mock
 	private Logger delegate;
 	@Mock
 	private Log log;
 
-	private BaseLog baseLog;
+	private BaseJulLog baseLog;
 
 	@BeforeEach
 	void before() {
-		this.baseLog = new BaseLog() {
+		this.baseLog = new BaseJulLog() {
 			@Override
 			public Logger delegate() {
 				return delegate;
@@ -87,12 +85,12 @@ class BaseLogTest {
 
 	@Test
 	void delegate_resourceBundle() {
-		when(this.log.resourceBundleName()).thenReturn(BaseLogTest.class.getName());
+		when(this.log.resourceBundleName()).thenReturn(BaseJulLogTest.class.getName());
 
 		Logger logger = this.baseLog.delegate("BaseLogTest#resourceBundle");
 
 		assertThat(logger.getName(), equalTo("BaseLogTest#resourceBundle"));
-		assertThat(logger.getResourceBundleName(), equalTo(BaseLogTest.class.getName()));
+		assertThat(logger.getResourceBundleName(), equalTo(BaseJulLogTest.class.getName()));
 		assertThat(logger.getResourceBundle(), notNullValue());
 
 		verify(this.log).resourceBundleName();
@@ -102,15 +100,13 @@ class BaseLogTest {
 	void isLoggable() {
 		this.baseLog.isLoggable(Level.DEBUG);
 
-		verify(this.delegate).isLoggable(Level.DEBUG.julLevel);
+		verify(this.delegate).isLoggable(java.util.logging.Level.FINE);
 	}
 
 	@Test
-	void logp() {
-		when(this.delegate.getResourceBundleName()).thenReturn("myBundle");
-
+	void log() {
 		this.baseLog.logp(Level.DEBUG,
-			"hello",
+			"hello %s %s %s %d %d %,.2f %s %s %d %d %d %,.2f",
 			"world",
 			(Supplier<String>) () -> "foo",  // test expansion
 			(BooleanSupplier) () -> true,
@@ -120,54 +116,30 @@ class BaseLogTest {
 			Optional.of("bar"),
 			Optional.empty(),
 			OptionalInt.of(5),
+			OptionalInt.empty(),
 			OptionalLong.of(6),
 			OptionalDouble.of(3.2));
 
-		var recordCaptor = ArgumentCaptor.forClass(LogRecord.class);
-		verify(this.delegate).log(recordCaptor.capture());
+		@SuppressWarnings("unchecked")
+		ArgumentCaptor<Supplier<String>> msgCaptor = ArgumentCaptor.forClass(Supplier.class);
 
-		var record = recordCaptor.getValue();
-		assertThat(record.getLevel(), equalTo(Level.DEBUG.julLevel));
-		assertThat(record.getMessage(), equalTo("hello"));
-		assertThat(record.getParameters(), arrayContaining("world", "foo", true, 2, 3L, 2.3, "bar", null, 5, 6L, 3.2));
-		assertThat(record.getThrown(), nullValue());
-		assertThat(record.getResourceBundleName(), equalTo("myBundle"));
+		verify(this.delegate).log(
+			eq(java.util.logging.Level.FINE),
+			msgCaptor.capture());
+		assertThat(msgCaptor.getValue().get(), equalTo("hello world foo true 2 3 2.30 bar null 5 null 6 3.20"));
 	}
 
 	@Test
-	void logp_throwable() {
+	void log_throwable() {
 		this.baseLog.logp(Level.DEBUG, "hello", new IllegalStateException());
 
-		var recordCaptor = ArgumentCaptor.forClass(LogRecord.class);
-		verify(this.delegate).log(recordCaptor.capture());
+		@SuppressWarnings("unchecked")
+		ArgumentCaptor<Supplier<String>> msgCaptor = ArgumentCaptor.forClass(Supplier.class);
 
-		var record = recordCaptor.getValue();
-		assertThat(record.getLevel(), equalTo(Level.DEBUG.julLevel));
-		assertThat(record.getMessage(), equalTo("hello"));
-		assertThat(record.getThrown(), isA(IllegalStateException.class));
-	}
-
-	@Test
-	void logp_noParams() {
-		this.baseLog.logp(Level.DEBUG, "hello");
-
-		var recordCaptor = ArgumentCaptor.forClass(LogRecord.class);
-		verify(this.delegate).log(recordCaptor.capture());
-
-		var record = recordCaptor.getValue();
-		assertThat(record.getLevel(), equalTo(Level.DEBUG.julLevel));
-		assertThat(record.getMessage(), equalTo("hello"));
-		assertThat(record.getParameters(), nullValue());
-		assertThat(record.getThrown(), nullValue());
-		assertThat(record.getResourceBundleName(), nullValue());
-	}
-
-	@Test
-	void levels() {
-		assertThat(Level.TRACE.julLevel, equalTo(java.util.logging.Level.FINER));
-		assertThat(Level.DEBUG.julLevel, equalTo(java.util.logging.Level.FINE));
-		assertThat(Level.INFO.julLevel, equalTo(java.util.logging.Level.INFO));
-		assertThat(Level.WARN.julLevel, equalTo(java.util.logging.Level.WARNING));
-		assertThat(Level.ERROR.julLevel, equalTo(java.util.logging.Level.SEVERE));
-	}
+		verify(this.delegate).log(
+			eq(java.util.logging.Level.FINE),
+			isA(IllegalStateException.class),
+			msgCaptor.capture());
+		assertThat(msgCaptor.getValue().get(), equalTo("hello"));
+  }
 }

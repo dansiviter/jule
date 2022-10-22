@@ -55,10 +55,12 @@ import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 
-import uk.dansiviter.jule.BaseLog;
+import uk.dansiviter.jule.BaseJulLog;
+import uk.dansiviter.jule.BaseSystemLog;
 import uk.dansiviter.jule.LogProducer;
 import uk.dansiviter.jule.annotations.Log;
 import uk.dansiviter.jule.annotations.Message;
+import uk.dansiviter.jule.annotations.Log.Type;
 import uk.dansiviter.jule.annotations.Message.Level;
 
 /**
@@ -117,6 +119,18 @@ public class LogProcessor extends AbstractProcessor {
 				.addJavadoc("@returns the annotation instance.")
 				.build();
 
+		var log = type.getAnnotation(Log.class);
+		Class<?> baseLogType;
+
+		if (log.type() == Type.JUL) {
+			baseLogType = BaseJulLog.class;
+		} else if (log.type() == Type.SYSTEM) {
+			baseLogType = BaseSystemLog.class;
+		} else {
+			processingEnv.getMessager().printMessage(ERROR, "Unknown type! [" + log.type() + "]", type);
+			return;
+		}
+
 		var typeBuilder = TypeSpec.classBuilder(concreteName)
 				.addModifiers(PUBLIC, FINAL)
 				.addAnnotation(AnnotationSpec
@@ -124,7 +138,7 @@ public class LogProcessor extends AbstractProcessor {
 					.addMember("value", format("\"%s\"", getClass().getName()))
 					.addMember("comments", "\"https://jule.dansiviter.uk/\"")
 					.build())
-				.addSuperinterface(BaseLog.class)
+				.addSuperinterface(baseLogType)
 				.addSuperinterface(typeMirror)
 				.addMethod(constructor)
 				.addField(Log.class, "log", PRIVATE, FINAL)
