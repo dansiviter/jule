@@ -98,36 +98,37 @@ public interface BaseLog<L> {
 			return;
 		}
 		for (var i = 0; i < params.length; i++) {
-			if (params[i] instanceof Supplier) {
-				params[i] = ((Supplier<?>) params[i]).get();
-			}
-			if (params[i] instanceof BooleanSupplier) {
-				params[i] = ((BooleanSupplier) params[i]).getAsBoolean();
-			}
-			if (params[i] instanceof IntSupplier) {
-				params[i] = ((IntSupplier) params[i]).getAsInt();
-			}
-			if (params[i] instanceof LongSupplier) {
-				params[i] = ((LongSupplier) params[i]).getAsLong();
-			}
-			if (params[i] instanceof DoubleSupplier) {
-				params[i] = ((DoubleSupplier) params[i]).getAsDouble();
-			}
-			if (params[i] instanceof Optional) {
-				params[i] = ((Optional<?>) params[i]).orElse(null);
-			}
-			if (params[i] instanceof OptionalInt) {
-				var optional = (OptionalInt) params[i];
-				params[i] = optional.isPresent() ? optional.getAsInt() : null;
-			}
-			if (params[i] instanceof OptionalLong) {
-				var optional = (OptionalLong) params[i];
-				params[i] = optional.isPresent() ? optional.getAsLong() : null;
-			}
-			if (params[i] instanceof OptionalDouble) {
-				var optional = (OptionalDouble) params[i];
-				params[i] = optional.isPresent() ? optional.getAsDouble() : null;
-			}
+			params[i] = expand(params[i]);
 		}
+	}
+
+	/**
+	 * @param param the parameter to expand to get lazy values.
+	 * @return the expanded value or the input value if unable to expand.
+	 */
+	private static Object expand(Object param) {
+		if (param instanceof Supplier) {
+			return ((Supplier<?>) param).get();
+		} else if (param instanceof BooleanSupplier) {
+			return ((BooleanSupplier) param).getAsBoolean();
+		} else if (param instanceof IntSupplier) {
+			return ((IntSupplier) param).getAsInt();
+		} else if (param instanceof LongSupplier) {
+			return ((LongSupplier) param).getAsLong();
+		} else if (param instanceof DoubleSupplier) {
+			return ((DoubleSupplier) param).getAsDouble();
+		} else if (param instanceof Optional) {
+			return ((Optional<?>) param).orElse(null);
+		} else if (param instanceof OptionalInt) {
+			var optional = (OptionalInt) param;
+			return optional.isPresent() ? optional.getAsInt() : null;
+		} else if (param instanceof OptionalLong) {
+			var optional = (OptionalLong) param;
+			return optional.isPresent() ? optional.getAsLong() : null;
+		} else if (param instanceof OptionalDouble) {
+			var optional = (OptionalDouble) param;
+			return optional.isPresent() ? optional.getAsDouble() : null;
+		}
+		return param;
 	}
 }
