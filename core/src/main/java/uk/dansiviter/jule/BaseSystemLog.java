@@ -66,9 +66,4 @@ public interface BaseSystemLog extends BaseLog<Logger> {
 		}
 		return Level.OFF;
 	}
-
-	public static void main(String[] args) {
-		var log = System.getLogger("foo");
-		System.out.println(log);
-	}
 }

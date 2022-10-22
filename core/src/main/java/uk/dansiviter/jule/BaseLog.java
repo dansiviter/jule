@@ -74,12 +74,10 @@ public interface BaseLog<L> {
 		BaseLog.expand(params);
 
 		Throwable thrown = null;
-		if (params.length > 0) {
-			if (params[params.length - 1] instanceof Throwable) {
-				thrown = (Throwable) params[params.length - 1];
-				params = Arrays.copyOfRange(params, 0, params.length - 1);
-			}
-		}
+		if (params.length > 0 && params[params.length - 1] instanceof Throwable) {
+			thrown = (Throwable) params[params.length - 1];
+			params = Arrays.copyOfRange(params, 0, params.length - 1);
+	}
 
 		var finalParams = params;
 		log(level, () -> format(msg, finalParams), thrown);
