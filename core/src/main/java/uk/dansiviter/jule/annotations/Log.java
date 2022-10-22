@@ -57,10 +57,6 @@ public @interface Log {
 		JUL,
 		/**
 		 * Uses {@link java.lang.System.Logger} as delegate.
-		 *
-		 * <p/>
-		 * <strong>Note:</strong> This will not report accurate positioning (i.e. source class and method) as the API does
-		 * not support it.
 		 */
 		SYSTEM
 	}
