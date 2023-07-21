@@ -96,6 +96,18 @@ public class LogProcessor extends AbstractProcessor {
 			format("Generating class for: %s.%s", pkg.getQualifiedName(), className),
 			type);
 
+		var log = type.getAnnotation(Log.class);
+		Class<?> logType;
+
+		if (log.type() == Type.JUL) {
+			logType = Logger.class;
+		} else if (log.type() == Type.SYSTEM) {
+			logType = java.lang.System.Logger.class;
+		} else {
+			processingEnv.getMessager().printMessage(ERROR, "Unknown type! [" + log.type() + "]", type);
+			return;
+		}
+
 		var constructor = MethodSpec.constructorBuilder()
 				.addModifiers(Modifier.PUBLIC)
 				.addParameter(String.class, "name")
@@ -107,7 +119,7 @@ public class LogProcessor extends AbstractProcessor {
 		var delegateMethod = MethodSpec.methodBuilder("delegate")
 				.addAnnotation(Override.class)
 				.addModifiers(PUBLIC, FINAL)
-				.returns(Logger.class)
+				.returns(logType)
 				.addStatement("return this.delegate")
 				.addJavadoc("@returns the delegate logger.")
 				.build();
@@ -119,9 +131,7 @@ public class LogProcessor extends AbstractProcessor {
 				.addJavadoc("@returns the annotation instance.")
 				.build();
 
-		var log = type.getAnnotation(Log.class);
 		Class<?> baseLogType;
-
 		if (log.type() == Type.JUL) {
 			baseLogType = BaseJulLog.class;
 		} else if (log.type() == Type.SYSTEM) {
@@ -145,7 +155,7 @@ public class LogProcessor extends AbstractProcessor {
 				.addMethod(delegateMethod)
 				.addField(String.class, "key", PUBLIC, FINAL)  // purposefully public
 				.addMethod(logMethod)
-				.addField(Logger.class, "delegate", PRIVATE, FINAL);
+				.addField(logType, "delegate", PRIVATE, FINAL);
 
 		methods(type).forEach(m -> processMethod(typeBuilder, m));
 

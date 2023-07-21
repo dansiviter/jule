@@ -1,4 +1,4 @@
-[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/dansiviter/jule/Build?style=flat-square)](https://github.com/dansiviter/jule/actions/workflows/build.yaml) [![Known Vulnerabilities](https://snyk.io/test/github/dansiviter/jule/badge.svg?style=flat-square)](https://snyk.io/test/github/dansiviter/jule) [![Sonar Coverage](https://img.shields.io/sonar/coverage/dansiviter_jule?server=https%3A%2F%2Fsonarcloud.io&style=flat-square)](https://sonarcloud.io/dashboard?id=dansiviter_jule) [![Maven Central](https://img.shields.io/maven-central/v/uk.dansiviter.jule/jule-project?style=flat-square)](https://search.maven.org/artifact/uk.dansiviter.jule/jule-project) ![Java 11+](https://img.shields.io/badge/-Java%2011%2B-informational?style=flat-square)
+[![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/dansiviter/jule/deploy.yaml)](https://github.com/dansiviter/jule/actions/workflows/build.yaml) [![Known Vulnerabilities](https://snyk.io/test/github/dansiviter/jule/badge.svg?style=flat-square)](https://snyk.io/test/github/dansiviter/jule) [![Sonar Coverage](https://img.shields.io/sonar/coverage/dansiviter_jule?server=https%3A%2F%2Fsonarcloud.io&style=flat-square)](https://sonarcloud.io/dashboard?id=dansiviter_jule) [![Maven Central](https://img.shields.io/maven-central/v/uk.dansiviter.jule/jule-project?style=flat-square)](https://search.maven.org/artifact/uk.dansiviter.jule/jule-project) ![Java 11+](https://img.shields.io/badge/-Java%2011%2B-informational?style=flat-square)
 
 
 # Java Util Logging Enhancer (JULE) #
@@ -44,10 +44,10 @@ package com.foo;
 
 @Log
 public interface MyLog {
-  @Message("Hello %s")  // <- defaults to `Info` level
+  @Message("Hello %s")  // Uses java.util.Formatter and defaults to `INFO` level
   void hello(String name);
 
-  @Message(value = "Oh no! %s", level = Level.ERROR)  // <- 'Error' level
+  @Message(value = "Oh no! %s", level =.ERROR)  // <- 'ERROR' level
   void error(String name, Throwable t);  // <- Throwables must be last parameter
 
   @Message("Hello %s")
@@ -79,16 +79,19 @@ public class MyClass {
 
 ## CDI ##
 
-This can perform automatic injection of dependencies via CDI:
+Simply create your own factory:
 
-```xml
-<dependency>
-  <groupId>uk.dansiviter.jule</groupId>
-  <artifactId>cdi</artifactId>
-  <version>${jule.version}</version>
-</dependency>
+```java
+@ApplicationScoped
+public class MyLogFactory {
+  @Produces @Dependent  // Always use dependent scope to prevent proxying
+  public static MyLog myLog(InjectionPoint ip) {
+    return LogProducer.log(MyLog.class, ip.getMember().getDeclaringClass());
+  }
+}
 ```
 
+Then just inject:
 ```java
 @ApplicationScoped
 public class MyClass {

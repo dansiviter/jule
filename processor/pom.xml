@@ -33,7 +33,7 @@
 		<dependency>
 			<groupId>com.google.testing.compile</groupId>
 			<artifactId>compile-testing</artifactId>
-			<version>0.19</version>
+			<version>0.21.0</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
@@ -55,7 +55,11 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration>
 					<argLine>
-						@{argLine} --add-opens jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED
+						@{argLine}
+						--add-opens jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED
+						--add-opens jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED
+						--add-opens jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED
+						--add-opens java.base/sun.util.logging=ALL-UNNAMED
 					</argLine>
 				</configuration>
 			</plugin>

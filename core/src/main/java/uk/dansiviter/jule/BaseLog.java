@@ -15,6 +15,7 @@
  */
 package uk.dansiviter.jule;
 
+import static java.lang.StackWalker.Option.RETAIN_CLASS_REFERENCE;
 import static java.lang.String.format;
 
 import java.util.Arrays;
@@ -128,5 +129,10 @@ public interface BaseLog<L> {
 			return optional.isPresent() ? optional.getAsDouble() : null;
 		}
 		return param;
+	}
+
+	default Optional<StackWalker.StackFrame> frame(int skip) {
+		var walker = StackWalker.getInstance(RETAIN_CLASS_REFERENCE);
+		return walker.walk(s -> s.skip(skip).findFirst());
 	}
 }

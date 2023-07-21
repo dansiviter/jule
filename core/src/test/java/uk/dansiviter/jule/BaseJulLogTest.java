@@ -18,8 +18,8 @@ package uk.dansiviter.jule;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.nullValue;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.hamcrest.Matchers.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -123,8 +123,10 @@ class BaseJulLogTest {
 		@SuppressWarnings("unchecked")
 		ArgumentCaptor<Supplier<String>> msgCaptor = ArgumentCaptor.forClass(Supplier.class);
 
-		verify(this.delegate).log(
+		verify(this.delegate).logp(
 			eq(java.util.logging.Level.FINE),
+			any(),
+			any(),
 			msgCaptor.capture());
 		assertThat(msgCaptor.getValue().get(), equalTo("hello world foo true 2 3 2.30 bar null 5 null 6 3.20"));
 	}
@@ -136,8 +138,10 @@ class BaseJulLogTest {
 		@SuppressWarnings("unchecked")
 		ArgumentCaptor<Supplier<String>> msgCaptor = ArgumentCaptor.forClass(Supplier.class);
 
-		verify(this.delegate).log(
+		verify(this.delegate).logp(
 			eq(java.util.logging.Level.FINE),
+			any(),
+			any(),
 			isA(IllegalStateException.class),
 			msgCaptor.capture());
 		assertThat(msgCaptor.getValue().get(), equalTo("hello"));

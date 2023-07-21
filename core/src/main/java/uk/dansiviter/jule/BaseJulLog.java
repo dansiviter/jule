@@ -24,7 +24,7 @@ import java.util.logging.Logger;
 import uk.dansiviter.jule.annotations.Message;
 
 /**
- *
+ * Base {@code java.util.Logger} implementation.
  */
 public interface BaseJulLog extends BaseLog<Logger> {
 	@Override
@@ -40,10 +40,12 @@ public interface BaseJulLog extends BaseLog<Logger> {
 
 	@Override
 	default void log(Message.Level level, Supplier<String> msg, Throwable thrown) {
+		var frame = frame(4).orElseThrow();
+
 		if (thrown != null) {
-			delegate().log(level(level), thrown, msg);
+			delegate().logp(level(level), frame.getClassName(), frame.getMethodName(), thrown, msg);
 		} else {
-			delegate().log(level(level), msg);
+			delegate().logp(level(level), frame.getClassName(), frame.getMethodName(), msg);
 		}
 	}
 
