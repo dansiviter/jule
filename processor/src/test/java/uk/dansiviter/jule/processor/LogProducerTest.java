@@ -46,6 +46,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.dansiviter.jule.LogProducer;
 import uk.dansiviter.jule.annotations.Log;
 import uk.dansiviter.jule.annotations.Message;
+import uk.dansiviter.jule.annotations.Log.Type;
 import uk.dansiviter.jule.annotations.Message.Level;
 
 /**
@@ -56,7 +57,8 @@ import uk.dansiviter.jule.annotations.Message.Level;
 class LogProducerTest {
 	private static Collection<Handler> HANDLERS;
 
-	private final MyLog log = LogProducer.log(MyLog.class);
+	private final MyJulLog log = LogProducer.log(MyJulLog.class);
+	private final MySysLog sysLog = LogProducer.log(MySysLog.class);
 
 	@BeforeAll
 	public static void beforeAll() {
@@ -67,13 +69,14 @@ class LogProducerTest {
 
 	@Test
 	void equivalence() {
-		assertSame(this.log, LogProducer.log(MyLog.class, LogProducerTest.class));
-		assertSame(LogProducer.log(MyLog.class, "foo"), LogProducer.log(MyLog.class, "foo"));
-		assertNotSame(this.log, LogProducer.log(MyLog.class, "foo"));
+		assertSame(this.log, LogProducer.log(MyJulLog.class, LogProducerTest.class));
+		assertSame(LogProducer.log(MyJulLog.class, "foo"), LogProducer.log(MyJulLog.class, "foo"));
+		assertNotSame(this.log, LogProducer.log(MyJulLog.class, "foo"));
 	}
 
 	@Test
-	void logInjected(@Mock Handler handler) {
+	void julLog(@Mock Handler handler) {
+		System.getLogger("foo").isLoggable(System.Logger.Level.ERROR);
 		Logger.getLogger("").addHandler(handler);
 
 		assertNotNull(log);
@@ -99,6 +102,8 @@ class LogProducerTest {
 		assertThat(record.getMessage(), is("Hello world!"));
 		assertThat(record.getParameters(), nullValue());
 		assertThat(record.getThrown(), nullValue());
+		assertThat(record.getSourceClassName(), is("uk.dansiviter.jule.processor.LogProducerTest"));
+		assertThat(record.getSourceMethodName(), is("julLog"));
 
 		record = records.next();
 		assertThat(record.getLevel(), is(java.util.logging.Level.SEVERE));
@@ -133,13 +138,31 @@ class LogProducerTest {
 		verifyNoMoreInteractions(handler);
 	}
 
+	@Test
+	void sysLog(@Mock Handler handler) {
+		System.getLogger("foo").isLoggable(System.Logger.Level.ERROR);
+		Logger.getLogger("").addHandler(handler);
+
+		assertNotNull(sysLog);
+		sysLog.doLog();
+
+		var recordCaptor = ArgumentCaptor.forClass(LogRecord.class);
+		verify(handler).publish(recordCaptor.capture());
+
+		var records = recordCaptor.getAllValues().iterator();
+		var record = records.next();
+		assertThat(record.getLevel(), is(java.util.logging.Level.INFO));
+		assertThat(record.getLoggerName(), is(getClass().getName()));
+		assertThat(record.getMessage(), is("Hello world!"));
+	}
+
 	interface MySuperLog {
-		@Message("Hello world!")
+		@Message(value = "Hello world!", level = Level.ERROR)
 		void doSuperLog();
 	}
 
 	@Log
-	interface MyLog extends MySuperLog {
+	interface MyJulLog extends MySuperLog {
 		@Message("Hello world!")
 		void doLog();
 
@@ -173,6 +196,12 @@ class LogProducerTest {
 		default void anotherMethods(String foo) {
 			throw new IllegalArgumentException();
 		}
+	}
+
+	@Log(type = Type.SYSTEM)
+	interface MySysLog extends MySuperLog {
+		@Message("Hello world!")
+		void doLog();
 	}
 
 	@AfterAll

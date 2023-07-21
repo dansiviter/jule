@@ -56,7 +56,7 @@ public @interface Log {
 		 */
 		JUL,
 		/**
-		 * Uses {@link java.lang.System.Logger} as delegate.
+		 * <strong>EXPERIMENTAL</strong> Uses {@link java.lang.System.Logger} as delegate.
 		 */
 		SYSTEM
 	}

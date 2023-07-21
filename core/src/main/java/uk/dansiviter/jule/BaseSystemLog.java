@@ -25,9 +25,14 @@ import java.util.function.Supplier;
 import uk.dansiviter.jule.annotations.Message;
 
 /**
- *
+ * Base {@code java.lang.System.Logger} implementation.
+ * <p>
+ * <strong>Note:</strong> This API has no mechanism for finding source class and method so will likely just state this
+ * class as the source.
  */
 public interface BaseSystemLog extends BaseLog<Logger> {
+
+
 	@Override
 	default Logger delegate(String name) {
 		var bundleName = log().resourceBundleName();
@@ -45,10 +50,12 @@ public interface BaseSystemLog extends BaseLog<Logger> {
 
 	@Override
 	default void log(Message.Level level, Supplier<String> msg, Throwable thrown) {
+		var frame = frame(4).orElseThrow();
+
 		if (thrown != null) {
-			delegate().log(level(level), msg, thrown);
+			PlatformLoggerUtil.logp(delegate(), level(level), frame.getClassName(), frame.getMethodName(), msg, thrown);
 		} else {
-			delegate().log(level(level), msg);
+			PlatformLoggerUtil.logp(delegate(), level(level), frame.getClassName(), frame.getMethodName(), msg);
 		}
 	}
 
