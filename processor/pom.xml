@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>uk.dansiviter.jule</groupId>
 		<artifactId>jule-project</artifactId>
-		<version>0.7.1-SNAPSHOT</version>
+		<version>0.7.1</version>
 	</parent>
 	<artifactId>jule-processor</artifactId>
 	<name>Annotation Processor</name>

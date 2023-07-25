@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>uk.dansiviter.jule</groupId>
 	<artifactId>jule-project</artifactId>
-	<version>0.7.1-SNAPSHOT</version>
+	<version>0.7.1</version>
 	<packaging>pom</packaging>
 	<name>Java Util Logger Enhancer (JULE)</name>
 	<description>Library to help simplfy and improve java.util.logger</description>
@@ -15,7 +15,7 @@
 		<developerConnection>scm:git:git@github.com:dansiviter/jule.git</developerConnection>
 		<connection>scm:git:git@github.com:dansiviter/jule.git</connection>
 		<url>https://github.com/dansiviter/jule</url>
-		<tag>jule-project-0.7.0</tag>
+		<tag>jule-project-0.7.1</tag>
 	</scm>
 
 	<licenses>
