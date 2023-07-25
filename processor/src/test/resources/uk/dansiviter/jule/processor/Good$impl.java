@@ -11,7 +11,8 @@ import uk.dansiviter.jule.annotations.Message;
 
 @Generated(
     value = "uk.dansiviter.jule.processor.LogProcessor",
-    comments = "https://jule.dansiviter.uk/"
+    comments = "https://jule.dansiviter.uk",
+    date = "2023-02-01T01:02:03.000004Z"
 )
 public final class Good$impl implements BaseJulLog, Good {
   private static final AtomicBoolean ONCE__foo = new AtomicBoolean();
@@ -29,16 +30,16 @@ public final class Good$impl implements BaseJulLog, Good {
   }
 
   /**
-   * @returns the delegate logger.
-   */
+    * @returns the delegate logger.
+    */
   @Override
   public final Logger delegate() {
     return this.delegate;
   }
 
   /**
-   * @returns the annotation instance.
-   */
+    * @returns the annotation instance.
+    */
   @Override
   public final Log log() {
     return this.log;

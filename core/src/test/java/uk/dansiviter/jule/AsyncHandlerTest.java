@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Daniel Siviter
+ * Copyright 2023 Daniel Siviter
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,15 +56,13 @@ class AsyncHandlerTest {
 		log.info("hello");
 		log.fine("hello");
 
-		handler.flush();
-
 		new Thread(() -> log.info("world")).start();
 
 		await().atMost(1, SECONDS).untilAsserted(() -> {
-				assertThat(handler.records, hasSize(2));
-				assertThat(handler.records.get(0).getMessage(), equalTo("hello"));
-				assertThat(handler.records.get(1).getMessage(), equalTo("world"));
-			});
+			assertThat(handler.records, hasSize(2));
+			assertThat(handler.records.get(0).getMessage(), equalTo("hello"));
+			assertThat(handler.records.get(1).getMessage(), equalTo("world"));
+		});
 	}
 
 	@Test
@@ -105,7 +103,7 @@ class AsyncHandlerTest {
 		}
 	}
 
-	private static class TestHandler extends AsyncHandler<LogRecord> {
+	private static class TestHandler extends AsyncHandler {
 		private final List<LogRecord> records = new Vector<>();
 
 		@Override
@@ -114,7 +112,7 @@ class AsyncHandlerTest {
 		}
 	}
 
-	private static class FailingHandler extends AsyncHandler<LogRecord> {
+	private static class FailingHandler extends AsyncHandler {
 		@Override
 		protected void doPublish(LogRecord record) {
 			throw new RuntimeException();

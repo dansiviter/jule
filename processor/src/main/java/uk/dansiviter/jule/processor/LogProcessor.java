@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Daniel Siviter
+ * Copyright 2023 Daniel Siviter
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,9 +25,11 @@ import static javax.tools.Diagnostic.Kind.NOTE;
 import static javax.tools.StandardLocation.CLASS_OUTPUT;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Supplier;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 
@@ -69,6 +71,19 @@ import uk.dansiviter.jule.annotations.Message.Level;
 @SupportedAnnotationTypes("uk.dansiviter.jule.annotations.Log")
 @SupportedSourceVersion(SourceVersion.RELEASE_11)
 public class LogProcessor extends AbstractProcessor {
+
+	private final Supplier<Instant> nowSupplier;
+
+	/**
+	 * Creates a new processor.
+	 */
+	public LogProcessor() {
+		this(Instant::now);
+	}
+
+	LogProcessor(Supplier<Instant> nowSupplier) {
+		this.nowSupplier = nowSupplier;
+	}
 
 	@Override
 	public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
@@ -145,8 +160,9 @@ public class LogProcessor extends AbstractProcessor {
 				.addModifiers(PUBLIC, FINAL)
 				.addAnnotation(AnnotationSpec
 					.builder(Generated.class)
-					.addMember("value", format("\"%s\"", getClass().getName()))
-					.addMember("comments", "\"https://jule.dansiviter.uk/\"")
+					.addMember("value", "$S", getClass().getName())
+					.addMember("comments", "$S", "https://jule.dansiviter.uk")
+					.addMember("date", "$S", this.nowSupplier.get().toString())
 					.build())
 				.addSuperinterface(baseLogType)
 				.addSuperinterface(typeMirror)

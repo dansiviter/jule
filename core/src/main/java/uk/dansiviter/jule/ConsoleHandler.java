@@ -15,14 +15,24 @@
  */
 package uk.dansiviter.jule;
 
+import java.util.logging.LogRecord;
+import java.util.logging.SimpleFormatter;
+import java.util.logging.StreamHandler;
+
 /**
- * Async implementation which simply delegates to {@link ConsoleHandler}.
+ * A improvement on {@link java.util.logging.ConsoleHandler} where uses {@code STDOUT}.
  */
-public class AsyncConsoleHandler extends AsyncStreamHandler<ConsoleHandler> {
+public class ConsoleHandler extends StreamHandler {
 	/**
-	 * Constructs an asynchronous {@code ConsoleHandlerExt}
+	 * Default constructor that uses permits setting of output.
 	 */
-	public AsyncConsoleHandler() {
-		super(new ConsoleHandler());
+	public ConsoleHandler() {
+		super(System.out, new SimpleFormatter());
+	}
+
+	@Override
+	public synchronized void publish(LogRecord record) {
+		super.publish(record);
+		flush();
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Daniel Siviter
+ * Copyright 2023 Daniel Siviter
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import java.util.logging.StreamHandler;
 /**
  * Async implementation of {@link StreamHandler} which simply delegates.
  */
-public abstract class AsyncStreamHandler<H extends StreamHandler> extends AsyncHandler<LogRecord> {
+public abstract class AsyncStreamHandler<H extends StreamHandler> extends AsyncHandler {
 	/** Delegate {@code StreamHandler} */
 	protected final H delegate;
 
@@ -57,12 +57,13 @@ public abstract class AsyncStreamHandler<H extends StreamHandler> extends AsyncH
 	}
 
 	@Override
-	public void flush() {
+	protected void doFlush() {
 		this.delegate.flush();
 	}
 
 	@Override
 	public void close() throws SecurityException {
+		super.close();
 		this.delegate.close();
 	}
 
