@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Daniel Siviter
+ * Copyright 2023 Daniel Siviter
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package uk.dansiviter.jule;
 
+import static java.nio.charset.Charset.defaultCharset;
 import static java.util.concurrent.ForkJoinPool.commonPool;
 import static java.util.logging.ErrorManager.GENERIC_FAILURE;
 import static java.util.logging.ErrorManager.OPEN_FAILURE;
@@ -60,9 +61,10 @@ import java.util.logging.SimpleFormatter;
  *        (defaults to {@link java.util.concurrent.Flow#defaultBufferSize()}). </li>
  * </ul>
  */
-public abstract class AsyncHandler<R> extends AbstractHandler {
-	private final Subscriber<R> subscriber = new LogSubscriber();
-	private final SubmissionPublisher<R> publisher;
+public abstract class AsyncHandler extends AbstractHandler {
+	private static final LogRecord FLUSH = new LogRecord(Level.OFF, "flush");
+	private final Subscriber<LogRecord> subscriber = new LogSubscriber();
+	private final SubmissionPublisher<LogRecord> publisher;
 	/** Closed status */
 	protected final AtomicBoolean closed = new AtomicBoolean();
 
@@ -101,15 +103,19 @@ public abstract class AsyncHandler<R> extends AbstractHandler {
 		this.publisher.submit(transform(r));
 	}
 
+	@Override
+	public void flush() {
+		this.publisher.submit(FLUSH);
+	}
+
 	/**
 	 * Perform any pre-flight transformation of this record. This will be called on the log calling thread.
 	 *
 	 * @param r the record to transform.
 	 * @return the transformed record.
 	 */
-	@SuppressWarnings("unchecked")
-	protected R transform(LogRecord r) {
-		return (R) r;
+	protected LogRecord transform(LogRecord r) {
+		return r;
 	}
 
 	/**
@@ -117,7 +123,12 @@ public abstract class AsyncHandler<R> extends AbstractHandler {
 	 *
 	 * @param r the log record to process.
 	 */
-	protected abstract void doPublish(R r);
+	protected abstract void doPublish(LogRecord r);
+
+	/**
+	 * This will be called asynchronously.
+	 */
+	protected void doFlush() { }
 
 	/**
 	 * @return {@code true} if closed.
@@ -140,7 +151,7 @@ public abstract class AsyncHandler<R> extends AbstractHandler {
 	/**
 	 *
 	 */
-	private class LogSubscriber implements Subscriber<R> {
+	private class LogSubscriber implements Subscriber<LogRecord> {
 		private Subscription subscription;
 
 		@Override
@@ -150,13 +161,18 @@ public abstract class AsyncHandler<R> extends AbstractHandler {
 		}
 
 		@Override
-		public void onNext(R item) {
+		public void onNext(LogRecord item) {
 			try {
+				if (item == FLUSH) {
+					doFlush();
+				}
+
 				doPublish(item);
 			} catch (RuntimeException e) {
 				getErrorManager().error(e.getMessage(), e, WRITE_FAILURE);
+			} finally {
+				this.subscription.request(1);
 			}
-			this.subscription.request(1);
 		}
 
 		@Override

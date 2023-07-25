@@ -4,7 +4,7 @@ import uk.dansiviter.jule.annotations.Log;
 import uk.dansiviter.jule.annotations.Message;
 
 @Log
-interface Foo {
+interface Bad {
 	@Message("")
   void empty();
 

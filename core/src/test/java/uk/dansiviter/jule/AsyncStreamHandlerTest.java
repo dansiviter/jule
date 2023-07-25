@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Daniel Siviter
+ * Copyright 2023 Daniel Siviter
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ package uk.dansiviter.jule;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.endsWith;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 
@@ -62,7 +63,7 @@ class AsyncStreamHandlerTest {
 
 		handler.flush();
 
-		verify(delegate).flush();
+		verify(delegate, timeout(500)).flush();
 	}
 
 	@Test
@@ -70,6 +71,7 @@ class AsyncStreamHandlerTest {
 		var handler = new AsyncStreamHandler<>(delegate) { };
 
 		handler.close();
+		assertTrue(handler.isClosed());
 
 		verify(delegate).close();
 	}

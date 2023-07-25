@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Daniel Siviter
+ * Copyright 2023 Daniel Siviter
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,8 @@ package uk.dansiviter.jule.processor;
 import static com.google.testing.compile.CompilationSubject.assertThat;
 import static com.google.testing.compile.Compiler.javac;
 
+import java.time.Instant;
+
 import com.google.testing.compile.Compilation;
 import com.google.testing.compile.JavaFileObjects;
 
@@ -29,8 +31,9 @@ import org.junit.jupiter.api.Test;
 class LogProcessorTest {
 	@Test
 	void process() {
+		var instant = Instant.parse("2023-02-01T01:02:03.000004Z");
 		Compilation compilation = javac()
-			.withProcessors(new LogProcessor())
+			.withProcessors(new LogProcessor(() -> instant))
 			.compile(JavaFileObjects.forResource("uk/dansiviter/jule/processor/Good.java"));
 		assertThat(compilation).succeeded();
 		assertThat(compilation).hadNoteContaining("Generating class for: uk.dansiviter.jule.processor.Good");
