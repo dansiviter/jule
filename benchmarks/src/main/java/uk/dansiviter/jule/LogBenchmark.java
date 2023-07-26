@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Daniel Siviter
+ * Copyright 2023 Daniel Siviter
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ public class LogBenchmark {
 
 		@Setup
 		public void setup() {
-			log = LogProducer.log(BenchmarkLog.class, LogBenchmark.class);
+			log = LogFactory.log(BenchmarkLog.class, LogBenchmark.class);
 		}
 	}
 

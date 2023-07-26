@@ -15,7 +15,6 @@
  */
 package uk.dansiviter.jule;
 
-import static java.nio.charset.Charset.defaultCharset;
 import static java.util.concurrent.ForkJoinPool.commonPool;
 import static java.util.logging.ErrorManager.GENERIC_FAILURE;
 import static java.util.logging.ErrorManager.OPEN_FAILURE;

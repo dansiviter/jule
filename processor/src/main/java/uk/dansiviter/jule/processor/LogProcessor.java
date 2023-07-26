@@ -46,8 +46,10 @@ import javax.lang.model.element.Modifier;
 import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
-import javax.lang.model.type.TypeMirror;
 
+import jakarta.enterprise.context.Dependent;
+import jakarta.enterprise.inject.spi.InjectionPoint;
+import jakarta.inject.Inject;
 import jakarta.json.Json;
 
 import com.squareup.javapoet.AnnotationSpec;
@@ -59,10 +61,11 @@ import com.squareup.javapoet.TypeSpec;
 
 import uk.dansiviter.jule.BaseJulLog;
 import uk.dansiviter.jule.BaseSystemLog;
-import uk.dansiviter.jule.LogProducer;
+import uk.dansiviter.jule.LogFactory;
 import uk.dansiviter.jule.annotations.Log;
-import uk.dansiviter.jule.annotations.Message;
+import uk.dansiviter.jule.annotations.Log.Lifecycle;
 import uk.dansiviter.jule.annotations.Log.Type;
+import uk.dansiviter.jule.annotations.Message;
 import uk.dansiviter.jule.annotations.Message.Level;
 
 /**
@@ -93,16 +96,14 @@ public class LogProcessor extends AbstractProcessor {
 
 	private void process(TypeElement element) {
 		var pkg = this.processingEnv.getElementUtils().getPackageOf(element);
-		var type = element.asType();
 		var className = className(element);
-		var concreteName = className.concat(LogProducer.SUFFIX);
-		createConcrete(className, element, type, concreteName, pkg);
+		var concreteName = className.concat(LogFactory.SUFFIX);
+		createConcrete(className, element, concreteName, pkg);
 	}
 
 	private void createConcrete(
 		String className,
 		TypeElement type,
-		TypeMirror typeMirror,
 		String concreteName,
 		PackageElement pkg)
 	{
@@ -124,10 +125,10 @@ public class LogProcessor extends AbstractProcessor {
 		}
 
 		var constructor = MethodSpec.constructorBuilder()
-				.addModifiers(Modifier.PUBLIC)
+				.addModifiers(PUBLIC)
 				.addParameter(String.class, "name")
 				.addParameter(String.class, "key")
-				.addStatement("this.log = $T.class.getAnnotation($T.class)", typeMirror, Log.class)
+				.addStatement("this.log = $T.class.getAnnotation($T.class)", type, Log.class)
 				.addStatement("this.key = key")
 				.addStatement("this.delegate = delegate(name)")
 				.build();
@@ -165,13 +166,25 @@ public class LogProcessor extends AbstractProcessor {
 					.addMember("date", "$S", this.nowSupplier.get().toString())
 					.build())
 				.addSuperinterface(baseLogType)
-				.addSuperinterface(typeMirror)
+				.addSuperinterface(type.asType())
 				.addMethod(constructor)
 				.addField(Log.class, "log", PRIVATE, FINAL)
 				.addMethod(delegateMethod)
 				.addField(String.class, "key", PUBLIC, FINAL)  // purposefully public
 				.addMethod(logMethod)
 				.addField(logType, "delegate", PRIVATE, FINAL);
+
+		if (log.lifecycle() == Lifecycle.CDI) {
+			typeBuilder.addAnnotation(Dependent.class);
+
+			var cdiConstructor = MethodSpec.constructorBuilder()
+				.addModifiers(PUBLIC)
+				.addAnnotation(Inject.class)
+				.addParameter(InjectionPoint.class, "ip")
+				.addStatement("this(ip.getMember().getDeclaringClass().getName(), $S)", concreteName)
+				.build();
+			typeBuilder.addMethod(cdiConstructor);
+		}
 
 		methods(type).forEach(m -> processMethod(typeBuilder, m));
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Daniel Siviter
+ * Copyright 2023 Daniel Siviter
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -81,7 +81,11 @@ public interface BaseLog<L> {
 	}
 
 		var finalParams = params;
-		log(level, () -> format(msg, finalParams), thrown);
+		log(level, () -> this.render(msg, finalParams), thrown);
+	}
+
+	default String render(String msg, Object... params) {
+		return format(msg, params);
 	}
 
 	void log(Message.Level level, Supplier<String> msg, Throwable thrown);

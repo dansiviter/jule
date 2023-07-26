@@ -43,6 +43,19 @@ class LogProcessorTest {
 	}
 
 	@Test
+	void process_cdi() {
+		var instant = Instant.parse("2023-02-01T01:02:03.000004Z");
+		Compilation compilation = javac()
+			.withProcessors(new LogProcessor(() -> instant))
+			.compile(JavaFileObjects.forResource("uk/dansiviter/jule/processor/GoodCdi.java"));
+		assertThat(compilation).succeeded();
+		assertThat(compilation).hadNoteContaining("Generating class for: uk.dansiviter.jule.processor.Good");
+		assertThat(compilation)
+			.generatedSourceFile("uk/dansiviter/jule/processor/GoodCdi$impl")
+			.hasSourceEquivalentTo(JavaFileObjects.forResource("uk/dansiviter/jule/processor/GoodCdi$impl.java"));
+	}
+
+	@Test
 	void process_bad()
 	{
 		Compilation compilation =

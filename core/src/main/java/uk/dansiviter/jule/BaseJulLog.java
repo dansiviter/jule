@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Daniel Siviter
+ * Copyright 2023 Daniel Siviter
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package uk.dansiviter.jule;
 
+import static java.lang.String.format;
 import static java.util.logging.Logger.getLogger;
 
 import java.util.function.Supplier;
@@ -47,6 +48,12 @@ public interface BaseJulLog extends BaseLog<Logger> {
 		} else {
 			delegate().logp(level(level), frame.getClassName(), frame.getMethodName(), msg);
 		}
+	}
+
+	@Override
+	default String render(String msg, Object... params) {
+		var resourceBundle = delegate().getResourceBundle();
+		return format(resourceBundle != null ? resourceBundle.getString(msg) : msg, params);
 	}
 
 	private static Level level(Message.Level level) {

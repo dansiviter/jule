@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Daniel Siviter
+ * Copyright 2023 Daniel Siviter
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,6 +50,15 @@ public @interface Log {
 	 */
 	Type type() default Type.JUL;
 
+	/**
+	 * @return the lifecycle management of the logger.
+	 */
+	Lifecycle lifecycle() default Lifecycle.DEFAULT;
+
+
+	/**
+	 * Type of underlying delegate logger.
+	 */
 	public enum Type {
 		/**
 		 * Uses {@link java.util.logging.Logger} as delegate.
@@ -59,5 +68,19 @@ public @interface Log {
 		 * <strong>EXPERIMENTAL</strong> Uses {@link java.lang.System.Logger} as delegate.
 		 */
 		SYSTEM
+	}
+
+	/**
+	 * Type of lifecycle for the logger.
+	 */
+	public enum Lifecycle {
+		/**
+		 * Logger can be accessed via {@code LogFactory#log(...)} methods.
+		 */
+		DEFAULT,
+		/**
+		 * In addition to {@link #DEFAULT} logger lifecycle will be managed by CDI as a {@link Dependent}
+		 */
+		CDI
 	}
 }

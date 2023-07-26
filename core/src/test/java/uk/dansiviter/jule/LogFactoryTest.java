@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Daniel Siviter
+ * Copyright 2023 Daniel Siviter
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,39 +24,39 @@ import org.junit.jupiter.api.Test;
 import uk.dansiviter.jule.annotations.Log;
 
 /**
- * Tests for {@link LogProducer}.
+ * Tests for {@link LogFactory}.
  * <p>
  * Note, it's not possible to test much of the functionality in this project. See tests in {@code ../processor} module.
  */
-class LogProducerTest {
+class LogFactoryTest {
 	@Test
 	void log() {
-		var log = (MyLog$impl) LogProducer.log(MyLog.class);
-		assertThat("uk.dansiviter.jule.LogProducerTest", equalTo(log.name));
+		var log = (MyLog$impl) LogFactory.log(MyLog.class);
+		assertThat("uk.dansiviter.jule.LogFactoryTest", equalTo(log.name));
 	}
 
 	@Test
 	void log_class() {
-		var log = (MyLog$impl) LogProducer.log(MyLog.class, String.class);
+		var log = (MyLog$impl) LogFactory.log(MyLog.class, String.class);
 		assertThat("java.lang.String", equalTo(log.name));
 	}
 
 	@Test
 	void log_name() {
-		var log = (MyLog$impl) LogProducer.log(MyLog.class, "foo");
+		var log = (MyLog$impl) LogFactory.log(MyLog.class, "foo");
 		assertThat("foo", equalTo(log.name));
 	}
 
 	@Test
 	void log_noAnnotation() {
-		var e = assertThrows(IllegalArgumentException.class, () -> LogProducer.log(NoAnnotation.class));
-		assertThat("@Log annotation not present! [uk.dansiviter.jule.LogProducerTest$NoAnnotation]", equalTo(e.getMessage()));
+		var e = assertThrows(IllegalArgumentException.class, () -> LogFactory.log(NoAnnotation.class));
+		assertThat("@Log annotation not present! [uk.dansiviter.jule.LogFactoryTest$NoAnnotation]", equalTo(e.getMessage()));
 	}
 
 	@Test
 	void log_classNotFound() {
-		var e = assertThrows(IllegalStateException.class, () -> LogProducer.log(NoImplemenatation.class));
-		assertThat("Unable to instantiate class! [uk.dansiviter.jule.LogProducerTest$NoImplemenatation$impl]", equalTo(e.getMessage()));
+		var e = assertThrows(IllegalStateException.class, () -> LogFactory.log(NoImplemenatation.class));
+		assertThat("Unable to instantiate class! [uk.dansiviter.jule.LogFactoryTest$NoImplemenatation$impl]", equalTo(e.getMessage()));
 	}
 
 

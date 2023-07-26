@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Daniel Siviter
+ * Copyright 2023 Daniel Siviter
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ import uk.dansiviter.jule.annotations.Log;
 /**
  * This class provides instances of the log wrappers.
  */
-public enum LogProducer { ;
+public enum LogFactory { ;
 	private static final Map<String, ? super Object> LOGS = new WeakHashMap<>();
 	public static final String SUFFIX = "$impl";
 
@@ -60,7 +60,7 @@ public enum LogProducer { ;
 	 *
 	 * @param <L>  the log type.
 	 * @param logClass  the log class type.
-	 * @param name the log ename.
+	 * @param name the log name.
 	 * @return log instance. This may come from a cache of instances.
 	 */
 	public static <L> L log(Class<L> logClass, String name) {

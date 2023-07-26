@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Daniel Siviter
+ * Copyright 2023 Daniel Siviter
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,22 +43,22 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import uk.dansiviter.jule.LogProducer;
+import uk.dansiviter.jule.LogFactory;
 import uk.dansiviter.jule.annotations.Log;
 import uk.dansiviter.jule.annotations.Message;
 import uk.dansiviter.jule.annotations.Log.Type;
 import uk.dansiviter.jule.annotations.Message.Level;
 
 /**
- * Unit test for {@link LogProducer}. This has to be in a different project as
+ * Unit test for {@link LogFactory}. This has to be in a different project as
  * the generated classes are here.
  */
 @ExtendWith(MockitoExtension.class)
-class LogProducerTest {
+class LogFactoryTest {
 	private static Collection<Handler> HANDLERS;
 
-	private final MyJulLog log = LogProducer.log(MyJulLog.class);
-	private final MySysLog sysLog = LogProducer.log(MySysLog.class);
+	private final MyJulLog log = LogFactory.log(MyJulLog.class);
+	private final MySysLog sysLog = LogFactory.log(MySysLog.class);
 
 	@BeforeAll
 	public static void beforeAll() {
@@ -69,9 +69,9 @@ class LogProducerTest {
 
 	@Test
 	void equivalence() {
-		assertSame(this.log, LogProducer.log(MyJulLog.class, LogProducerTest.class));
-		assertSame(LogProducer.log(MyJulLog.class, "foo"), LogProducer.log(MyJulLog.class, "foo"));
-		assertNotSame(this.log, LogProducer.log(MyJulLog.class, "foo"));
+		assertSame(this.log, LogFactory.log(MyJulLog.class, LogFactoryTest.class));
+		assertSame(LogFactory.log(MyJulLog.class, "foo"), LogFactory.log(MyJulLog.class, "foo"));
+		assertNotSame(this.log, LogFactory.log(MyJulLog.class, "foo"));
 	}
 
 	@Test
@@ -102,7 +102,7 @@ class LogProducerTest {
 		assertThat(record.getMessage(), is("Hello world!"));
 		assertThat(record.getParameters(), nullValue());
 		assertThat(record.getThrown(), nullValue());
-		assertThat(record.getSourceClassName(), is("uk.dansiviter.jule.processor.LogProducerTest"));
+		assertThat(record.getSourceClassName(), is("uk.dansiviter.jule.processor.LogFactoryTest"));
 		assertThat(record.getSourceMethodName(), is("julLog"));
 
 		record = records.next();
