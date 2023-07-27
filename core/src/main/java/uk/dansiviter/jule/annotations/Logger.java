@@ -38,7 +38,7 @@ import java.lang.annotation.Target;
  */
 @Target({ TYPE, FIELD })
 @Retention(RUNTIME)
-public @interface Log {
+public @interface Logger {
 	/**
 	 * @return the name of the resource bundle.
 	 * @see java.util.logging.Logger#setResourceBundle(java.util.ResourceBundle)

@@ -30,7 +30,6 @@ import java.util.ArrayList;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
-import java.util.logging.Logger;
 import java.util.stream.Stream;
 
 import javax.annotation.processing.AbstractProcessor;
@@ -42,7 +41,6 @@ import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.Modifier;
 import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
@@ -59,32 +57,32 @@ import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 
-import uk.dansiviter.jule.BaseJulLog;
+import uk.dansiviter.jule.BaseJulLogger;
 import uk.dansiviter.jule.BaseSystemLog;
-import uk.dansiviter.jule.LogFactory;
-import uk.dansiviter.jule.annotations.Log;
-import uk.dansiviter.jule.annotations.Log.Lifecycle;
-import uk.dansiviter.jule.annotations.Log.Type;
+import uk.dansiviter.jule.LoggerFactory;
+import uk.dansiviter.jule.annotations.Logger;
+import uk.dansiviter.jule.annotations.Logger.Lifecycle;
+import uk.dansiviter.jule.annotations.Logger.Type;
 import uk.dansiviter.jule.annotations.Message;
 import uk.dansiviter.jule.annotations.Message.Level;
 
 /**
- * Processes {@link Log} annotations.
+ * Processes {@link Logger} annotations.
  */
-@SupportedAnnotationTypes("uk.dansiviter.jule.annotations.Log")
+@SupportedAnnotationTypes("uk.dansiviter.jule.annotations.Logger")
 @SupportedSourceVersion(SourceVersion.RELEASE_11)
-public class LogProcessor extends AbstractProcessor {
+public class LoggerProcessor extends AbstractProcessor {
 
 	private final Supplier<Instant> nowSupplier;
 
 	/**
 	 * Creates a new processor.
 	 */
-	public LogProcessor() {
+	public LoggerProcessor() {
 		this(Instant::now);
 	}
 
-	LogProcessor(Supplier<Instant> nowSupplier) {
+	LoggerProcessor(Supplier<Instant> nowSupplier) {
 		this.nowSupplier = nowSupplier;
 	}
 
@@ -97,7 +95,7 @@ public class LogProcessor extends AbstractProcessor {
 	private void process(TypeElement element) {
 		var pkg = this.processingEnv.getElementUtils().getPackageOf(element);
 		var className = className(element);
-		var concreteName = className.concat(LogFactory.SUFFIX);
+		var concreteName = className.concat(LoggerFactory.SUFFIX);
 		createConcrete(className, element, concreteName, pkg);
 	}
 
@@ -112,11 +110,11 @@ public class LogProcessor extends AbstractProcessor {
 			format("Generating class for: %s.%s", pkg.getQualifiedName(), className),
 			type);
 
-		var log = type.getAnnotation(Log.class);
+		var log = type.getAnnotation(Logger.class);
 		Class<?> logType;
 
 		if (log.type() == Type.JUL) {
-			logType = Logger.class;
+			logType = java.util.logging.Logger.class;
 		} else if (log.type() == Type.SYSTEM) {
 			logType = java.lang.System.Logger.class;
 		} else {
@@ -127,9 +125,7 @@ public class LogProcessor extends AbstractProcessor {
 		var constructor = MethodSpec.constructorBuilder()
 				.addModifiers(PUBLIC)
 				.addParameter(String.class, "name")
-				.addParameter(String.class, "key")
-				.addStatement("this.log = $T.class.getAnnotation($T.class)", type, Log.class)
-				.addStatement("this.key = key")
+				.addStatement("this.logger = $T.class.getAnnotation($T.class)", type, Logger.class)
 				.addStatement("this.delegate = delegate(name)")
 				.build();
 		var delegateMethod = MethodSpec.methodBuilder("delegate")
@@ -139,17 +135,17 @@ public class LogProcessor extends AbstractProcessor {
 				.addStatement("return this.delegate")
 				.addJavadoc("@returns the delegate logger.")
 				.build();
-		var logMethod = MethodSpec.methodBuilder("log")
+		var logMethod = MethodSpec.methodBuilder("logger")
 				.addAnnotation(Override.class)
 				.addModifiers(PUBLIC, FINAL)
-				.returns(Log.class)
-				.addStatement("return this.log")
+				.returns(Logger.class)
+				.addStatement("return this.logger")
 				.addJavadoc("@returns the annotation instance.")
 				.build();
 
 		Class<?> baseLogType;
 		if (log.type() == Type.JUL) {
-			baseLogType = BaseJulLog.class;
+			baseLogType = BaseJulLogger.class;
 		} else if (log.type() == Type.SYSTEM) {
 			baseLogType = BaseSystemLog.class;
 		} else {
@@ -166,25 +162,15 @@ public class LogProcessor extends AbstractProcessor {
 					.addMember("date", "$S", this.nowSupplier.get().toString())
 					.build())
 				.addSuperinterface(baseLogType)
-				.addSuperinterface(type.asType())
-				.addMethod(constructor)
-				.addField(Log.class, "log", PRIVATE, FINAL)
-				.addMethod(delegateMethod)
-				.addField(String.class, "key", PUBLIC, FINAL)  // purposefully public
+				.addSuperinterface(type.asType());
+
+		cdiConstructor(typeBuilder, log);
+
+		typeBuilder.addMethod(constructor)
+				.addField(Logger.class, "logger", PRIVATE, FINAL)
 				.addMethod(logMethod)
-				.addField(logType, "delegate", PRIVATE, FINAL);
-
-		if (log.lifecycle() == Lifecycle.CDI) {
-			typeBuilder.addAnnotation(Dependent.class);
-
-			var cdiConstructor = MethodSpec.constructorBuilder()
-				.addModifiers(PUBLIC)
-				.addAnnotation(Inject.class)
-				.addParameter(InjectionPoint.class, "ip")
-				.addStatement("this(ip.getMember().getDeclaringClass().getName(), $S)", concreteName)
-				.build();
-			typeBuilder.addMethod(cdiConstructor);
-		}
+				.addField(logType, "delegate", PRIVATE, FINAL)
+				.addMethod(delegateMethod);
 
 		methods(type).forEach(m -> processMethod(typeBuilder, m));
 
@@ -212,6 +198,22 @@ public class LogProcessor extends AbstractProcessor {
 		} catch (IOException e) {
 				processingEnv.getMessager().printMessage(ERROR, e.getMessage(), type);
 		}
+	}
+
+	private void cdiConstructor(TypeSpec.Builder builder, Logger log) {
+		if (log.lifecycle() != Lifecycle.CDI) {
+			return;
+		}
+
+		builder.addAnnotation(Dependent.class);
+
+		var cdiConstructor = MethodSpec.constructorBuilder()
+			.addModifiers(PUBLIC)
+			.addAnnotation(Inject.class)
+			.addParameter(InjectionPoint.class, "ip")
+			.addStatement("this(ip.getMember().getDeclaringClass().getName())")
+			.build();
+		builder.addMethod(cdiConstructor);
 	}
 
 	private Stream<? extends ExecutableElement> methods(TypeElement type) {

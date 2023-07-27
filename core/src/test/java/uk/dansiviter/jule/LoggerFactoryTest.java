@@ -21,63 +21,61 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
 
-import uk.dansiviter.jule.annotations.Log;
+import uk.dansiviter.jule.annotations.Logger;
 
 /**
- * Tests for {@link LogFactory}.
+ * Tests for {@link LoggerFactory}.
  * <p>
  * Note, it's not possible to test much of the functionality in this project. See tests in {@code ../processor} module.
  */
-class LogFactoryTest {
+class LoggerFactoryTest {
 	@Test
 	void log() {
-		var log = (MyLog$impl) LogFactory.log(MyLog.class);
-		assertThat("uk.dansiviter.jule.LogFactoryTest", equalTo(log.name));
+		var log = (MyLogImpl) LoggerFactory.log(MyLog.class);
+		assertThat("uk.dansiviter.jule.LoggerFactoryTest", equalTo(log.name));
 	}
 
 	@Test
 	void log_class() {
-		var log = (MyLog$impl) LogFactory.log(MyLog.class, String.class);
+		var log = (MyLogImpl) LoggerFactory.log(MyLog.class, String.class);
 		assertThat("java.lang.String", equalTo(log.name));
 	}
 
 	@Test
 	void log_name() {
-		var log = (MyLog$impl) LogFactory.log(MyLog.class, "foo");
+		var log = (MyLogImpl) LoggerFactory.log(MyLog.class, "foo");
 		assertThat("foo", equalTo(log.name));
 	}
 
 	@Test
 	void log_noAnnotation() {
-		var e = assertThrows(IllegalArgumentException.class, () -> LogFactory.log(NoAnnotation.class));
-		assertThat("@Log annotation not present! [uk.dansiviter.jule.LogFactoryTest$NoAnnotation]", equalTo(e.getMessage()));
+		var e = assertThrows(IllegalArgumentException.class, () -> LoggerFactory.log(NoAnnotation.class));
+		assertThat("@Logger annotation not present! [uk.dansiviter.jule.LoggerFactoryTest$NoAnnotation]", equalTo(e.getMessage()));
 	}
 
 	@Test
 	void log_classNotFound() {
-		var e = assertThrows(IllegalStateException.class, () -> LogFactory.log(NoImplemenatation.class));
-		assertThat("Unable to instantiate class! [uk.dansiviter.jule.LogFactoryTest$NoImplemenatation$impl]", equalTo(e.getMessage()));
+		var e = assertThrows(IllegalStateException.class, () -> LoggerFactory.log(NoImplemenatation.class));
+		assertThat("Unable to instantiate class! [uk.dansiviter.jule.LoggerFactoryTest$NoImplemenatationImpl]", equalTo(e.getMessage()));
 	}
 
 
 	// --- Internal Classes ---
 
-	@Log
+	@Logger
 	interface MyLog { }
 
 	/**
 	 * This would normally be auto-generated.
 	 */
-	public static class MyLog$impl implements MyLog {
+	public static class MyLogImpl implements MyLog {
 		final String name;
-		final String key;
-		MyLog$impl(String name, String key) {
+		MyLogImpl(String name) {
 			this.name = name;
-			this.key = key;
 		}
 	}
 
-	@Log
+	@Logger
 	interface NoImplemenatation { }
 
 	interface NoAnnotation { }

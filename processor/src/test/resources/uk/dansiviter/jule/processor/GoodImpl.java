@@ -3,46 +3,42 @@ package uk.dansiviter.jule.processor;
 import java.lang.Override;
 import java.lang.String;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.logging.Logger;
 import javax.annotation.processing.Generated;
-import uk.dansiviter.jule.BaseJulLog;
-import uk.dansiviter.jule.annotations.Log;
+import uk.dansiviter.jule.BaseJulLogger;
+import uk.dansiviter.jule.annotations.Logger;
 import uk.dansiviter.jule.annotations.Message;
 
 @Generated(
-    value = "uk.dansiviter.jule.processor.LogProcessor",
+    value = "uk.dansiviter.jule.processor.LoggerProcessor",
     comments = "https://jule.dansiviter.uk",
     date = "2023-02-01T01:02:03.000004Z"
 )
-public final class Good$impl implements BaseJulLog, Good {
+public final class GoodImpl implements BaseJulLogger, Good {
   private static final AtomicBoolean ONCE__foo = new AtomicBoolean();
 
-  private final Log log;
+  private final Logger logger;
 
-  public final String key;
+  private final java.util.logging.Logger delegate;
 
-  private final Logger delegate;
-
-  public Good$impl(String name, String key) {
-    this.log = Good.class.getAnnotation(Log.class);
-    this.key = key;
+  public GoodImpl(String name) {
+    this.logger = Good.class.getAnnotation(Logger.class);
     this.delegate = delegate(name);
   }
 
   /**
-    * @returns the delegate logger.
-    */
+   * @returns the annotation instance.
+   */
   @Override
-  public final Logger delegate() {
-    return this.delegate;
+  public final Logger logger() {
+    return this.logger;
   }
 
   /**
-    * @returns the annotation instance.
-    */
+   * @returns the delegate logger.
+   */
   @Override
-  public final Log log() {
-    return this.log;
+  public final java.util.logging.Logger delegate() {
+    return this.delegate;
   }
 
   @Override

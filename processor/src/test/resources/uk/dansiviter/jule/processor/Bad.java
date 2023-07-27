@@ -1,9 +1,9 @@
 package uk.dansiviter.jule.processor;
 
-import uk.dansiviter.jule.annotations.Log;
+import uk.dansiviter.jule.annotations.Logger;
 import uk.dansiviter.jule.annotations.Message;
 
-@Log
+@Logger
 interface Bad {
 	@Message("")
   void empty();

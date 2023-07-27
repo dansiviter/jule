@@ -29,22 +29,22 @@ import java.util.function.IntSupplier;
 import java.util.function.LongSupplier;
 import java.util.function.Supplier;
 
-import uk.dansiviter.jule.annotations.Log;
+import uk.dansiviter.jule.annotations.Logger;
 import uk.dansiviter.jule.annotations.Message;
 
 /**
  * Defines the base implementation of the logger interface.
  */
-public interface BaseLog<L> {
+public interface BaseLogger<L> {
 	/**
 	 * @return the delegate logger.
 	 */
 	L delegate();
 
 	/**
-	 * @return the {@link Log} instance.
+	 * @return the {@link Logger} instance.
 	 */
-	Log log();
+	Logger logger();
 
 	/**
 	 * Gets delegate logger instance.
@@ -72,7 +72,7 @@ public interface BaseLog<L> {
 	 */
 	default void logp(Message.Level level, String msg, Object... params) {
 		// isLoggable check will already be done
-		BaseLog.expand(params);
+		BaseLogger.expand(params);
 
 		Throwable thrown = null;
 		if (params.length > 0 && params[params.length - 1] instanceof Throwable) {

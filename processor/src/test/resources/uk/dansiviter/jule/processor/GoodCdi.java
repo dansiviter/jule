@@ -1,9 +1,8 @@
 package uk.dansiviter.jule.processor;
 
-import uk.dansiviter.jule.annotations.Log;
-import uk.dansiviter.jule.annotations.Message;
-import uk.dansiviter.jule.annotations.Log.Lifecycle;
+import uk.dansiviter.jule.annotations.Logger;
+import uk.dansiviter.jule.annotations.Logger.Lifecycle;
 
-@Log(lifecycle = Lifecycle.CDI)
+@Logger(lifecycle = Lifecycle.CDI)
 interface GoodCdi {
 }
