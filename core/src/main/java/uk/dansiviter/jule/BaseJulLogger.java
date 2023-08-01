@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Daniel Siviter
+ * Copyright 2023 Daniel Siviter
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package uk.dansiviter.jule;
 
+import static java.lang.String.format;
 import static java.util.logging.Logger.getLogger;
 
 import java.util.function.Supplier;
@@ -26,10 +27,10 @@ import uk.dansiviter.jule.annotations.Message;
 /**
  * Base {@code java.util.Logger} implementation.
  */
-public interface BaseJulLog extends BaseLog<Logger> {
+public interface BaseJulLogger extends BaseLogger<Logger> {
 	@Override
 	default Logger delegate(String name) {
-		var bundleName = log().resourceBundleName();
+		var bundleName = logger().resourceBundleName();
 		return getLogger(name, bundleName.isBlank() ? null : bundleName);
 	}
 
@@ -49,19 +50,26 @@ public interface BaseJulLog extends BaseLog<Logger> {
 		}
 	}
 
+	@Override
+	default String render(String msg, Object... params) {
+		var resourceBundle = delegate().getResourceBundle();
+		return format(resourceBundle != null ? resourceBundle.getString(msg) : msg, params);
+	}
+
 	private static Level level(Message.Level level) {
 		switch (level) {
 			case ERROR:
-			return Level.SEVERE;
+				return Level.SEVERE;
 			case WARN:
-			return Level.WARNING;
+				return Level.WARNING;
 			case INFO:
-			return Level.INFO;
+				return Level.INFO;
 			case DEBUG:
-			return Level.FINE;
+				return Level.FINE;
 			case TRACE:
-			return Level.FINER;
+				return Level.FINER;
+			default:
+				return Level.OFF;
 		}
-		throw new IllegalArgumentException("Unknown type! [" + level + "]");
 	}
 }

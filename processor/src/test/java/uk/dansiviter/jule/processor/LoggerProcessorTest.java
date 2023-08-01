@@ -26,28 +26,40 @@ import com.google.testing.compile.JavaFileObjects;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests for {@link LogProcessor}
+ * Tests for {@link LoggerProcessor}
  */
-class LogProcessorTest {
+class LoggerProcessorTest {
 	@Test
 	void process() {
 		var instant = Instant.parse("2023-02-01T01:02:03.000004Z");
 		Compilation compilation = javac()
-			.withProcessors(new LogProcessor(() -> instant))
+			.withProcessors(new LoggerProcessor(() -> instant))
 			.compile(JavaFileObjects.forResource("uk/dansiviter/jule/processor/Good.java"));
 		assertThat(compilation).succeeded();
 		assertThat(compilation).hadNoteContaining("Generating class for: uk.dansiviter.jule.processor.Good");
 		assertThat(compilation)
-			.generatedSourceFile("uk/dansiviter/jule/processor/Good$impl")
-			.hasSourceEquivalentTo(JavaFileObjects.forResource("uk/dansiviter/jule/processor/Good$impl.java"));
+			.generatedSourceFile("uk/dansiviter/jule/processor/GoodImpl")
+			.hasSourceEquivalentTo(JavaFileObjects.forResource("uk/dansiviter/jule/processor/GoodImpl.java"));
 	}
 
 	@Test
-	void process_bad()
-	{
+	void process_cdi() {
+		var instant = Instant.parse("2023-02-01T01:02:03.000004Z");
+		Compilation compilation = javac()
+			.withProcessors(new LoggerProcessor(() -> instant))
+			.compile(JavaFileObjects.forResource("uk/dansiviter/jule/processor/GoodCdi.java"));
+		assertThat(compilation).succeeded();
+		assertThat(compilation).hadNoteContaining("Generating class for: uk.dansiviter.jule.processor.GoodCdi");
+		assertThat(compilation)
+			.generatedSourceFile("uk/dansiviter/jule/processor/GoodCdiImpl")
+			.hasSourceEquivalentTo(JavaFileObjects.forResource("uk/dansiviter/jule/processor/GoodCdiImpl.java"));
+	}
+
+	@Test
+	void process_bad() {
 		Compilation compilation =
      javac()
-         .withProcessors(new LogProcessor())
+         .withProcessors(new LoggerProcessor())
 						.compile(JavaFileObjects.forResource("uk/dansiviter/jule/processor/Bad.java"));
 		assertThat(compilation).failed();
 		assertThat(compilation).hadErrorContaining("Message cannot be empty!");

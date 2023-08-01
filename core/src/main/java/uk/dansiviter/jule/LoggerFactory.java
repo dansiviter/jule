@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Daniel Siviter
+ * Copyright 2023 Daniel Siviter
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,14 +22,14 @@ import static java.util.Objects.requireNonNull;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-import uk.dansiviter.jule.annotations.Log;
+import uk.dansiviter.jule.annotations.Logger;
 
 /**
  * This class provides instances of the log wrappers.
  */
-public enum LogProducer { ;
+public enum LoggerFactory { ;
 	private static final Map<String, ? super Object> LOGS = new WeakHashMap<>();
-	public static final String SUFFIX = "$impl";
+	public static final String SUFFIX = "Impl";
 
 	/**
 	 * Return an instance of the given type. This will attempt to walk the stack
@@ -60,23 +60,23 @@ public enum LogProducer { ;
 	 *
 	 * @param <L>  the log type.
 	 * @param logClass  the log class type.
-	 * @param name the log ename.
+	 * @param name the log name.
 	 * @return log instance. This may come from a cache of instances.
 	 */
 	public static <L> L log(Class<L> logClass, String name) {
-		if (!logClass.isAnnotationPresent(Log.class)) {
-			throw new IllegalArgumentException(format("@Log annotation not present! [%s]", logClass.getName()));
+		if (!logClass.isAnnotationPresent(Logger.class)) {
+			throw new IllegalArgumentException(format("@Logger annotation not present! [%s]", logClass.getName()));
 		}
 		var key = key(logClass, name);
-		return logClass.cast(LOGS.computeIfAbsent(key, k -> create(key, logClass, name)));
+		return logClass.cast(LOGS.computeIfAbsent(key, k -> create(logClass, name)));
 	}
 
-	private static Object create(String key, Class<?> logClass, String name) {
+	private static Object create(Class<?> logClass, String name) {
 		var className = logClass.getName().concat(SUFFIX);
 		try {
 			return Class.forName(className, true, logClass.getClassLoader())
-				.getDeclaredConstructor(String.class, String.class)
-				.newInstance(name, key);
+				.getDeclaredConstructor(String.class)
+				.newInstance(name);
 		} catch (ReflectiveOperationException e) {
 			throw new IllegalStateException(format("Unable to instantiate class! [%s]", className), e);
 		}
@@ -90,7 +90,7 @@ public enum LogProducer { ;
 	 * @param name the log name.
 	 * @return the key.
 	 */
-	public static String key(Class<?> log, String name) {
+	private static String key(Class<?> log, String name) {
 		return format("%s-%s", log.getName(), requireNonNull(name)).intern();
 	}
 }

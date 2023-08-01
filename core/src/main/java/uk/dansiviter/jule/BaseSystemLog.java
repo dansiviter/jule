@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Daniel Siviter
+ * Copyright 2023 Daniel Siviter
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,12 +30,11 @@ import uk.dansiviter.jule.annotations.Message;
  * <strong>Note:</strong> This API has no mechanism for finding source class and method so will likely just state this
  * class as the source.
  */
-public interface BaseSystemLog extends BaseLog<Logger> {
-
+public interface BaseSystemLog extends BaseLogger<Logger> {
 
 	@Override
 	default Logger delegate(String name) {
-		var bundleName = log().resourceBundleName();
+		var bundleName = logger().resourceBundleName();
 		if (bundleName.isEmpty()) {
 			return getLogger(name);
 		}
@@ -62,16 +61,17 @@ public interface BaseSystemLog extends BaseLog<Logger> {
 	private static Level level(Message.Level level) {
 		switch (level) {
 			case ERROR:
-			return Level.ERROR;
+				return Level.ERROR;
 			case WARN:
-			return Level.WARNING;
+				return Level.WARNING;
 			case INFO:
-			return Level.INFO;
+				return Level.INFO;
 			case DEBUG:
-			return Level.DEBUG;
+				return Level.DEBUG;
 			case TRACE:
-			return Level.TRACE;
+				return Level.TRACE;
+			default:
+				return Level.OFF;
 		}
-		return Level.OFF;
 	}
 }

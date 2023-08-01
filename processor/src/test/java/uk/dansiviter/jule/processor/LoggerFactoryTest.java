@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Daniel Siviter
+ * Copyright 2023 Daniel Siviter
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,6 @@ import java.util.function.LongSupplier;
 import java.util.function.Supplier;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
-import java.util.logging.Logger;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -43,41 +42,41 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import uk.dansiviter.jule.LogProducer;
-import uk.dansiviter.jule.annotations.Log;
+import uk.dansiviter.jule.LoggerFactory;
+import uk.dansiviter.jule.annotations.Logger;
 import uk.dansiviter.jule.annotations.Message;
-import uk.dansiviter.jule.annotations.Log.Type;
+import uk.dansiviter.jule.annotations.Logger.Type;
 import uk.dansiviter.jule.annotations.Message.Level;
 
 /**
- * Unit test for {@link LogProducer}. This has to be in a different project as
+ * Unit test for {@link LoggerFactory}. This has to be in a different project as
  * the generated classes are here.
  */
 @ExtendWith(MockitoExtension.class)
-class LogProducerTest {
+class LoggerFactoryTest {
 	private static Collection<Handler> HANDLERS;
 
-	private final MyJulLog log = LogProducer.log(MyJulLog.class);
-	private final MySysLog sysLog = LogProducer.log(MySysLog.class);
+	private final MyJulLog log = LoggerFactory.log(MyJulLog.class);
+	private final MySysLog sysLog = LoggerFactory.log(MySysLog.class);
 
 	@BeforeAll
 	public static void beforeAll() {
-		var root = Logger.getLogger("");
+		var root = java.util.logging.Logger.getLogger("");
 		HANDLERS = Arrays.asList(root.getHandlers());
 		HANDLERS.forEach(root::removeHandler);
 	}
 
 	@Test
 	void equivalence() {
-		assertSame(this.log, LogProducer.log(MyJulLog.class, LogProducerTest.class));
-		assertSame(LogProducer.log(MyJulLog.class, "foo"), LogProducer.log(MyJulLog.class, "foo"));
-		assertNotSame(this.log, LogProducer.log(MyJulLog.class, "foo"));
+		assertSame(this.log, LoggerFactory.log(MyJulLog.class, LoggerFactoryTest.class));
+		assertSame(LoggerFactory.log(MyJulLog.class, "foo"), LoggerFactory.log(MyJulLog.class, "foo"));
+		assertNotSame(this.log, LoggerFactory.log(MyJulLog.class, "foo"));
 	}
 
 	@Test
 	void julLog(@Mock Handler handler) {
 		System.getLogger("foo").isLoggable(System.Logger.Level.ERROR);
-		Logger.getLogger("").addHandler(handler);
+		java.util.logging.Logger.getLogger("").addHandler(handler);
 
 		assertNotNull(log);
 		log.doLog();
@@ -102,7 +101,7 @@ class LogProducerTest {
 		assertThat(record.getMessage(), is("Hello world!"));
 		assertThat(record.getParameters(), nullValue());
 		assertThat(record.getThrown(), nullValue());
-		assertThat(record.getSourceClassName(), is("uk.dansiviter.jule.processor.LogProducerTest"));
+		assertThat(record.getSourceClassName(), is("uk.dansiviter.jule.processor.LoggerFactoryTest"));
 		assertThat(record.getSourceMethodName(), is("julLog"));
 
 		record = records.next();
@@ -141,7 +140,7 @@ class LogProducerTest {
 	@Test
 	void sysLog(@Mock Handler handler) {
 		System.getLogger("foo").isLoggable(System.Logger.Level.ERROR);
-		Logger.getLogger("").addHandler(handler);
+		java.util.logging.Logger.getLogger("").addHandler(handler);
 
 		assertNotNull(sysLog);
 		sysLog.doLog();
@@ -161,7 +160,7 @@ class LogProducerTest {
 		void doSuperLog();
 	}
 
-	@Log
+	@Logger
 	interface MyJulLog extends MySuperLog {
 		@Message("Hello world!")
 		void doLog();
@@ -198,7 +197,7 @@ class LogProducerTest {
 		}
 	}
 
-	@Log(type = Type.SYSTEM)
+	@Logger(type = Type.SYSTEM)
 	interface MySysLog extends MySuperLog {
 		@Message("Hello world!")
 		void doLog();
@@ -206,7 +205,7 @@ class LogProducerTest {
 
 	@AfterAll
 	public static void afterAll() {
-		var root = Logger.getLogger("");
+		var root = java.util.logging.Logger.getLogger("");
 		HANDLERS.forEach(root::addHandler);
 	}
 }

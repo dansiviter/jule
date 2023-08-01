@@ -42,7 +42,7 @@ Define a logger interface:
 package com.foo;
 ...
 
-@Log
+@Logger
 public interface MyLog {
   @Message("Hello %s")  // Uses java.util.Formatter and defaults to `INFO` level
   void hello(String name);
@@ -61,12 +61,12 @@ public interface MyLog {
 }
 ```
 
-This will generate a class `com.foo.MyLog$impl` which actually does the logging. For Maven this can be seen in the `target/generated-sources/annotations/` folder for reference.
+This will generate a class `com.foo.MyLogImpl` which actually does the logging. For Maven this can be seen in the `target/generated-sources/annotations/` folder for reference.
 
-To get an instance use `uk.dansiviter.jule.LogProducer`:
+To get an instance use `uk.dansiviter.jule.LogFactory`:
 ```java
 public class MyClass {
-  private final static MyLog LOG = LogProducer.log(MyLog.class);
+  private final static MyLog LOG = LogFactory.log(MyLog.class);
 
   public void myMethod() {
     LOG.hello("foo");
@@ -79,17 +79,16 @@ public class MyClass {
 
 ## CDI ##
 
-Simply create your own factory:
+If you wish for CDI to manage the logger and and make it available for injection, just use:
 
 ```java
-@ApplicationScoped
-public class MyLogFactory {
-  @Produces @Dependent  // Always use dependent scope to prevent proxying
-  public static MyLog myLog(InjectionPoint ip) {
-    return LogProducer.log(MyLog.class, ip.getMember().getDeclaringClass());
-  }
+@Logger(lifecycle = Lifecycle.CDI)
+interface MyLog {
+  ...
 }
 ```
+
+This will generage a `@Dependent` logger implementation.
 
 Then just inject:
 ```java
