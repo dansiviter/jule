@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Daniel Siviter
+ * Copyright 2023 Daniel Siviter
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,12 +17,13 @@ package uk.dansiviter.jule;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.lang.System.Logger;
 import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
@@ -40,62 +41,65 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import uk.dansiviter.jule.annotations.Log;
+import uk.dansiviter.jule.annotations.Logger;
 import uk.dansiviter.jule.annotations.Message.Level;
 
 /**
- * Tests for {@link BaseSystemLog}.
+ * Tests for {@link BaseJulLogger}.
  */
 @ExtendWith(MockitoExtension.class)
-class BaseSystemLogTest {
+class BaseJulLoggerTest {
 	@Mock
-	private Logger delegate;
+	private java.util.logging.Logger delegate;
 	@Mock
-	private Log log;
+	private Logger annotation;
 
-	private BaseSystemLog baseLog;
+	private BaseJulLogger baseLog;
 
 	@BeforeEach
 	void before() {
-		this.baseLog = new BaseSystemLog() {
+		this.baseLog = new BaseJulLogger() {
 			@Override
-			public Logger delegate() {
+			public java.util.logging.Logger delegate() {
 				return delegate;
 			}
 
 			@Override
-			public Log log() {
-				return log;
+			public Logger logger() {
+				return annotation;
 			}
 		};
 	}
 
 	@Test
 	void delegate() {
-		when(this.log.resourceBundleName()).thenReturn("");
+		when(this.annotation.resourceBundleName()).thenReturn("");
 
-		Logger logger = this.baseLog.delegate("BaseLogTest#delegate");
+		var logger = this.baseLog.delegate("BaseLogTest#delegate");
 
 		assertThat(logger.getName(), equalTo("BaseLogTest#delegate"));
-		verify(this.log).resourceBundleName();
+		assertThat(logger.getResourceBundleName(), nullValue());
+		verify(this.annotation).resourceBundleName();
 	}
 
 	@Test
 	void delegate_resourceBundle() {
-		when(this.log.resourceBundleName()).thenReturn(BaseJulLogTest.class.getName());
+		when(this.annotation.resourceBundleName()).thenReturn(BaseJulLoggerTest.class.getName());
 
-		Logger logger = this.baseLog.delegate("BaseLogTest#resourceBundle");
+		var logger = this.baseLog.delegate("BaseLogTest#resourceBundle");
 
 		assertThat(logger.getName(), equalTo("BaseLogTest#resourceBundle"));
+		assertThat(logger.getResourceBundleName(), equalTo(BaseJulLoggerTest.class.getName()));
+		assertThat(logger.getResourceBundle(), notNullValue());
 
-		verify(this.log).resourceBundleName();
+		verify(this.annotation).resourceBundleName();
 	}
 
 	@Test
 	void isLoggable() {
 		this.baseLog.isLoggable(Level.DEBUG);
 
-		verify(this.delegate).isLoggable(java.lang.System.Logger.Level.DEBUG);
+		verify(this.delegate).isLoggable(java.util.logging.Level.FINE);
 	}
 
 	@Test
@@ -118,8 +122,10 @@ class BaseSystemLogTest {
 		@SuppressWarnings("unchecked")
 		ArgumentCaptor<Supplier<String>> msgCaptor = ArgumentCaptor.forClass(Supplier.class);
 
-		verify(this.delegate).log(
-			eq(java.lang.System.Logger.Level.DEBUG),
+		verify(this.delegate).logp(
+			eq(java.util.logging.Level.FINE),
+			any(),
+			any(),
 			msgCaptor.capture());
 		assertThat(msgCaptor.getValue().get(), equalTo("hello world foo true 2 3 2.30 bar null 5 null 6 3.20"));
 	}
@@ -131,11 +137,12 @@ class BaseSystemLogTest {
 		@SuppressWarnings("unchecked")
 		ArgumentCaptor<Supplier<String>> msgCaptor = ArgumentCaptor.forClass(Supplier.class);
 
-		verify(this.delegate).log(
-			eq(java.lang.System.Logger.Level.DEBUG),
-			msgCaptor.capture(),
-			isA(IllegalStateException.class)
-			);
+		verify(this.delegate).logp(
+			eq(java.util.logging.Level.FINE),
+			any(),
+			any(),
+			isA(IllegalStateException.class),
+			msgCaptor.capture());
 		assertThat(msgCaptor.getValue().get(), equalTo("hello"));
   }
 }

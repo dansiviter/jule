@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Daniel Siviter
+ * Copyright 2023 Daniel Siviter
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,12 @@
  */
 package uk.dansiviter.jule;
 
-import java.util.logging.Logger;
-
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
 
-import uk.dansiviter.jule.annotations.Log;
+import uk.dansiviter.jule.annotations.Logger;
 import uk.dansiviter.jule.annotations.Message;
 import uk.dansiviter.jule.annotations.Message.Level;
 
@@ -33,17 +31,17 @@ public class LogBenchmark {
 
 		@Setup
 		public void setup() {
-			log = LogProducer.log(BenchmarkLog.class, LogBenchmark.class);
+			log = LoggerFactory.log(BenchmarkLog.class, LogBenchmark.class);
 		}
 	}
 
 	@State(Scope.Benchmark)
 	public static class LegacyState {
-		Logger log;
+		java.util.logging.Logger log;
 
 		@Setup
 		public void setup() {
-			log = Logger.getLogger(LogBenchmark.class.getSimpleName());
+			log = java.util.logging.Logger.getLogger(LogBenchmark.class.getSimpleName());
 		}
 	}
 
@@ -63,7 +61,7 @@ public class LogBenchmark {
 		}
 	}
 
-	@Log
+	@Logger
 	public interface BenchmarkLog {
 		@Message("Hello %d")
 		void hello(int i);
