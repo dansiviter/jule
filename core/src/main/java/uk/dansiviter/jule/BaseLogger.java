@@ -81,13 +81,27 @@ public interface BaseLogger<L> {
 	}
 
 		var finalParams = params;
-		log(level, () -> this.render(msg, finalParams), thrown);
+		log(level, () -> render(msg, finalParams), thrown);
 	}
 
+	/**
+	 * Renders the message. Default implementation uses {@link String#format(String, Object...)}.
+	 *
+	 * @param msg the message to render.
+	 * @param params the message params.
+	 * @return the rendered string.
+	 */
 	default String render(String msg, Object... params) {
 		return format(msg, params);
 	}
 
+	/**
+	 * Log a message.
+	 *
+	 * @param level the log level.
+	 * @param msg the message to supply.
+	 * @param thrown an exception.
+	 */
 	void log(Message.Level level, Supplier<String> msg, Throwable thrown);
 
 
