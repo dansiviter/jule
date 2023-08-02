@@ -15,7 +15,8 @@
  */
 package uk.dansiviter.jule;
 
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
+
 import java.util.Optional;
 import java.util.logging.Handler;
 import java.util.logging.LogManager;
@@ -24,10 +25,14 @@ import java.util.logging.LogManager;
  * Base {@link Handler} implementation.
  */
 public abstract class AbstractHandler extends Handler {
+	/** Log manager instance. */
 	protected final LogManager manager;
 
+	/**
+	 * Creates new handler.
+	 */
   protected AbstractHandler() {
-		this.manager = Objects.requireNonNull(LogManager.getLogManager());
+		this.manager = requireNonNull(LogManager.getLogManager());
 	}
 
 	@Override

@@ -79,7 +79,7 @@ public @interface Logger {
 		 */
 		DEFAULT,
 		/**
-		 * In addition to {@link #DEFAULT} logger lifecycle will be managed by CDI as a {@link Dependent}
+		 * In addition to {@link #DEFAULT} logger lifecycle will be managed by CDI as a {@code jakarta.enterprise.context.Dependent}
 		 */
 		CDI
 	}
