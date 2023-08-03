@@ -15,7 +15,8 @@
  */
 package uk.dansiviter.jule;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.logging.ErrorManager.WRITE_FAILURE;
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -29,7 +30,7 @@ import static org.mockito.Mockito.verify;
 import static uk.dansiviter.jule.JulUtil.newInstance;
 
 import java.util.List;
-import java.util.Vector;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.ErrorManager;
 import java.util.logging.Filter;
 import java.util.logging.LogRecord;
@@ -46,7 +47,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
  */
 @ExtendWith(MockitoExtension.class)
 class AsyncHandlerTest {
-	private final Logger log = Logger.getLogger("TEST");
+	private final Logger log = Logger.getLogger("AsyncHandler.class");
 
 	@Test
 	void doPublish() {
@@ -58,7 +59,7 @@ class AsyncHandlerTest {
 
 		new Thread(() -> log.info("world")).start();
 
-		await().atMost(1, SECONDS).untilAsserted(() -> {
+		await().atMost(150, MILLISECONDS).untilAsserted(() -> {
 			assertThat(handler.records, hasSize(2));
 			assertThat(handler.records.get(0).getMessage(), equalTo("hello"));
 			assertThat(handler.records.get(1).getMessage(), equalTo("world"));
@@ -74,7 +75,7 @@ class AsyncHandlerTest {
 		log.info("hello0");
 		log.info("hello1");
 
-		verify(em, timeout(250).times(2)).error(any(), any(), eq(ErrorManager.WRITE_FAILURE));
+		verify(em, timeout(250).times(2)).error(any(), any(), eq(WRITE_FAILURE));
 	}
 
 	@Test
@@ -104,7 +105,7 @@ class AsyncHandlerTest {
 	}
 
 	private static class TestHandler extends AsyncHandler {
-		private final List<LogRecord> records = new Vector<>();
+		private final List<LogRecord> records = new CopyOnWriteArrayList<>();
 
 		@Override
 		protected void doPublish(LogRecord record) {
