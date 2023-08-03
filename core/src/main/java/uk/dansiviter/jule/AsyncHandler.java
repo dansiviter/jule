@@ -15,12 +15,15 @@
  */
 package uk.dansiviter.jule;
 
-import static java.util.concurrent.ForkJoinPool.commonPool;
+import static java.util.concurrent.Executors.newSingleThreadExecutor;
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.logging.ErrorManager.CLOSE_FAILURE;
 import static java.util.logging.ErrorManager.GENERIC_FAILURE;
 import static java.util.logging.ErrorManager.OPEN_FAILURE;
 import static java.util.logging.ErrorManager.WRITE_FAILURE;
 
 import java.io.UnsupportedEncodingException;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Flow;
 import java.util.concurrent.Flow.Subscriber;
 import java.util.concurrent.Flow.Subscription;
@@ -67,6 +70,8 @@ public abstract class AsyncHandler extends AbstractHandler {
 	/** Closed status */
 	protected final AtomicBoolean closed = new AtomicBoolean();
 
+	private ExecutorService executorService;
+
 	/**
 	 * Create an asynchronous {@code Handler} and configure it based on {@code LogManager} configuration properties.
 	 */
@@ -81,12 +86,9 @@ public abstract class AsyncHandler extends AbstractHandler {
 		}
 
 		var maxBuffer = property("maxBuffer").map(Integer::parseInt).orElseGet(Flow::defaultBufferSize);
-		this.publisher = new SubmissionPublisher<>(commonPool(), maxBuffer);
+		this.publisher = new SubmissionPublisher<>(this.executorService = newSingleThreadExecutor(r -> new Thread(r, getClass().getSimpleName())), maxBuffer);
 		this.publisher.subscribe(this.subscriber);
 	}
-
-
-	// --- Static Methods ---
 
 	@Override
 	public void publish(LogRecord r) {
@@ -142,6 +144,22 @@ public abstract class AsyncHandler extends AbstractHandler {
 			throw new IllegalStateException("Already closed!");
 		}
 		this.publisher.close();
+		shutdown(this.executorService);
+	}
+
+	private void shutdown(ExecutorService executor) {
+		executor.shutdown();
+		try {
+			if (!executor.awaitTermination(5, SECONDS)) {
+				executor.shutdownNow();
+				if (!executor.awaitTermination(5, SECONDS)) {
+					getErrorManager().error("Executor did not terminate within timeout!", null, CLOSE_FAILURE);
+				}
+			}
+		} catch (InterruptedException ie) {
+			executor.shutdownNow();
+			Thread.currentThread().interrupt();
+    }
 	}
 
 

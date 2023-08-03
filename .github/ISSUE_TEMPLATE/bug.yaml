@@ -37,7 +37,7 @@ body:
   - type: textarea
     id: actual
     attributes:
-      label: What actually happen?
+      label: What actually happens?
       description: A description of what actually happened?
       placeholder: Oh, it was awful!
     validations:
