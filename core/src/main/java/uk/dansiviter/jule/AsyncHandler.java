@@ -28,7 +28,6 @@ import java.util.concurrent.Flow;
 import java.util.concurrent.Flow.Subscriber;
 import java.util.concurrent.Flow.Subscription;
 import java.util.concurrent.SubmissionPublisher;
-import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Filter;
 import java.util.logging.Formatter;
@@ -161,10 +160,6 @@ public abstract class AsyncHandler extends AbstractHandler {
 			executor.shutdownNow();
 			Thread.currentThread().interrupt();
     }
-	}
-
-	public ThreadFactory threadFactory() {
-		return ;
 	}
 
 
