@@ -16,6 +16,7 @@
 package uk.dansiviter.jule;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static java.util.logging.ErrorManager.WRITE_FAILURE;
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -31,11 +32,15 @@ import static uk.dansiviter.jule.JulUtil.newInstance;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.logging.ErrorManager;
 import java.util.logging.Filter;
+import java.util.logging.Handler;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -47,17 +52,25 @@ import org.mockito.junit.jupiter.MockitoExtension;
  */
 @ExtendWith(MockitoExtension.class)
 class AsyncHandlerTest {
-	private final Logger log = Logger.getLogger("AsyncHandler.class");
+	private static final ExecutorService EXECUTOR = Executors.newSingleThreadExecutor();
+	private static final Logger LOG;
+
+	static {
+		LOG = Logger.getLogger(AsyncHandlerTest.class.getName());
+		LOG.setUseParentHandlers(false);
+	}
+
+	private Handler handler;
 
 	@Test
 	void doPublish() {
 		var handler = new TestHandler();
-		log.addHandler(handler);
+		LOG.addHandler(this.handler = handler);
 
-		log.info("hello");
-		log.fine("hello");
+		LOG.info("hello");
+		LOG.fine("hello");
 
-		new Thread(() -> log.info("world")).start();
+		EXECUTOR.submit(() -> LOG.info("world"));
 
 		await().atMost(150, MILLISECONDS).untilAsserted(() -> {
 			assertThat(handler.records, hasSize(2));
@@ -70,23 +83,23 @@ class AsyncHandlerTest {
 	void doPublish_error(@Mock ErrorManager em) {
 		var handler = new FailingHandler();
 		handler.setErrorManager(em);
-		log.addHandler(handler);
+		LOG.addHandler(this.handler = handler);
 
-		log.info("hello0");
-		log.info("hello1");
+		LOG.info("hello0");
+		LOG.info("hello1");
 
-		verify(em, timeout(250).times(2)).error(any(), any(), eq(WRITE_FAILURE));
+		verify(em, timeout(150).times(2)).error(any(), any(), eq(WRITE_FAILURE));
 	}
 
 	@Test
 	void close() {
 		var handler = new TestHandler();
-		log.addHandler(handler);
+		LOG.addHandler(this.handler = handler);
 		assertThat(handler.isClosed(), equalTo(false));
 		handler.close();
 
 		assertThat(handler.isClosed(), equalTo(true));
-		assertThrows(IllegalStateException.class, () -> log.info("hello"));
+		assertThrows(IllegalStateException.class, () -> LOG.info("hello"));
 		assertThrows(IllegalStateException.class, () -> handler.close());
 	}
 
@@ -98,31 +111,34 @@ class AsyncHandlerTest {
 
 	@AfterEach
 	void after() {
-		// cleanup as potentially artifacts that live after each test run
-		for (var h : this.log.getHandlers()) {
-			this.log.removeHandler(h);
-		}
+		LOG.removeHandler(this.handler);
+	}
+
+	@AfterAll
+	static void afterAll() throws InterruptedException {
+		EXECUTOR.shutdown();
+		EXECUTOR.awaitTermination(1, SECONDS);
 	}
 
 	private static class TestHandler extends AsyncHandler {
 		private final List<LogRecord> records = new CopyOnWriteArrayList<>();
 
 		@Override
-		protected void doPublish(LogRecord record) {
-			records.add(record);
+		protected void doPublish(LogRecord r) {
+			records.add(r);
 		}
 	}
 
 	private static class FailingHandler extends AsyncHandler {
 		@Override
-		protected void doPublish(LogRecord record) {
+		protected void doPublish(LogRecord r) {
 			throw new RuntimeException();
 		}
 	}
 
 	static class NoopFilter implements Filter {
 		@Override
-		public boolean isLoggable(LogRecord record) {
+		public boolean isLoggable(LogRecord r) {
 			return false;
 		}
 	}
