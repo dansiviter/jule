@@ -116,7 +116,7 @@ class AsyncHandlerTest {
 	@AfterAll
 	static void afterAll() throws InterruptedException {
 		EXECUTOR.shutdown();
-		EXECUTOR.awaitTermination(1, SECONDS);
+		EXECUTOR.awaitTermination(250, MILLISECONDS);
 	}
 
 	private static class TestHandler extends AsyncHandler {
