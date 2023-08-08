@@ -16,7 +16,6 @@
 package uk.dansiviter.jule;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static java.util.concurrent.TimeUnit.SECONDS;
 import static java.util.logging.ErrorManager.WRITE_FAILURE;
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.MatcherAssert.assertThat;
