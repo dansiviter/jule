@@ -62,6 +62,8 @@ import java.util.logging.SimpleFormatter;
  *        specifies the maximum buffer size level for the handler
  *        (defaults to {@link java.util.concurrent.Flow#defaultBufferSize()}). </li>
  * </ul>
+ *
+ * @param <R> the record type to transform to.
  */
 public abstract class AsyncHandler<R> extends AbstractHandler {
 	private static final Object FLUSH = new Object();
