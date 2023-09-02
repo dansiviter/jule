@@ -24,7 +24,7 @@ import java.util.logging.StreamHandler;
 /**
  * Async implementation of {@link StreamHandler} which simply delegates.
  */
-public abstract class AsyncStreamHandler<H extends StreamHandler> extends AsyncHandler {
+public abstract class AsyncStreamHandler<H extends StreamHandler> extends AsyncHandler<LogRecord> {
 	/** Delegate {@code StreamHandler} */
 	protected final H delegate;
 

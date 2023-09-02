@@ -63,11 +63,12 @@ class AsyncHandlerTest {
 
 	@Test
 	void doPublish() {
-		var handler = new TestHandler();
+		var handler = new TestHandler<LogRecord>();
 		LOG.addHandler(this.handler = handler);
 
 		LOG.info("hello");
 		LOG.fine("hello");
+		handler.flush();
 
 		EXECUTOR.submit(() -> LOG.info("world"));
 
@@ -91,8 +92,21 @@ class AsyncHandlerTest {
 	}
 
 	@Test
+	void doPublish_transform() {
+		var handler = new FooRecordHandler();
+		LOG.addHandler(this.handler = handler);
+
+		LOG.info("hello");
+		handler.flush();  // verify flush() doesn't cause errors for transform
+
+		await().atMost(150, MILLISECONDS).untilAsserted(() -> {
+			assertThat(handler.records, hasSize(1));
+		});
+	}
+
+	@Test
 	void close() {
-		var handler = new TestHandler();
+		var handler = new TestHandler<LogRecord>();
 		LOG.addHandler(this.handler = handler);
 		assertThat(handler.isClosed(), equalTo(false));
 		handler.close();
@@ -119,21 +133,30 @@ class AsyncHandlerTest {
 		EXECUTOR.awaitTermination(250, MILLISECONDS);
 	}
 
-	private static class TestHandler extends AsyncHandler {
-		private final List<LogRecord> records = new CopyOnWriteArrayList<>();
+	private static class TestHandler<R> extends AsyncHandler<R> {
+		public final List<R> records = new CopyOnWriteArrayList<>();
 
 		@Override
-		protected void doPublish(LogRecord r) {
+		protected void doPublish(R r) {
 			records.add(r);
 		}
 	}
 
-	private static class FailingHandler extends AsyncHandler {
+	private static class FailingHandler extends AsyncHandler<LogRecord> {
 		@Override
 		protected void doPublish(LogRecord r) {
 			throw new RuntimeException();
 		}
 	}
+
+	private static class FooRecordHandler extends TestHandler<FooRecord> {
+		@Override
+		public FooRecord transform(LogRecord r) {
+			return new FooRecord();
+		}
+	}
+
+	static class FooRecord { }
 
 	static class NoopFilter implements Filter {
 		@Override

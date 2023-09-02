@@ -63,10 +63,10 @@ import java.util.logging.SimpleFormatter;
  *        (defaults to {@link java.util.concurrent.Flow#defaultBufferSize()}). </li>
  * </ul>
  */
-public abstract class AsyncHandler extends AbstractHandler {
-	private static final LogRecord FLUSH = new LogRecord(Level.OFF, "flush");
-	private final Subscriber<LogRecord> subscriber = new LogSubscriber();
-	private final SubmissionPublisher<LogRecord> publisher;
+public abstract class AsyncHandler<R> extends AbstractHandler {
+	private static final Object FLUSH = new Object();
+	private final Subscriber<R> subscriber = new LogSubscriber();
+	private final SubmissionPublisher<R> publisher;
 	/** Closed status */
 	protected final AtomicBoolean closed = new AtomicBoolean();
 
@@ -105,8 +105,9 @@ public abstract class AsyncHandler extends AbstractHandler {
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public void flush() {
-		this.publisher.submit(FLUSH);
+		this.publisher.submit((R) FLUSH);
 	}
 
 	/**
@@ -115,8 +116,9 @@ public abstract class AsyncHandler extends AbstractHandler {
 	 * @param r the record to transform.
 	 * @return the transformed record.
 	 */
-	protected LogRecord transform(LogRecord r) {
-		return r;
+	@SuppressWarnings("unchecked")
+	protected R transform(LogRecord r) {
+		return (R) r;
 	}
 
 	/**
@@ -124,7 +126,7 @@ public abstract class AsyncHandler extends AbstractHandler {
 	 *
 	 * @param r the log record to process.
 	 */
-	protected abstract void doPublish(LogRecord r);
+	protected abstract void doPublish(R r);
 
 	/**
 	 * This will be called asynchronously.
@@ -168,7 +170,7 @@ public abstract class AsyncHandler extends AbstractHandler {
 	/**
 	 *
 	 */
-	private class LogSubscriber implements Subscriber<LogRecord> {
+	private class LogSubscriber implements Subscriber<R> {
 		private Subscription subscription;
 
 		@Override
@@ -178,10 +180,11 @@ public abstract class AsyncHandler extends AbstractHandler {
 		}
 
 		@Override
-		public void onNext(LogRecord item) {
+		public void onNext(R item) {
 			try {
 				if (item == FLUSH) {
 					doFlush();
+					return;
 				}
 
 				doPublish(item);
