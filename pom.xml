@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>uk.dansiviter.jule</groupId>
 	<artifactId>jule-project</artifactId>
-	<version>0.8.1-SNAPSHOT</version>
+	<version>0.9.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>Java Util Logger Enhancer (JULE)</name>
 	<description>Library to help simplfy and improve java.util.logger</description>
@@ -34,7 +34,7 @@
 	</developers>
 
 	<properties>
-		<java.version>11</java.version>
+		<java.version>21</java.version>
 		<maven.compiler.release>${java.version}</maven.compiler.release>
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<maven.compiler.target>${java.version}</maven.compiler.target>
