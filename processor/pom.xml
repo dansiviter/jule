@@ -56,6 +56,9 @@
 						</configuration>
 					</execution>
 				</executions>
+				<configuration>
+					<proc>full</proc>
+				</configuration>
 			</plugin>
 			<plugin>
 				<artifactId>maven-surefire-plugin</artifactId>

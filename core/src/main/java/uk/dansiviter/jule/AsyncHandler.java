@@ -15,7 +15,7 @@
  */
 package uk.dansiviter.jule;
 
-import static java.util.concurrent.Executors.newSingleThreadExecutor;
+import static java.util.concurrent.Executors.newVirtualThreadPerTaskExecutor;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static java.util.logging.ErrorManager.CLOSE_FAILURE;
 import static java.util.logging.ErrorManager.GENERIC_FAILURE;
@@ -86,9 +86,8 @@ public abstract class AsyncHandler<R> extends AbstractHandler {
 		} catch (UnsupportedEncodingException e) {
 			getErrorManager().error(e.getMessage(), e, OPEN_FAILURE);
 		}
-
 		var maxBuffer = property("maxBuffer").map(Integer::parseInt).orElseGet(Flow::defaultBufferSize);
-		this.publisher = new SubmissionPublisher<>(this.executorService = newSingleThreadExecutor(r -> new Thread(r, getClass().getSimpleName())), maxBuffer);
+		this.publisher = new SubmissionPublisher<>(this.executorService = newVirtualThreadPerTaskExecutor(), maxBuffer);
 		this.publisher.subscribe(this.subscriber);
 	}
 
